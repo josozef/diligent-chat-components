@@ -6,10 +6,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import MicIcon from "@mui/icons-material/Mic";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import { TertiaryButton, TertiaryIconButton } from "../common";
-import {
-  atlasSemanticColor as color,
-  atlasSemanticRadius as radius,
-} from "../../tokens/atlasLight";
+import { useTokens } from "../../hooks/useTokens";
 
 interface ChatPromptProps {
   value: string;
@@ -31,6 +28,7 @@ export default function ChatPrompt({
   maxWidth = 640,
 }: ChatPromptProps) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const { color, radius, isDark } = useTokens();
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -38,6 +36,8 @@ export default function ChatPrompt({
       if (canSend) onSend();
     }
   };
+
+  const shadowColor = isDark ? "rgba(0, 0, 0, 0.3)" : "rgba(36, 38, 40, 0.07)";
 
   return (
     <Box sx={{ maxWidth, width: "100%", borderRadius: radius.lg }}>
@@ -50,7 +50,7 @@ export default function ChatPrompt({
           py: "8px",
           display: "flex",
           flexDirection: "column",
-          boxShadow: "0 1px 2px rgba(36, 38, 40, 0.06), 0 4px 14px rgba(36, 38, 40, 0.07)",
+          boxShadow: `0 1px 2px ${shadowColor}, 0 4px 14px ${shadowColor}`,
         }}
       >
         <InputBase

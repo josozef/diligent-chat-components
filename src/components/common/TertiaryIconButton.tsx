@@ -1,8 +1,5 @@
 import { IconButton } from "@mui/material";
-import {
-  atlasSemanticColor as color,
-  atlasSemanticRadius as radius,
-} from "../../tokens/atlasLight";
+import { useTokens } from "../../hooks/useTokens";
 
 export default function TertiaryIconButton({
   children,
@@ -15,6 +12,8 @@ export default function TertiaryIconButton({
   onClick?: () => void;
   ariaLabel: string;
 }) {
+  const { color, radius } = useTokens();
+
   return (
     <IconButton
       disabled={disabled}

@@ -1,8 +1,5 @@
 import { Box, Typography } from "@mui/material";
-import {
-  atlasSemanticColor as color,
-  atlasFontWeight as weight,
-} from "../../tokens/atlasLight";
+import { useTokens } from "../../hooks/useTokens";
 
 export default function TertiaryButton({
   label,
@@ -15,6 +12,8 @@ export default function TertiaryButton({
   trailingIcon?: React.ReactNode;
   onClick?: () => void;
 }) {
+  const { color, weight } = useTokens();
+
   return (
     <Box
       component="button"

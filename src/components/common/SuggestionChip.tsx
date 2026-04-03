@@ -1,9 +1,6 @@
 import { Box, Typography } from "@mui/material";
 import NorthEastIcon from "@mui/icons-material/NorthEast";
-import {
-  atlasSemanticColor as color,
-  atlasFontWeight as weight,
-} from "../../tokens/atlasLight";
+import { useTokens } from "../../hooks/useTokens";
 
 export default function SuggestionChip({
   label,
@@ -12,6 +9,8 @@ export default function SuggestionChip({
   label: string;
   onClick?: () => void;
 }) {
+  const { color, weight } = useTokens();
+
   return (
     <Box
       component="button"

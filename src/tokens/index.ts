@@ -1,7 +1,9 @@
 export {
   atlasCoreSpacing,
-  atlasFontWeight,
-  atlasSemanticColor,
   atlasSemanticRadius,
+  atlasFontWeight,
   atlasTypography,
-} from "./atlasLight.js";
+  atlasSemanticColor,
+} from "./atlasLight";
+
+export { atlasSemanticColorDark } from "./atlasDark";

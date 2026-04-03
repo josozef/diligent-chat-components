@@ -21,16 +21,26 @@ interface ProjectCardProps {
   icon: React.ReactNode;
   href?: string;
   comingSoon?: boolean;
+  openInNewTab?: boolean;
 }
 
-function ProjectCard({ title, description, icon, href, comingSoon }: ProjectCardProps) {
+function ProjectCard({ title, description, icon, href, comingSoon, openInNewTab }: ProjectCardProps) {
   const navigate = useNavigate();
+
+  const handleClick = () => {
+    if (comingSoon || !href) return;
+    if (openInNewTab) {
+      window.open(href, "_blank", "noopener,noreferrer");
+    } else {
+      navigate(href);
+    }
+  };
 
   return (
     <Box
       component={comingSoon ? "div" : "button"}
       type={comingSoon ? undefined : "button"}
-      onClick={comingSoon ? undefined : () => href && navigate(href)}
+      onClick={comingSoon ? undefined : handleClick}
       sx={{
         display: "flex",
         flexDirection: "column",
@@ -232,7 +242,8 @@ export default function HubPage() {
             title="Corporate secretary"
             description="Board meeting prep, filing deadlines, and entity management for the corporate secretary."
             icon={<DashboardOutlinedIcon sx={{ fontSize: 22 }} />}
-            comingSoon
+            href="/corpsec"
+            openInNewTab
           />
           <ProjectCard
             title="Board"
