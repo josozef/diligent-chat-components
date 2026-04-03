@@ -10,7 +10,8 @@ import { atlasSemanticColorDark } from "./tokens/atlasDark";
 
 const mdRadiusPx = Number.parseInt(atlasSemanticRadius.md.replace("px", ""), 10) || 8;
 
-type SemanticColors = typeof atlasSemanticColor;
+type DeepStringify<T> = { [K in keyof T]: T[K] extends string ? string : DeepStringify<T[K]> };
+type SemanticColors = DeepStringify<typeof atlasSemanticColor>;
 
 function buildTheme(mode: "light" | "dark", c: SemanticColors): Theme {
   return createTheme({
