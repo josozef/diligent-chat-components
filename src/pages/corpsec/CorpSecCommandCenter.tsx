@@ -133,16 +133,19 @@ function IncidentTile({
         {stats}
       </TradAtlasText>
 
-      {actionLabel && actionHref && (
+      {actionLabel && (
         <Button
           variant="contained"
           color="primary"
           size="medium"
-          component={RouterLink}
-          to={actionHref}
+          {...(actionHref
+            ? { component: RouterLink, to: actionHref }
+            : { component: "button" as const, type: "button" as const })}
           data-atlas-component="Button"
           data-atlas-variant="primary - md"
           sx={{
+            alignSelf: "flex-start",
+            width: "auto",
             ...semanticFontStyle(SF.actionLabelPrimary),
             textTransform: "none",
           }}
