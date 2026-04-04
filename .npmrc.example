@@ -1,0 +1,13 @@
+# Copy to `.npmrc` (or merge into your global npm config) so `@diligentcorp/*` resolves to your org registry.
+# The public npm registry does not host `@diligentcorp/atlas-react-bundle`; use your internal URL from Confluence / Atlas docs.
+#
+# Example — GitHub Packages (replace org and use a PAT with read:packages):
+# @diligentcorp:registry=https://npm.pkg.github.com
+# //npm.pkg.github.com/:_authToken=${NPM_TOKEN}
+#
+# Example — Artifactory / Azure Artifacts (replace host and path):
+# @diligentcorp:registry=https://your-org.jfrog.io/artifactory/api/npm/npm/
+#
+# Alternative: install from an HTTPS tarball (see `src/AGENTS.md`):
+# In package.json use:
+#   "@diligentcorp/atlas-react-bundle": "https://<host>/path/to/atlas-react-bundle-<version>.tgz"

@@ -1,19 +1,19 @@
 import { useNavigate } from "react-router";
-import { Box, Typography } from "@mui/material";
-import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
-import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined";
-import AccountTreeOutlinedIcon from "@mui/icons-material/AccountTreeOutlined";
-import PaletteOutlinedIcon from "@mui/icons-material/PaletteOutlined";
-import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
-import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
-import GavelOutlinedIcon from "@mui/icons-material/GavelOutlined";
-import FactCheckOutlinedIcon from "@mui/icons-material/FactCheckOutlined";
-import NorthEastIcon from "@mui/icons-material/NorthEast";
+import { Box } from "@mui/material";
 import {
-  atlasSemanticColor as color,
-  atlasSemanticRadius as radius,
-  atlasFontWeight as weight,
-} from "../tokens/atlasLight";
+  ChatBubbleOutlineIcon,
+  DashboardOutlinedIcon,
+  AccountTreeOutlinedIcon,
+  PaletteOutlinedIcon,
+  SecurityOutlinedIcon,
+  GroupsOutlinedIcon,
+  GavelOutlinedIcon,
+  FactCheckOutlinedIcon,
+  NorthEastIcon,
+} from "@/icons";
+import { atlasSemanticColor as color, atlasSemanticRadius as radius } from "../tokens/atlasLight";
+import TradAtlasText from "../components/common/TradAtlasText";
+import { SF } from "../tokens/tradAtlasSemanticTypography";
 
 interface ProjectCardProps {
   title: string;
@@ -77,45 +77,27 @@ function ProjectCard({ title, description, icon, href, comingSoon, openInNewTab 
           {icon}
         </Box>
         {comingSoon ? (
-          <Typography
+          <TradAtlasText
+            semanticFont={SF.textSmEmphasis}
             sx={{
-              fontSize: "12px",
-              lineHeight: "16px",
-              fontWeight: weight.semiBold,
               letterSpacing: "0.3px",
               color: color.type.muted,
               textTransform: "uppercase",
             }}
           >
             Coming soon
-          </Typography>
+          </TradAtlasText>
         ) : (
           <NorthEastIcon sx={{ fontSize: 16, color: color.type.muted }} />
         )}
       </Box>
       <Box>
-        <Typography
-          sx={{
-            fontSize: "16px",
-            lineHeight: "24px",
-            fontWeight: weight.semiBold,
-            letterSpacing: "0.2px",
-            color: color.type.default,
-            mb: "4px",
-          }}
-        >
+        <TradAtlasText semanticFont={SF.textLgEmphasis} sx={{ color: color.type.default, mb: "4px" }}>
           {title}
-        </Typography>
-        <Typography
-          sx={{
-            fontSize: "14px",
-            lineHeight: "20px",
-            letterSpacing: "0.2px",
-            color: color.type.muted,
-          }}
-        >
+        </TradAtlasText>
+        <TradAtlasText semanticFont={SF.textMd} sx={{ color: color.type.muted }}>
           {description}
-        </Typography>
+        </TradAtlasText>
       </Box>
     </Box>
   );
@@ -131,28 +113,19 @@ function Section({ title, subtitle, children }: SectionProps) {
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: "16px" }}>
       <Box>
-        <Typography
+        <TradAtlasText
+          semanticFont={SF.titleH4Emphasis}
           sx={{
-            fontSize: "18px",
-            lineHeight: "28px",
-            fontWeight: weight.semiBold,
             letterSpacing: "-0.1px",
             color: color.type.default,
             mb: "4px",
           }}
         >
           {title}
-        </Typography>
-        <Typography
-          sx={{
-            fontSize: "14px",
-            lineHeight: "20px",
-            letterSpacing: "0.2px",
-            color: color.type.muted,
-          }}
-        >
+        </TradAtlasText>
+        <TradAtlasText semanticFont={SF.textMd} sx={{ color: color.type.muted }}>
           {subtitle}
-        </Typography>
+        </TradAtlasText>
       </Box>
       <Box
         sx={{
@@ -183,29 +156,20 @@ export default function HubPage() {
       <Box sx={{ maxWidth: 960, width: "100%", display: "flex", flexDirection: "column", gap: "48px" }}>
         {/* Header */}
         <Box>
-          <Typography
+          <TradAtlasText
+            semanticFont={SF.titleH1Emphasis}
             sx={{
-              fontSize: "30px",
-              lineHeight: "38px",
-              fontWeight: weight.semiBold,
               letterSpacing: "-0.3px",
               color: color.type.default,
               mb: "8px",
             }}
           >
             Atlas AI
-          </Typography>
-          <Typography
-            sx={{
-              fontSize: "16px",
-              lineHeight: "24px",
-              letterSpacing: "0.2px",
-              color: color.type.muted,
-              maxWidth: 600,
-            }}
-          >
-            A creation studio for functional use-case prototypes built on the Atlas design system. Explore AI-powered governance tools, persona dashboards, and agentic workflows.
-          </Typography>
+          </TradAtlasText>
+          <TradAtlasText semanticFont={SF.textLg} sx={{ color: color.type.muted, maxWidth: 600 }}>
+            A creation studio for functional use-case prototypes built on the Atlas design system. Explore AI-powered
+            governance tools, persona dashboards, and agentic workflows.
+          </TradAtlasText>
         </Box>
 
         {/* Use cases */}

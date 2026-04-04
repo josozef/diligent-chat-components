@@ -1,15 +1,10 @@
-import { Box, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import {
   atlasSemanticColor as color,
   atlasSemanticRadius as radius,
 } from "../../tokens/atlasLight";
-
-const body = {
-  fontSize: "16px",
-  lineHeight: "24px",
-  letterSpacing: "0.2px",
-  color: color.type.default,
-} as const;
+import TradAtlasText from "../common/TradAtlasText";
+import { DATA_SEMANTIC_FONT, SF } from "@/tokens/tradAtlasSemanticTypography";
 
 export default function MessageBubble({
   children,
@@ -21,6 +16,9 @@ export default function MessageBubble({
   return (
     <Box sx={{ display: "flex", justifyContent: align === "right" ? "flex-end" : "flex-start", width: "100%" }}>
       <Box
+        data-atlas-component="MessageBubble"
+        data-atlas-variant={`bubble - ${align} - md`}
+        {...{ [DATA_SEMANTIC_FONT]: SF.textLg }}
         sx={{
           maxWidth: 520,
           minWidth: 280,
@@ -31,7 +29,9 @@ export default function MessageBubble({
           border: `1px solid ${color.outline.static}`,
         }}
       >
-        <Typography sx={body}>{children}</Typography>
+        <TradAtlasText semanticFont={SF.textLg} sx={{ color: color.type.default }}>
+          {children}
+        </TradAtlasText>
       </Box>
     </Box>
   );

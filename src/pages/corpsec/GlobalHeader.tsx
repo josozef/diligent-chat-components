@@ -6,13 +6,11 @@ import {
   Menu,
   MenuItem,
   Stack,
-  Typography,
 } from "@mui/material";
 import { Link } from "react-router";
-import AppsIcon from "@mui/icons-material/Apps";
-import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
-import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
-import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
+import { AppsIcon, HelpOutlineIcon, SettingsOutlinedIcon, AccountCircleOutlinedIcon } from "@/icons";
+import TradAtlasText from "../../components/common/TradAtlasText";
+import { DATA_SEMANTIC_FONT, SF, semanticFontStyle } from "@/tokens/tradAtlasSemanticTypography";
 import { useTokens } from "../../hooks/useTokens";
 
 export default function GlobalHeader() {
@@ -36,6 +34,7 @@ export default function GlobalHeader() {
       <Stack direction="row" alignItems="center" spacing={1.5}>
         <Link to="/" style={{ textDecoration: "none", display: "flex", alignItems: "center" }}>
           <Box
+            {...{ [DATA_SEMANTIC_FONT]: SF.textMdEmphasis }}
             sx={{
               width: 32,
               height: 32,
@@ -45,7 +44,7 @@ export default function GlobalHeader() {
               alignItems: "center",
               justifyContent: "center",
               color: "#fff",
-              fontSize: "14px",
+              ...semanticFontStyle(SF.textMdEmphasis),
               fontWeight: weight.bold,
               boxShadow: "0 1px 3px rgba(0,0,0,0.12)",
             }}
@@ -56,16 +55,9 @@ export default function GlobalHeader() {
 
         <Divider orientation="vertical" flexItem sx={{ borderColor: color.outline.fixed }} />
 
-        <Typography
-          sx={{
-            fontSize: "14px",
-            lineHeight: "20px",
-            fontWeight: weight.semiBold,
-            color: color.type.default,
-          }}
-        >
+        <TradAtlasText semanticFont={SF.textMdEmphasis} sx={{ color: color.type.default }}>
           Acme Co, Inc.
-        </Typography>
+        </TradAtlasText>
 
         <Divider orientation="vertical" flexItem sx={{ borderColor: color.outline.fixed }} />
 
@@ -94,34 +86,33 @@ export default function GlobalHeader() {
           }}
         >
           <MenuItem sx={{ gap: "8px" }}>
-            <Typography sx={{ fontSize: "14px", fontWeight: weight.semiBold, color: color.type.default }}>
+            <TradAtlasText semanticFont={SF.textMdEmphasis} sx={{ color: color.type.default }}>
               Corporate secretary
-            </Typography>
-            <Typography sx={{ fontSize: "11px", color: color.action.primary.default, fontWeight: weight.semiBold }}>
+            </TradAtlasText>
+            <TradAtlasText semanticFont={SF.textMicroEmphasis} sx={{ color: color.action.primary.default }}>
               Current
-            </Typography>
+            </TradAtlasText>
           </MenuItem>
           <MenuItem onClick={() => setAppMenuAnchor(null)}>
-            <Typography sx={{ fontSize: "14px", color: color.type.muted }}>Board & leadership</Typography>
+            <TradAtlasText semanticFont={SF.textMd} sx={{ color: color.type.muted }}>
+              Board & leadership
+            </TradAtlasText>
           </MenuItem>
           <MenuItem onClick={() => setAppMenuAnchor(null)}>
-            <Typography sx={{ fontSize: "14px", color: color.type.muted }}>Compliance</Typography>
+            <TradAtlasText semanticFont={SF.textMd} sx={{ color: color.type.muted }}>
+              Compliance
+            </TradAtlasText>
           </MenuItem>
           <MenuItem onClick={() => setAppMenuAnchor(null)}>
-            <Typography sx={{ fontSize: "14px", color: color.type.muted }}>Entities</Typography>
+            <TradAtlasText semanticFont={SF.textMd} sx={{ color: color.type.muted }}>
+              Entities
+            </TradAtlasText>
           </MenuItem>
         </Menu>
 
-        <Typography
-          sx={{
-            fontSize: "14px",
-            lineHeight: "20px",
-            fontWeight: weight.medium,
-            color: color.type.muted,
-          }}
-        >
+        <TradAtlasText semanticFont={SF.textMd} sx={{ color: color.type.muted, fontWeight: weight.medium }}>
           Corporate Secretary Command Center
-        </Typography>
+        </TradAtlasText>
       </Stack>
 
       {/* Right: utilities */}

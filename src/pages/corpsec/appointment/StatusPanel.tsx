@@ -1,6 +1,7 @@
-import { Box, LinearProgress, Typography } from "@mui/material";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
+import { Box, LinearProgress } from "@mui/material";
+import { CheckCircleIcon, RadioButtonUncheckedIcon } from "@/icons";
+import TradAtlasText from "../../../components/common/TradAtlasText";
+import { SF } from "@/tokens/tradAtlasSemanticTypography";
 import { useTokens } from "../../../hooks/useTokens";
 import type { WorkflowStep, WorkflowStepId } from "./AppointmentWorkspace";
 
@@ -62,17 +63,9 @@ export default function StatusPanel({
           },
         }}
       >
-        <Typography
-          sx={{
-            fontSize: "14px",
-            lineHeight: "20px",
-            fontWeight: weight.semiBold,
-            color: color.type.default,
-            mb: "4px",
-          }}
-        >
+        <TradAtlasText semanticFont={SF.textMdEmphasis} sx={{ color: color.type.default, mb: "4px" }}>
           Appointment workflow
-        </Typography>
+        </TradAtlasText>
         <Box sx={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <LinearProgress
             variant="determinate"
@@ -88,9 +81,9 @@ export default function StatusPanel({
               },
             }}
           />
-          <Typography sx={{ fontSize: "12px", color: color.type.muted, fontWeight: weight.medium }}>
+          <TradAtlasText semanticFont={SF.textSm} sx={{ color: color.type.muted, fontWeight: weight.medium }}>
             {completedCount}/{totalCount}
-          </Typography>
+          </TradAtlasText>
         </Box>
       </Box>
 
@@ -155,43 +148,40 @@ export default function StatusPanel({
                 </Box>
 
                 <Box sx={{ flex: 1, minWidth: 0 }}>
-                  <Typography
+                  <TradAtlasText
+                    semanticFont={SF.labelMdRelaxed}
                     sx={{
-                      fontSize: "13px",
-                      lineHeight: "18px",
                       fontWeight: isActive || isInProgress ? weight.semiBold : weight.regular,
                       color: step.status === "not_started" ? color.type.muted : color.type.default,
                     }}
                   >
                     {step.name}
-                  </Typography>
+                  </TradAtlasText>
                   {isInProgress && !isActive && (
-                    <Typography
+                    <TradAtlasText
+                      semanticFont={SF.textMicroEmphasis}
                       sx={{
-                        fontSize: "11px",
-                        lineHeight: "16px",
                         color: color.action.primary.default,
                         fontWeight: weight.medium,
                         mt: "2px",
                       }}
                     >
                       In progress
-                    </Typography>
+                    </TradAtlasText>
                   )}
                   {isActive && step.substeps && (
                     <Box sx={{ mt: "6px", display: "flex", flexDirection: "column", gap: "4px" }}>
                       {step.substeps.map((sub) => (
-                        <Typography
+                        <TradAtlasText
                           key={sub}
+                          semanticFont={SF.textMicro}
                           sx={{
-                            fontSize: "11px",
-                            lineHeight: "16px",
                             color: color.type.muted,
                             pl: "4px",
                           }}
                         >
                           {sub}
-                        </Typography>
+                        </TradAtlasText>
                       ))}
                     </Box>
                   )}

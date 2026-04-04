@@ -7,19 +7,9 @@
  * following the Atlas semantic variable structure with dark-mode value mappings.
  */
 
-import {
-  atlasCoreSpacing,
-  atlasSemanticRadius,
-  atlasFontWeight,
-  atlasTypography,
-} from "./atlasLight";
+import { atlasCoreSpacing, atlasSemanticRadius, atlasFontWeight } from "./atlasLight";
 
-export {
-  atlasCoreSpacing,
-  atlasSemanticRadius,
-  atlasFontWeight,
-  atlasTypography,
-};
+export { atlasCoreSpacing, atlasSemanticRadius, atlasFontWeight };
 
 export const atlasSemanticColorDark = {
   background: {

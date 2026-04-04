@@ -1,10 +1,7 @@
 import { useRef } from "react";
 import { Box, InputBase } from "@mui/material";
-import AttachFileIcon from "@mui/icons-material/AttachFile";
-import TuneIcon from "@mui/icons-material/Tune";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import MicIcon from "@mui/icons-material/Mic";
-import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+import { AttachFileIcon, TuneIcon, ExpandMoreIcon, MicIcon, ArrowUpwardIcon } from "@/icons";
+import { DATA_SEMANTIC_FONT, SF, semanticFontStyle } from "@/tokens/tradAtlasSemanticTypography";
 import { TertiaryButton, TertiaryIconButton } from "../common";
 import { useTokens } from "../../hooks/useTokens";
 
@@ -42,6 +39,8 @@ export default function ChatPrompt({
   return (
     <Box sx={{ maxWidth, width: "100%", borderRadius: radius.lg }}>
       <Box
+        data-atlas-component="ChatPrompt"
+        data-atlas-variant="input - composite - lg"
         sx={{
           border: `1px solid ${color.outline.default}`,
           borderRadius: radius.lg,
@@ -62,11 +61,10 @@ export default function ChatPrompt({
           multiline
           maxRows={6}
           disabled={disabled}
+          {...{ [DATA_SEMANTIC_FONT]: SF.textLg }}
           sx={{
+            ...semanticFontStyle(SF.textLg),
             width: "100%",
-            fontSize: "16px",
-            lineHeight: "24px",
-            letterSpacing: "0.2px",
             color: color.type.default,
             py: "8px",
             px: "12px",

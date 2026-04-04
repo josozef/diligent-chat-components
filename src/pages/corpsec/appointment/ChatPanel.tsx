@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from "react";
-import { Box, Typography, IconButton } from "@mui/material";
-import AutoAwesomeOutlinedIcon from "@mui/icons-material/AutoAwesomeOutlined";
-import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
+import { Box, IconButton } from "@mui/material";
+import { AutoAwesomeOutlinedIcon, SendOutlinedIcon } from "@/icons";
+import TradAtlasText from "../../../components/common/TradAtlasText";
+import { DATA_SEMANTIC_FONT, SF, semanticFontStyle } from "@/tokens/tradAtlasSemanticTypography";
 import { useTokens } from "../../../hooks/useTokens";
 
 interface Message {
@@ -61,19 +62,12 @@ export default function ChatPanel() {
       >
         <AutoAwesomeOutlinedIcon sx={{ fontSize: 18, color: color.action.primary.default }} />
         <Box>
-          <Typography
-            sx={{
-              fontSize: "13px",
-              lineHeight: "18px",
-              fontWeight: weight.semiBold,
-              color: color.type.default,
-            }}
-          >
+          <TradAtlasText semanticFont={SF.labelMdEmphasis} sx={{ color: color.type.default }}>
             AI Governance Assistant
-          </Typography>
-          <Typography sx={{ fontSize: "11px", lineHeight: "14px", color: color.type.muted }}>
+          </TradAtlasText>
+          <TradAtlasText semanticFont={SF.textMicro} sx={{ color: color.type.muted }}>
             Context for this appointment
-          </Typography>
+          </TradAtlasText>
         </Box>
       </Box>
 
@@ -90,6 +84,9 @@ export default function ChatPanel() {
               }}
             >
               <Box
+                data-atlas-component="MessageBubble"
+                data-atlas-variant={`chat - ${msg.role} - lg`}
+                {...{ [DATA_SEMANTIC_FONT]: SF.labelMd }}
                 sx={{
                   maxWidth: "95%",
                   px: "12px",
@@ -101,10 +98,9 @@ export default function ChatPanel() {
                     msg.role === "user" ? color.action.primary.onPrimary : color.type.default,
                 }}
               >
-                <Typography
+                <TradAtlasText
+                  semanticFont={SF.labelMd}
                   sx={{
-                    fontSize: "13px",
-                    lineHeight: "20px",
                     whiteSpace: "pre-wrap",
                     "& strong": { fontWeight: weight.semiBold },
                   }}
@@ -129,6 +125,8 @@ export default function ChatPanel() {
         }}
       >
         <Box
+          data-atlas-component="ChatInput"
+          data-atlas-variant="input - outlined - lg"
           sx={{
             display: "flex",
             alignItems: "center",
@@ -147,11 +145,12 @@ export default function ChatPanel() {
             value={inputValue}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInputValue(e.target.value)}
             placeholder="Ask a question..."
+            {...{ [DATA_SEMANTIC_FONT]: SF.labelMd }}
             sx={{
+              ...semanticFontStyle(SF.labelMd),
               flex: 1,
               border: "none",
               outline: "none",
-              fontSize: "13px",
               background: "transparent",
               color: color.type.default,
               "&::placeholder": { color: color.type.disabled },

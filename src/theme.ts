@@ -1,11 +1,22 @@
 import { createTheme, type Theme } from "@mui/material/styles";
 
 import {
+  atlasFontFamily,
   atlasFontWeight,
   atlasSemanticColor,
   atlasSemanticRadius,
-  atlasTypography,
 } from "./tokens/atlasLight";
+import { DATA_SEMANTIC_FONT, SF, semanticFontStyle } from "./tokens/tradAtlasSemanticTypography";
+
+type ActionLabelFont = {
+  fontFamily: string;
+  fontSize: string;
+  fontWeight: number;
+  lineHeight: string;
+  letterSpacing: string;
+};
+
+const actionLabelPrimaryStyle = semanticFontStyle(SF.actionLabelPrimary) as ActionLabelFont;
 import { atlasSemanticColorDark } from "./tokens/atlasDark";
 
 const mdRadiusPx = Number.parseInt(atlasSemanticRadius.md.replace("px", ""), 10) || 8;
@@ -60,77 +71,37 @@ function buildTheme(mode: "light" | "dark", c: SemanticColors): Theme {
       borderRadius: mdRadiusPx,
     },
     typography: {
-      fontFamily: '"Inter", system-ui, -apple-system, sans-serif',
+      fontFamily: atlasFontFamily,
       fontWeightRegular: atlasFontWeight.regular,
       fontWeightMedium: atlasFontWeight.medium,
       fontWeightBold: atlasFontWeight.bold,
-      h1: {
-        fontSize: atlasTypography.fontSize.h1Billboard,
-        lineHeight: atlasTypography.lineHeight.h1Billboard,
-        fontWeight: atlasFontWeight.regular,
-      },
-      h2: {
-        fontSize: atlasTypography.fontSize.h2Display,
-        lineHeight: atlasTypography.lineHeight.h2Display,
-        fontWeight: atlasFontWeight.regular,
-      },
-      h3: {
-        fontSize: atlasTypography.fontSize.h3Lg,
-        lineHeight: atlasTypography.lineHeight.h3Lg,
-        fontWeight: atlasFontWeight.regular,
-      },
-      h4: {
-        fontSize: atlasTypography.fontSize.h4Md,
-        lineHeight: atlasTypography.lineHeight.h4Md,
-        fontWeight: atlasFontWeight.regular,
-      },
-      h5: {
-        fontSize: atlasTypography.fontSize.h5Sm,
-        lineHeight: atlasTypography.lineHeight.h5Sm,
-        fontWeight: atlasFontWeight.regular,
-      },
-      h6: {
-        fontSize: atlasTypography.fontSize.h6Xs,
-        lineHeight: atlasTypography.lineHeight.h6Xs,
-        fontWeight: atlasFontWeight.regular,
-      },
-      body1: {
-        fontSize: atlasTypography.fontSize.body,
-        lineHeight: atlasTypography.lineHeight.body,
-        fontWeight: atlasFontWeight.regular,
-      },
-      body2: {
-        fontSize: atlasTypography.fontSize.md,
-        lineHeight: atlasTypography.lineHeight.md,
-        fontWeight: atlasFontWeight.regular,
-      },
-      subtitle1: {
-        fontSize: atlasTypography.fontSize.md,
-        lineHeight: atlasTypography.lineHeight.md,
-        fontWeight: atlasFontWeight.medium,
-      },
-      subtitle2: {
-        fontSize: atlasTypography.fontSize.sm,
-        lineHeight: atlasTypography.lineHeight.sm,
-        fontWeight: atlasFontWeight.medium,
-      },
-      button: {
-        fontSize: atlasTypography.fontSize.md,
-        lineHeight: atlasTypography.lineHeight.md,
-        fontWeight: atlasFontWeight.semiBold,
-        textTransform: "none",
-      },
-      caption: {
-        fontSize: atlasTypography.fontSize.sm,
-        lineHeight: atlasTypography.lineHeight.sm,
-        fontWeight: atlasFontWeight.regular,
-      },
     },
     components: {
+      MuiCssBaseline: {
+        styleOverrides: {
+          body: {
+            fontFamily: atlasFontFamily,
+          },
+        },
+      },
       MuiButton: {
+        defaultProps: {
+          ...{ [DATA_SEMANTIC_FONT]: SF.actionLabelPrimary },
+        },
         styleOverrides: {
           root: {
-            borderRadius: atlasSemanticRadius.lg,
+            ...actionLabelPrimaryStyle,
+            borderRadius: atlasSemanticRadius.smmd,
+            textTransform: "none",
+          },
+          sizeSmall: {
+            borderRadius: atlasSemanticRadius.sm,
+          },
+          sizeMedium: {
+            borderRadius: atlasSemanticRadius.smmd,
+          },
+          sizeLarge: {
+            borderRadius: atlasSemanticRadius.md,
           },
         },
       },

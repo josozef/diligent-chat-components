@@ -19,6 +19,8 @@ export default function TertiaryIconButton({
       disabled={disabled}
       onClick={onClick}
       aria-label={ariaLabel}
+      data-atlas-component="IconButton"
+      data-atlas-variant="text - tertiary - sm"
       sx={{
         borderRadius: radius.lg,
         p: "8px",

@@ -1,9 +1,11 @@
 import { Box, IconButton } from "@mui/material";
-import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import ThumbDownOutlinedIcon from "@mui/icons-material/ThumbDownOutlined";
-import ThumbUpOutlinedIcon from "@mui/icons-material/ThumbUpOutlined";
-import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
-import ShareOutlinedIcon from "@mui/icons-material/ShareOutlined";
+import {
+  ContentCopyIcon,
+  ThumbDownOutlinedIcon,
+  ThumbUpOutlinedIcon,
+  FileDownloadOutlinedIcon,
+  ShareOutlinedIcon,
+} from "@/icons";
 import {
   atlasSemanticColor as color,
   atlasSemanticRadius as radius,

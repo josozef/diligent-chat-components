@@ -1,7 +1,8 @@
-import { Box, Typography } from "@mui/material";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
+import { Box, Button, IconButton } from "@mui/material";
+import { ArrowBackIcon, VisibilityOutlinedIcon } from "@/icons";
 import { useNavigate } from "react-router";
+import TradAtlasText from "../../../components/common/TradAtlasText";
+import { DATA_SEMANTIC_FONT, SF, semanticFontStyle } from "@/tokens/tradAtlasSemanticTypography";
 import { useTokens } from "../../../hooks/useTokens";
 
 interface WorkspaceHeaderProps {
@@ -30,56 +31,46 @@ export default function WorkspaceHeader({ selectedCandidate }: WorkspaceHeaderPr
       }}
     >
       <Box sx={{ display: "flex", alignItems: "center", gap: "16px" }}>
-        <Box
-          component="button"
+        <IconButton
           onClick={() => navigate("/corpsec")}
+          size="small"
+          data-atlas-component="IconButton"
+          data-atlas-variant="ghost - sm"
           sx={{
-            display: "inline-flex",
-            alignItems: "center",
-            background: "transparent",
-            border: "none",
-            cursor: "pointer",
             color: color.type.muted,
-            p: 0,
             "&:hover": { color: color.type.default },
           }}
         >
           <ArrowBackIcon sx={{ fontSize: 18 }} />
-        </Box>
+        </IconButton>
 
-        <Typography
-          sx={{
-            fontSize: "14px",
-            lineHeight: "20px",
-            fontWeight: weight.medium,
-            color: color.type.default,
-          }}
-        >
+        <TradAtlasText semanticFont={SF.textMd} sx={{ color: color.type.default, fontWeight: weight.medium }}>
           {title}
-        </Typography>
+        </TradAtlasText>
       </Box>
 
-      <Box
-        component="button"
+      <Button
+        variant="outlined"
+        color="inherit"
+        size="small"
+        data-atlas-component="Button"
+        data-atlas-variant="outlined - secondary - sm"
+        {...{ [DATA_SEMANTIC_FONT]: SF.labelMd }}
+        startIcon={<VisibilityOutlinedIcon sx={{ fontSize: 15 }} />}
         sx={{
-          display: "inline-flex",
-          alignItems: "center",
-          gap: "6px",
-          background: "transparent",
-          border: `1px solid ${color.outline.fixed}`,
-          borderRadius: "6px",
-          cursor: "pointer",
+          ...semanticFontStyle(SF.labelMd),
+          textTransform: "none",
           color: color.type.muted,
-          fontSize: "13px",
+          borderColor: color.outline.fixed,
           fontWeight: weight.medium,
           px: "10px",
           py: "4px",
+          minWidth: 0,
           "&:hover": { color: color.type.default, borderColor: color.outline.default },
         }}
       >
-        <VisibilityOutlinedIcon sx={{ fontSize: 15 }} />
         Preview
-      </Box>
+      </Button>
     </Box>
   );
 }

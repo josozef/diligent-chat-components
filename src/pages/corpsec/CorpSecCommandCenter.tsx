@@ -1,20 +1,31 @@
 import { useState } from "react";
-import { useNavigate } from "react-router";
-import { Box, Typography, Chip, LinearProgress, IconButton, Divider } from "@mui/material";
-import WarningAmberIcon from "@mui/icons-material/WarningAmber";
-import BoltOutlinedIcon from "@mui/icons-material/BoltOutlined";
-import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
-import BusinessOutlinedIcon from "@mui/icons-material/BusinessOutlined";
-import GavelOutlinedIcon from "@mui/icons-material/GavelOutlined";
-import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
-import EventOutlinedIcon from "@mui/icons-material/EventOutlined";
-import TrendingUpOutlinedIcon from "@mui/icons-material/TrendingUpOutlined";
-import TrendingDownOutlinedIcon from "@mui/icons-material/TrendingDownOutlined";
-import AutoAwesomeOutlinedIcon from "@mui/icons-material/AutoAwesomeOutlined";
-import AccountTreeOutlinedIcon from "@mui/icons-material/AccountTreeOutlined";
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-import DomainOutlinedIcon from "@mui/icons-material/DomainOutlined";
+import {
+  Box,
+  Button,
+  Chip,
+  LinearProgress,
+  IconButton,
+  Divider,
+} from "@mui/material";
+import { Link as RouterLink } from "react-router";
+import {
+  WarningAmberIcon,
+  BoltOutlinedIcon,
+  CheckCircleOutlineIcon,
+  GroupsOutlinedIcon,
+  BusinessOutlinedIcon,
+  GavelOutlinedIcon,
+  DescriptionOutlinedIcon,
+  EventOutlinedIcon,
+  TrendingUpOutlinedIcon,
+  TrendingDownOutlinedIcon,
+  AutoAwesomeOutlinedIcon,
+  AccountTreeOutlinedIcon,
+  MoreHorizIcon,
+  DomainOutlinedIcon,
+} from "@/icons";
+import TradAtlasText from "@/components/common/TradAtlasText";
+import { DATA_SEMANTIC_FONT, SF, semanticFontStyle } from "@/tokens/tradAtlasSemanticTypography";
 import { useDemo } from "../../DemoContext";
 import { useTokens } from "../../hooks/useTokens";
 import { ChatPrompt } from "../../components/ai";
@@ -25,6 +36,8 @@ function ContentCard({ children, sx }: { children: React.ReactNode; sx?: object 
   const { color, radius } = useTokens();
   return (
     <Box
+      data-atlas-component="ContentCard"
+      data-atlas-variant="surface - card - lg"
       sx={{
         borderRadius: radius.lg,
         border: `1px solid ${color.outline.fixed}`,
@@ -57,7 +70,6 @@ function IncidentTile({
   actionLabel?: string;
   actionHref?: string;
 }) {
-  const navigate = useNavigate();
   const { color, weight, radius } = useTokens();
 
   const severityStyles =
@@ -75,6 +87,8 @@ function IncidentTile({
 
   return (
     <Box
+      data-atlas-component="IncidentTile"
+      data-atlas-variant={`surface - incident - ${severityVariant}`}
       sx={{
         flex: 1,
         minWidth: 0,
@@ -90,74 +104,51 @@ function IncidentTile({
       <Box sx={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "12px" }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: "10px", flex: 1, minWidth: 0 }}>
           {icon}
-          <Typography
-            sx={{
-              fontSize: "15px",
-              lineHeight: "22px",
-              fontWeight: weight.bold,
-              color: color.type.default,
-            }}
+          <TradAtlasText
+            semanticFont={SF.bodyLead}
+            sx={{ fontWeight: weight.bold, color: color.type.default }}
           >
             {title}
-          </Typography>
+          </TradAtlasText>
         </Box>
         <Chip
           label={severity}
           size="small"
+          slotProps={{ label: { [DATA_SEMANTIC_FONT]: SF.textMicro } as React.HTMLAttributes<HTMLSpanElement> }}
           sx={{
             ...severityStyles,
             fontWeight: weight.semiBold,
-            fontSize: "11px",
             height: 22,
             flexShrink: 0,
+            ...semanticFontStyle(SF.textMicro),
           }}
         />
       </Box>
 
-      <Typography
-        sx={{
-          fontSize: "14px",
-          lineHeight: "20px",
-          color: color.type.muted,
-        }}
-      >
+      <TradAtlasText semanticFont={SF.textMd} sx={{ color: color.type.muted }}>
         {subtitle}
-      </Typography>
+      </TradAtlasText>
 
-      <Typography
-        sx={{
-          fontSize: "13px",
-          lineHeight: "18px",
-          color: color.type.muted,
-          fontWeight: weight.medium,
-        }}
-      >
+      <TradAtlasText semanticFont={SF.labelMdRelaxed} sx={{ color: color.type.muted, fontWeight: weight.medium }}>
         {stats}
-      </Typography>
+      </TradAtlasText>
 
-      {actionLabel && (
-        <Box>
-          <Box
-            component="button"
-            onClick={actionHref ? () => navigate(actionHref) : undefined}
-            sx={{
-              display: "inline-flex",
-              alignItems: "center",
-              px: "16px",
-              py: "8px",
-              borderRadius: radius.lg,
-              border: "none",
-              background: color.action.primary.default,
-              color: color.action.primary.onPrimary,
-              fontSize: "14px",
-              fontWeight: weight.semiBold,
-              cursor: "pointer",
-              "&:hover": { background: color.action.primary.hover },
-            }}
-          >
-            {actionLabel}
-          </Box>
-        </Box>
+      {actionLabel && actionHref && (
+        <Button
+          variant="contained"
+          color="primary"
+          size="medium"
+          component={RouterLink}
+          to={actionHref}
+          data-atlas-component="Button"
+          data-atlas-variant="primary - md"
+          sx={{
+            ...semanticFontStyle(SF.actionLabelPrimary),
+            textTransform: "none",
+          }}
+        >
+          {actionLabel}
+        </Button>
       )}
     </Box>
   );
@@ -214,26 +205,12 @@ function HeroBanner() {
       }}
     >
       <CheckCircleOutlineIcon sx={{ color: color.type.disabled, fontSize: 48 }} />
-      <Typography
-        sx={{
-          fontSize: "20px",
-          lineHeight: "28px",
-          fontWeight: weight.bold,
-          color: color.type.default,
-        }}
-      >
+      <TradAtlasText semanticFont={SF.titleMdEmphasis} sx={{ fontWeight: weight.bold, color: color.type.default }}>
         All clear
-      </Typography>
-      <Typography
-        sx={{
-          fontSize: "14px",
-          lineHeight: "22px",
-          color: color.type.muted,
-          maxWidth: 560,
-        }}
-      >
+      </TradAtlasText>
+      <TradAtlasText semanticFont={SF.textMdLoose} sx={{ color: color.type.muted, maxWidth: 560 }}>
         All 47 entities in good standing, 3 filings due this month (all prepared), and 2 KYC requests in progress.
-      </Typography>
+      </TradAtlasText>
     </Box>
   );
 }
@@ -268,19 +245,12 @@ function EntityPortfolio() {
           <DomainOutlinedIcon sx={{ fontSize: 20 }} />
         </Box>
         <Box>
-          <Typography
-            sx={{
-              fontSize: "15px",
-              lineHeight: "22px",
-              fontWeight: weight.semiBold,
-              color: color.type.default,
-            }}
-          >
+          <TradAtlasText semanticFont={SF.bodyLeadEmphasis} sx={{ color: color.type.default }}>
             Entity portfolio at a glance
-          </Typography>
-          <Typography sx={{ fontSize: "13px", lineHeight: "16px", color: color.type.muted }}>
+          </TradAtlasText>
+          <TradAtlasText semanticFont={SF.labelMdCompact} sx={{ color: color.type.muted }}>
             Your corporate structure summary
-          </Typography>
+          </TradAtlasText>
         </Box>
       </Box>
 
@@ -296,27 +266,12 @@ function EntityPortfolio() {
       >
         {stats.map((s) => (
           <Box key={s.label}>
-            <Typography
-              sx={{
-                fontSize: "28px",
-                lineHeight: "36px",
-                fontWeight: weight.bold,
-                color: s.valueColor,
-              }}
-            >
+            <TradAtlasText semanticFont={SF.titleStatEmphasis} sx={{ fontWeight: weight.bold, color: s.valueColor }}>
               {s.value}
-            </Typography>
-            <Typography
-              sx={{
-                fontSize: "12px",
-                lineHeight: "16px",
-                color: color.type.muted,
-                fontWeight: weight.medium,
-                mt: "4px",
-              }}
-            >
+            </TradAtlasText>
+            <TradAtlasText semanticFont={SF.textSm} sx={{ color: color.type.muted, fontWeight: weight.medium, mt: "4px" }}>
               {s.label}
-            </Typography>
+            </TradAtlasText>
           </Box>
         ))}
       </Box>
@@ -326,7 +281,7 @@ function EntityPortfolio() {
 
 function ChatSection() {
   const [input, setInput] = useState("");
-  const { color, weight, radius } = useTokens();
+  const { color, weight } = useTokens();
 
   const suggestions = [
     {
@@ -364,39 +319,26 @@ function ChatSection() {
   return (
     <ContentCard>
       <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: "4px" }}>
-        <Typography
-          sx={{
-            fontSize: "18px",
-            lineHeight: "28px",
-            fontWeight: weight.semiBold,
-            color: color.type.default,
-          }}
-        >
+        <TradAtlasText semanticFont={SF.titleH4Emphasis} sx={{ fontWeight: weight.semiBold, color: color.type.default }}>
           What do you need to do?
-        </Typography>
+        </TradAtlasText>
         <Chip
           icon={<Box sx={{ width: 8, height: 8, borderRadius: "50%", background: "#16a34a", ml: "8px !important" }} />}
           label="Demo"
           size="small"
           variant="outlined"
+          slotProps={{ label: { [DATA_SEMANTIC_FONT]: SF.textSm } as React.HTMLAttributes<HTMLSpanElement> }}
           sx={{
             borderColor: color.outline.fixed,
             color: color.type.default,
             fontWeight: weight.semiBold,
-            fontSize: "12px",
+            ...semanticFontStyle(SF.textSm),
           }}
         />
       </Box>
-      <Typography
-        sx={{
-          fontSize: "14px",
-          lineHeight: "20px",
-          color: color.type.muted,
-          mb: "16px",
-        }}
-      >
+      <TradAtlasText semanticFont={SF.textMd} sx={{ color: color.type.muted, mb: "16px" }}>
         Ask questions or choose an action below. Work entirely within Diligent.
-      </Typography>
+      </TradAtlasText>
 
       <ChatPrompt
         value={input}
@@ -407,18 +349,12 @@ function ChatSection() {
         maxWidth={9999}
       />
 
-      <Typography
-        sx={{
-          fontSize: "13px",
-          lineHeight: "16px",
-          fontWeight: weight.semiBold,
-          color: color.type.muted,
-          mt: "16px",
-          mb: "12px",
-        }}
+      <TradAtlasText
+        semanticFont={SF.labelMdCompact}
+        sx={{ fontWeight: weight.semiBold, color: color.type.muted, mt: "16px", mb: "12px" }}
       >
         Or start with
-      </Typography>
+      </TradAtlasText>
 
       <Box
         sx={{
@@ -428,48 +364,44 @@ function ChatSection() {
         }}
       >
         {suggestions.map((s) => (
-          <Box
+          <Button
             key={s.label}
-            component="button"
+            variant="outlined"
+            color="inherit"
+            size="large"
+            data-atlas-component="Button"
+            data-atlas-variant="outlined - secondary - lg"
             sx={{
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
               gap: "8px",
               p: "16px",
-              borderRadius: radius.md,
-              border: `1px solid ${color.outline.fixed}`,
-              background: color.surface.subtle,
-              cursor: "pointer",
+              height: "auto",
               textAlign: "center",
+              textTransform: "none",
+              borderColor: color.outline.fixed,
+              background: color.surface.subtle,
               transition: "border-color 0.15s, box-shadow 0.15s",
               "&:hover": {
                 borderColor: color.outline.hover,
                 boxShadow: `0 1px 4px ${color.background.backdrop}`,
+                background: color.surface.subtle,
               },
             }}
           >
             <Box sx={{ color: color.type.muted }}>{s.icon}</Box>
-            <Typography
-              sx={{
-                fontSize: "13px",
-                lineHeight: "18px",
-                fontWeight: weight.semiBold,
-                color: color.type.default,
-              }}
+            <TradAtlasText
+              component="span"
+              semanticFont={SF.labelMdRelaxed}
+              sx={{ fontWeight: weight.semiBold, color: color.type.default }}
             >
               {s.label}
-            </Typography>
-            <Typography
-              sx={{
-                fontSize: "12px",
-                lineHeight: "16px",
-                color: color.type.muted,
-              }}
-            >
+            </TradAtlasText>
+            <TradAtlasText component="span" semanticFont={SF.textSm} sx={{ color: color.type.muted }}>
               {s.description}
-            </Typography>
-          </Box>
+            </TradAtlasText>
+          </Button>
         ))}
       </Box>
     </ContentCard>
@@ -487,20 +419,14 @@ function EntityStatusSummary() {
   return (
     <ContentCard>
       <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: "16px" }}>
-        <Typography
-          sx={{
-            fontSize: "18px",
-            lineHeight: "28px",
-            fontWeight: weight.semiBold,
-            color: color.type.default,
-          }}
-        >
+        <TradAtlasText semanticFont={SF.titleH4Emphasis} sx={{ fontWeight: weight.semiBold, color: color.type.default }}>
           Entities requiring attention
-        </Typography>
-        <Typography
+        </TradAtlasText>
+        <Box
+          component="span"
+          {...{ [DATA_SEMANTIC_FONT]: SF.labelMdCompact }}
           sx={{
-            fontSize: "13px",
-            lineHeight: "16px",
+            ...semanticFontStyle(SF.labelMdCompact),
             color: color.action.link.default,
             cursor: "pointer",
             fontWeight: weight.medium,
@@ -508,12 +434,12 @@ function EntityStatusSummary() {
           }}
         >
           View all 47 entities →
-        </Typography>
+        </Box>
       </Box>
 
-      <Typography sx={{ fontSize: "14px", lineHeight: "20px", color: color.type.muted, mb: "16px" }}>
+      <TradAtlasText semanticFont={SF.textMd} sx={{ color: color.type.muted, mb: "16px" }}>
         {flaggedEntities.length} entities flagged — 45 entities in good standing are not shown.
-      </Typography>
+      </TradAtlasText>
 
       <Box
         sx={{
@@ -533,11 +459,10 @@ function EntityStatusSummary() {
           }}
         >
           {["Entity", "Jurisdiction", "Status", "Issue", "Deadline"].map((h) => (
-            <Typography
+            <TradAtlasText
               key={h}
+              semanticFont={SF.textMicroEmphasis}
               sx={{
-                fontSize: "12px",
-                lineHeight: "16px",
                 fontWeight: weight.semiBold,
                 color: color.type.muted,
                 textTransform: "uppercase",
@@ -545,7 +470,7 @@ function EntityStatusSummary() {
               }}
             >
               {h}
-            </Typography>
+            </TradAtlasText>
           ))}
         </Box>
 
@@ -562,19 +487,12 @@ function EntityStatusSummary() {
               "&:hover": { background: color.surface.subtle },
             }}
           >
-            <Typography
-              sx={{
-                fontSize: "14px",
-                lineHeight: "20px",
-                fontWeight: weight.medium,
-                color: color.type.default,
-              }}
-            >
+            <TradAtlasText semanticFont={SF.textMd} sx={{ fontWeight: weight.medium, color: color.type.default }}>
               {e.name}
-            </Typography>
-            <Typography sx={{ fontSize: "14px", lineHeight: "20px", color: color.type.muted }}>
+            </TradAtlasText>
+            <TradAtlasText semanticFont={SF.textMd} sx={{ color: color.type.muted }}>
               {e.jurisdiction}
-            </Typography>
+            </TradAtlasText>
             <Box sx={{ display: "flex", alignItems: "center", gap: "6px" }}>
               <Box
                 sx={{
@@ -585,23 +503,22 @@ function EntityStatusSummary() {
                   flexShrink: 0,
                 }}
               />
-              <Typography sx={{ fontSize: "13px", lineHeight: "16px", color: color.type.default }}>
+              <TradAtlasText semanticFont={SF.labelMdCompact} sx={{ color: color.type.default }}>
                 {e.status}
-              </Typography>
+              </TradAtlasText>
             </Box>
-            <Typography sx={{ fontSize: "13px", lineHeight: "18px", color: color.type.muted }}>
+            <TradAtlasText semanticFont={SF.labelMdRelaxed} sx={{ color: color.type.muted }}>
               {e.issue}
-            </Typography>
-            <Typography
+            </TradAtlasText>
+            <TradAtlasText
+              semanticFont={SF.textMd}
               sx={{
-                fontSize: "14px",
-                lineHeight: "20px",
                 color: e.nextDeadline === "Overdue" ? color.status.error.text : color.type.muted,
                 fontWeight: e.nextDeadline === "Overdue" ? weight.semiBold : weight.regular,
               }}
             >
               {e.nextDeadline}
-            </Typography>
+            </TradAtlasText>
           </Box>
         ))}
       </Box>
@@ -644,17 +561,9 @@ function AgentActivity() {
 
   return (
     <ContentCard>
-      <Typography
-        sx={{
-          fontSize: "18px",
-          lineHeight: "28px",
-          fontWeight: weight.semiBold,
-          color: color.type.default,
-          mb: "16px",
-        }}
-      >
+      <TradAtlasText semanticFont={SF.titleH4Emphasis} sx={{ fontWeight: weight.semiBold, color: color.type.default, mb: "16px" }}>
         Agent activity
-      </Typography>
+      </TradAtlasText>
 
       <Box sx={{ display: "flex", flexDirection: "column", gap: "12px" }}>
         {activities.map((a) => (
@@ -674,31 +583,25 @@ function AgentActivity() {
               <Box sx={{ flex: 1 }}>
                 <Box sx={{ display: "flex", alignItems: "center", gap: "8px", mb: "4px" }}>
                   <AutoAwesomeOutlinedIcon sx={{ fontSize: 16, color: color.action.primary.default }} />
-                  <Typography sx={{ fontSize: "12px", color: color.type.muted, fontWeight: weight.medium }}>
+                  <TradAtlasText semanticFont={SF.textSm} sx={{ color: color.type.muted, fontWeight: weight.medium }}>
                     {a.agent}
-                  </Typography>
+                  </TradAtlasText>
                   <Chip
                     label={a.status}
                     size="small"
+                    slotProps={{ label: { [DATA_SEMANTIC_FONT]: SF.textMicro } as React.HTMLAttributes<HTMLSpanElement> }}
                     sx={{
                       backgroundColor: a.statusColor,
                       color: "#fff",
                       fontWeight: weight.semiBold,
-                      fontSize: "11px",
                       height: 20,
+                      ...semanticFontStyle(SF.textMicro),
                     }}
                   />
                 </Box>
-                <Typography
-                  sx={{
-                    fontSize: "15px",
-                    lineHeight: "22px",
-                    fontWeight: weight.semiBold,
-                    color: color.type.default,
-                  }}
-                >
+                <TradAtlasText semanticFont={SF.bodyLeadEmphasis} sx={{ color: color.type.default }}>
                   {a.title}
-                </Typography>
+                </TradAtlasText>
               </Box>
               <IconButton size="small" sx={{ color: color.type.muted }}>
                 <MoreHorizIcon fontSize="small" />
@@ -707,12 +610,15 @@ function AgentActivity() {
 
             <Box>
               <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: "6px" }}>
-                <Typography sx={{ fontSize: "13px", color: color.type.muted }}>
+                <TradAtlasText semanticFont={SF.labelMd} sx={{ color: color.type.muted }}>
                   {a.step}
-                </Typography>
-                <Typography sx={{ fontSize: "12px", color: color.type.muted, fontWeight: weight.semiBold, flexShrink: 0, ml: "16px" }}>
+                </TradAtlasText>
+                <TradAtlasText
+                  semanticFont={SF.textSm}
+                  sx={{ color: color.type.muted, fontWeight: weight.semiBold, flexShrink: 0, ml: "16px" }}
+                >
                   {a.progress}%
-                </Typography>
+                </TradAtlasText>
               </Box>
               <LinearProgress
                 variant="determinate"
@@ -729,9 +635,9 @@ function AgentActivity() {
               />
             </Box>
 
-            <Typography sx={{ fontSize: "12px", color: color.type.muted }}>
+            <TradAtlasText semanticFont={SF.textSm} sx={{ color: color.type.muted }}>
               Updated {a.updated}
-            </Typography>
+            </TradAtlasText>
           </Box>
         ))}
       </Box>
@@ -764,26 +670,12 @@ function ProactiveTasks() {
   return (
     <ContentCard>
       <Box sx={{ mb: "16px" }}>
-        <Typography
-          sx={{
-            fontSize: "18px",
-            lineHeight: "28px",
-            fontWeight: weight.semiBold,
-            color: color.type.default,
-          }}
-        >
+        <TradAtlasText semanticFont={SF.titleH4Emphasis} sx={{ fontWeight: weight.semiBold, color: color.type.default }}>
           Proactive tasks
-        </Typography>
-        <Typography
-          sx={{
-            fontSize: "14px",
-            lineHeight: "20px",
-            color: color.type.muted,
-            mt: "4px",
-          }}
-        >
+        </TradAtlasText>
+        <TradAtlasText semanticFont={SF.textMd} sx={{ color: color.type.muted, mt: "4px" }}>
           Optional work you can start when you're ready — nothing here is in progress.
-        </Typography>
+        </TradAtlasText>
       </Box>
 
       <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" }, gap: "12px" }}>
@@ -800,60 +692,49 @@ function ProactiveTasks() {
               gap: "12px",
             }}
           >
-            <Typography
-              sx={{
-                fontSize: "15px",
-                lineHeight: "22px",
-                fontWeight: weight.semiBold,
-                color: color.type.default,
-              }}
-            >
+            <TradAtlasText semanticFont={SF.bodyLeadEmphasis} sx={{ color: color.type.default }}>
               {t.title}
-            </Typography>
-            <Typography
-              sx={{
-                fontSize: "14px",
-                lineHeight: "20px",
-                color: color.type.muted,
-              }}
-            >
+            </TradAtlasText>
+            <TradAtlasText semanticFont={SF.textMd} sx={{ color: color.type.muted }}>
               {t.description}
-            </Typography>
+            </TradAtlasText>
             <Box sx={{ display: "flex", gap: "8px", mt: "4px" }}>
-              <Box
-                component="button"
+              <Button
+                variant="outlined"
+                color="inherit"
+                size="small"
+                data-atlas-component="Button"
+                data-atlas-variant="outlined - secondary - sm"
                 sx={{
+                  ...semanticFontStyle(SF.labelMd),
                   px: "14px",
                   py: "6px",
-                  borderRadius: radius.md,
-                  border: `1px solid ${color.outline.fixed}`,
-                  background: color.surface.default,
-                  color: color.type.default,
-                  fontSize: "13px",
+                  textTransform: "none",
+                  borderColor: color.outline.fixed,
                   fontWeight: weight.semiBold,
-                  cursor: "pointer",
                   "&:hover": { borderColor: color.outline.hover },
                 }}
               >
                 Learn more
-              </Box>
-              <Box
-                component="button"
+              </Button>
+              <Button
+                variant="text"
+                color="inherit"
+                size="small"
+                data-atlas-component="Button"
+                data-atlas-variant="text - tertiary - sm"
                 sx={{
+                  ...semanticFontStyle(SF.labelMd),
                   px: "14px",
                   py: "6px",
-                  borderRadius: radius.md,
-                  border: "none",
-                  background: "transparent",
+                  textTransform: "none",
                   color: color.type.muted,
-                  fontSize: "13px",
                   fontWeight: weight.medium,
-                  cursor: "pointer",
                   "&:hover": { color: color.type.default },
                 }}
               >
                 Not now
-              </Box>
+              </Button>
             </Box>
           </Box>
         ))}
@@ -874,17 +755,9 @@ function RecentActivity() {
 
   return (
     <ContentCard sx={{ flex: 1 }}>
-      <Typography
-        sx={{
-          fontSize: "18px",
-          lineHeight: "28px",
-          fontWeight: weight.semiBold,
-          color: color.type.default,
-          mb: "16px",
-        }}
-      >
+      <TradAtlasText semanticFont={SF.titleH4Emphasis} sx={{ fontWeight: weight.semiBold, color: color.type.default, mb: "16px" }}>
         Recent activity
-      </Typography>
+      </TradAtlasText>
 
       {items.map((item, i) => (
         <Box
@@ -914,16 +787,16 @@ function RecentActivity() {
             {item.icon}
           </Box>
           <Box sx={{ flex: 1 }}>
-            <Typography sx={{ fontSize: "12px", fontWeight: weight.semiBold, color: color.type.default }}>
+            <TradAtlasText semanticFont={SF.textSm} sx={{ fontWeight: weight.semiBold, color: color.type.default }}>
               {item.category}
-            </Typography>
-            <Typography sx={{ fontSize: "14px", lineHeight: "20px", color: color.type.muted, mt: "2px" }}>
+            </TradAtlasText>
+            <TradAtlasText semanticFont={SF.textMd} sx={{ color: color.type.muted, mt: "2px" }}>
               {item.text}
-            </Typography>
+            </TradAtlasText>
           </Box>
-          <Typography sx={{ fontSize: "12px", color: color.type.muted, whiteSpace: "nowrap", flexShrink: 0 }}>
+          <TradAtlasText semanticFont={SF.textSm} sx={{ color: color.type.muted, whiteSpace: "nowrap", flexShrink: 0 }}>
             {item.time}
-          </Typography>
+          </TradAtlasText>
         </Box>
       ))}
     </ContentCard>
@@ -979,27 +852,12 @@ function OperationalTrends() {
 
   return (
     <ContentCard>
-      <Typography
-        sx={{
-          fontSize: "18px",
-          lineHeight: "28px",
-          fontWeight: weight.semiBold,
-          color: color.type.default,
-          mb: "4px",
-        }}
-      >
+      <TradAtlasText semanticFont={SF.titleH4Emphasis} sx={{ fontWeight: weight.semiBold, color: color.type.default, mb: "4px" }}>
         Key operational trends
-      </Typography>
-      <Typography
-        sx={{
-          fontSize: "14px",
-          lineHeight: "20px",
-          color: color.type.muted,
-          mb: "16px",
-        }}
-      >
+      </TradAtlasText>
+      <TradAtlasText semanticFont={SF.textMd} sx={{ color: color.type.muted, mb: "16px" }}>
         Rolling 90-day view of governance operations across all entities (demo data).
-      </Typography>
+      </TradAtlasText>
 
       <Box
         sx={{
@@ -1021,47 +879,33 @@ function OperationalTrends() {
               gap: "10px",
             }}
           >
-            <Typography
-              sx={{
-                fontSize: "13px",
-                lineHeight: "16px",
-                fontWeight: weight.semiBold,
-                color: color.type.muted,
-              }}
-            >
+            <TradAtlasText semanticFont={SF.labelMdCompact} sx={{ fontWeight: weight.semiBold, color: color.type.muted }}>
               {t.label}
-            </Typography>
+            </TradAtlasText>
             <Box sx={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
-              <Typography
-                sx={{
-                  fontSize: "28px",
-                  lineHeight: "32px",
-                  fontWeight: weight.bold,
-                  color: color.type.default,
-                }}
-              >
+              <TradAtlasText semanticFont={SF.titleStatTightEmphasis} sx={{ fontWeight: weight.bold, color: color.type.default }}>
                 {t.value}
-              </Typography>
+              </TradAtlasText>
               {miniChart(t.trend)}
             </Box>
-            <Typography sx={{ fontSize: "12px", color: color.type.muted }}>
+            <TradAtlasText semanticFont={SF.textSm} sx={{ color: color.type.muted }}>
               {t.description}
-            </Typography>
+            </TradAtlasText>
             <Box sx={{ display: "flex", alignItems: "center", gap: "4px" }}>
               {t.trend === "up" ? (
                 <TrendingUpOutlinedIcon sx={{ fontSize: 16, color: color.status.success.default }} />
               ) : (
                 <TrendingDownOutlinedIcon sx={{ fontSize: 16, color: color.status.error.default }} />
               )}
-              <Typography
+              <TradAtlasText
+                semanticFont={SF.textSm}
                 sx={{
-                  fontSize: "12px",
                   color: t.trend === "up" ? color.status.success.text : color.status.error.text,
                   fontWeight: weight.medium,
                 }}
               >
                 {t.trendLabel}
-              </Typography>
+              </TradAtlasText>
             </Box>
           </Box>
         ))}
@@ -1083,20 +927,12 @@ function SystemLog() {
 
   return (
     <ContentCard>
-      <Typography
-        sx={{
-          fontSize: "14px",
-          lineHeight: "20px",
-          fontWeight: weight.semiBold,
-          color: color.type.default,
-          mb: "4px",
-        }}
-      >
+      <TradAtlasText semanticFont={SF.textMd} sx={{ fontWeight: weight.semiBold, color: color.type.default, mb: "4px" }}>
         System log
-      </Typography>
-      <Typography sx={{ fontSize: "12px", color: color.type.muted, mb: "12px" }}>
+      </TradAtlasText>
+      <TradAtlasText semanticFont={SF.textSm} sx={{ color: color.type.muted, mb: "12px" }}>
         Recent agent activity (last 24 hours)
-      </Typography>
+      </TradAtlasText>
       <Box
         sx={{
           borderRadius: radius.md,
@@ -1108,21 +944,12 @@ function SystemLog() {
           gap: "8px",
           maxHeight: 200,
           overflow: "auto",
-          fontFamily: '"SF Mono", "Fira Code", "Fira Mono", "Roboto Mono", monospace',
         }}
       >
         {logs.map((log, i) => (
-          <Typography
-            key={i}
-            sx={{
-              fontSize: "12px",
-              lineHeight: "18px",
-              color: color.type.muted,
-              fontFamily: "inherit",
-            }}
-          >
+          <TradAtlasText key={i} semanticFont={SF.codeSm} sx={{ color: color.type.muted }}>
             {log}
-          </Typography>
+          </TradAtlasText>
         ))}
       </Box>
     </ContentCard>

@@ -2,12 +2,8 @@ import { useMemo } from "react";
 import { useDemo } from "../DemoContext";
 import { atlasSemanticColor } from "../tokens/atlasLight";
 import { atlasSemanticColorDark } from "../tokens/atlasDark";
-import {
-  atlasSemanticRadius,
-  atlasFontWeight,
-  atlasTypography,
-  atlasCoreSpacing,
-} from "../tokens/atlasLight";
+import { atlasSemanticRadius, atlasFontWeight, atlasCoreSpacing } from "../tokens/atlasLight";
+import { DATA_SEMANTIC_FONT, SF, semanticFontStyle } from "../tokens/tradAtlasSemanticTypography";
 
 export function useTokens() {
   const { themeMode } = useDemo();
@@ -19,8 +15,10 @@ export function useTokens() {
     color,
     radius: atlasSemanticRadius,
     weight: atlasFontWeight,
-    typography: atlasTypography,
     spacing: atlasCoreSpacing,
     isDark: themeMode === "atlas-dark",
+    semanticFontStyle,
+    SF,
+    DATA_SEMANTIC_FONT,
   };
 }

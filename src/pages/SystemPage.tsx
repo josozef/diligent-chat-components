@@ -10,9 +10,17 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Typography,
 } from "@mui/material";
 import type { SxProps, Theme } from "@mui/material/styles";
+
+import { atlasFontFamily, atlasSemanticRadius } from "../tokens/atlasLight";
+import TradAtlasText from "../components/common/TradAtlasText";
+import {
+  DATA_SEMANTIC_FONT,
+  SF,
+  semanticFontStyle,
+  TYPOGRAPHY_PRIMITIVE,
+} from "../tokens/tradAtlasSemanticTypography";
 
 /* ────────────────────────────────────────────────────────────
  * Atlas Light tokens (from Atlas MCP — atlas-light theme)
@@ -57,12 +65,12 @@ const ATLAS_LIGHT = {
   },
 } as const;
 
-/* Trad Atlas radius tokens (not in standard Atlas Light) */
+/* Trad Atlas button radii — same values as atlasSemanticRadius (tiny / sm / smmd / md) */
 const TRAD_RADIUS = {
-  "Extra small": { value: "2px", token: "radius/tiny" },
-  Small: { value: "4px", token: "radius/sm" },
-  Medium: { value: "6px", token: "radius/smmd" },
-  Large: { value: "8px", token: "radius/md" },
+  "Extra small": { value: atlasSemanticRadius.tiny, token: "radius/tiny" },
+  Small: { value: atlasSemanticRadius.sm, token: "radius/sm" },
+  Medium: { value: atlasSemanticRadius.smmd, token: "radius/smmd" },
+  Large: { value: atlasSemanticRadius.md, token: "radius/md" },
 } as const;
 
 type TradSize = keyof typeof TRAD_RADIUS;
@@ -74,18 +82,37 @@ const TYPES: TradType[] = ["Primary", "Secondary", "Tertiary"];
 const STATES: TradState[] = ["Default", "Hover", "Active", "Disabled", "Processing"];
 
 /* Exact Figma padding per size (from Trad Atlas Figma code output) */
+type TextMetrics = { fontSize: string; lineHeight: string; letterSpacing: string };
+
 function sizeMetrics(size: TradSize) {
+  const textLg = TYPOGRAPHY_PRIMITIVE["Typography/Text/Lg"] as TextMetrics;
+  const textSm = TYPOGRAPHY_PRIMITIVE["Typography/Text/Sm"] as TextMetrics;
+  const body = {
+    fontSize: textLg.fontSize,
+    lineHeight: textLg.lineHeight,
+    letterSpacing: textLg.letterSpacing,
+    progressSize: 16 as number,
+  };
   switch (size) {
     case "Extra small":
-      return { pt: "6px", pb: "4px", px: "8px", fontSize: "12px", lineHeight: "16px", letterSpacing: "0.3px", gap: "4px" };
+      return {
+        pt: "6px",
+        pb: "4px",
+        px: "8px",
+        fontSize: textSm.fontSize,
+        lineHeight: textSm.lineHeight,
+        letterSpacing: textSm.letterSpacing,
+        gap: "4px",
+        progressSize: 12,
+      };
     case "Small":
-      return { pt: "6px", pb: "4px", px: "12px", fontSize: "16px", lineHeight: "24px", letterSpacing: "0.2px", gap: "8px" };
+      return { pt: "6px", pb: "4px", px: "12px", gap: "8px", ...body };
     case "Medium":
-      return { pt: "8px", pb: "8px", px: "12px", fontSize: "16px", lineHeight: "24px", letterSpacing: "0.2px", gap: "8px" };
+      return { pt: "8px", pb: "8px", px: "12px", gap: "8px", ...body };
     case "Large":
-      return { pt: "12px", pb: "12px", px: "12px", fontSize: "16px", lineHeight: "24px", letterSpacing: "0.2px", gap: "8px" };
+      return { pt: "12px", pb: "12px", px: "12px", gap: "8px", ...body };
     default:
-      return { pt: "8px", pb: "8px", px: "12px", fontSize: "16px", lineHeight: "24px", letterSpacing: "0.2px", gap: "8px" };
+      return { pt: "8px", pb: "8px", px: "12px", gap: "8px", ...body };
   }
 }
 
@@ -112,7 +139,7 @@ function getButtonSx(p: {
     lineHeight: m.lineHeight,
     letterSpacing: m.letterSpacing,
     fontWeight: 600,
-    fontFamily: '"Inter", system-ui, sans-serif',
+    fontFamily: atlasFontFamily,
     textTransform: "none",
     minWidth: "auto",
     boxSizing: "border-box",
@@ -219,20 +246,25 @@ function VariantPreview(props: {
   const m = sizeMetrics(size);
 
   return (
-    <Box
-      component="span"
-      sx={{
-        ...sx,
-        display: "inline-flex",
-        alignItems: "center",
-        justifyContent: "center",
-        gap: m.gap,
-        cursor: state === "Disabled" || state === "Processing" ? "default" : "pointer",
-      }}
-    >
+    <Stack direction="column" spacing={0.5} alignItems="flex-start" sx={{ minWidth: 0 }}>
+      <TradAtlasText semanticFont={SF.textXs} sx={{ color: "text.secondary", lineHeight: 1.2 }}>
+        {size}
+      </TradAtlasText>
+      <Box
+        component="span"
+        data-trad-size={size}
+        sx={{
+          ...sx,
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: m.gap,
+          cursor: state === "Disabled" || state === "Processing" ? "default" : "pointer",
+        }}
+      >
       {state === "Processing" && (
         <CircularProgress
-          size={parseInt(m.fontSize)}
+          size={m.progressSize}
           thickness={4}
           sx={{
             color:
@@ -243,7 +275,8 @@ function VariantPreview(props: {
         />
       )}
       {"{Button}"}
-    </Box>
+      </Box>
+    </Stack>
   );
 }
 
@@ -384,39 +417,40 @@ export default function SystemPage() {
 
   return (
     <Box sx={{ py: "32px", px: "24px", maxWidth: 1400, mx: "auto" }}>
-      <Typography variant="h4" component="h1" fontWeight={600} gutterBottom>
+      <TradAtlasText component="h1" semanticFont={SF.titleH4Emphasis} sx={{ mb: "8px" }}>
         Design system reference
-      </Typography>
-      <Typography variant="body2" color="text.secondary" sx={{ mb: "24px" }}>
+      </TradAtlasText>
+      <TradAtlasText semanticFont={SF.textMd} sx={{ color: "text.secondary", mb: "24px" }}>
         Colors resolved from the <strong>Atlas Light</strong> theme. Radii from{" "}
         <strong>Trad Atlas</strong> (2 / 4 / 6 / 8 px). Focus variants omitted.
-      </Typography>
+      </TradAtlasText>
 
       {/* ── Token reference ── */}
-      <Typography variant="h5" fontWeight={600} sx={{ mb: "12px" }}>
+      <TradAtlasText semanticFont={SF.titleH5Emphasis} sx={{ mb: "12px" }}>
         Atlas Light design tokens
-      </Typography>
+      </TradAtlasText>
 
       <Stack spacing="24px" sx={{ mb: "40px" }}>
         {TOKEN_SECTIONS.map((section) => (
           <Box key={section.heading}>
-            <Typography variant="subtitle2" fontWeight={600} sx={{ mb: "4px" }}>
+            <TradAtlasText semanticFont={SF.textSmEmphasis} sx={{ mb: "4px" }}>
               {section.heading}
-            </Typography>
+            </TradAtlasText>
             <TableContainer component={Paper} variant="outlined">
               <Table size="small">
                 <TableBody>
                   {section.rows.map(([token, value]) => (
                     <TableRow key={token}>
-                      <TableCell sx={{ fontFamily: "monospace", fontSize: 12, py: "4px", width: "50%" }}>
+                      <TableCell
+                        {...{ [DATA_SEMANTIC_FONT]: SF.codeSm }}
+                        sx={{ ...semanticFontStyle(SF.codeSm), py: "4px", width: "50%" }}
+                      >
                         {token}
                       </TableCell>
                       <TableCell sx={{ py: "4px" }}>
                         <Box sx={{ display: "flex", alignItems: "center", gap: "8px" }}>
                           {!value.endsWith("px") && <Swatch color={value} />}
-                          <Typography variant="body2" sx={{ fontFamily: "monospace", fontSize: 12 }}>
-                            {value}
-                          </Typography>
+                          <TradAtlasText semanticFont={SF.codeSm}>{value}</TradAtlasText>
                         </Box>
                       </TableCell>
                     </TableRow>
@@ -431,12 +465,12 @@ export default function SystemPage() {
       <Divider sx={{ mb: "32px" }} />
 
       {/* ── Button component grid ── */}
-      <Typography variant="h5" fontWeight={600} sx={{ mb: "4px" }}>
+      <TradAtlasText semanticFont={SF.titleH5Emphasis} sx={{ mb: "4px" }}>
         Button
-      </Typography>
-      <Typography variant="body2" color="text.secondary" sx={{ mb: "12px" }}>
+      </TradAtlasText>
+      <TradAtlasText semanticFont={SF.textMd} sx={{ color: "text.secondary", mb: "12px" }}>
         Trad Atlas — Components. Border radii: XS 2px, S 4px, M 6px, L 8px.
-      </Typography>
+      </TradAtlasText>
 
       <TableContainer component={Paper} variant="outlined" sx={{ maxHeight: "70vh" }}>
         <Table size="small" stickyHeader>
@@ -462,14 +496,12 @@ export default function SystemPage() {
                     />
                   </TableCell>
                   <TableCell>
-                    <Typography variant="body2" sx={{ fontFamily: "monospace", fontSize: 12 }}>
-                      {variantLabel}
-                    </Typography>
+                    <TradAtlasText semanticFont={SF.codeSm}>{variantLabel}</TradAtlasText>
                   </TableCell>
                   <TableCell>
-                    <Typography variant="body2" sx={{ fontSize: 12, color: "text.secondary" }}>
+                    <TradAtlasText semanticFont={SF.codeSm} sx={{ color: "text.secondary" }}>
                       {describeStyle(row)}
-                    </Typography>
+                    </TradAtlasText>
                   </TableCell>
                 </TableRow>
               );

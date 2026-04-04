@@ -1,5 +1,6 @@
-import { Box, Typography } from "@mui/material";
-import NorthEastIcon from "@mui/icons-material/NorthEast";
+import { Box, Button } from "@mui/material";
+import { NorthEastIcon } from "@/icons";
+import { DATA_SEMANTIC_FONT, SF, semanticFontStyle } from "@/tokens/tradAtlasSemanticTypography";
 import { useTokens } from "../../hooks/useTokens";
 
 export default function SuggestionChip({
@@ -12,42 +13,38 @@ export default function SuggestionChip({
   const { color, weight } = useTokens();
 
   return (
-    <Box
-      component="button"
+    <Button
       type="button"
+      variant="outlined"
+      color="inherit"
+      size="small"
       onClick={onClick}
+      data-atlas-component="Button"
+      data-atlas-variant="outlined - chip - sm"
+      {...{ [DATA_SEMANTIC_FONT]: SF.textMdEmphasis }}
       sx={{
+        ...semanticFontStyle(SF.textMdEmphasis),
         display: "inline-flex",
         alignItems: "center",
         justifyContent: "center",
         height: "36px",
-        border: `1px solid ${color.outline.fixed}`,
-        borderRadius: "6px",
-        background: "transparent",
+        minWidth: 0,
         px: "8px",
         py: 0,
-        cursor: "pointer",
+        textTransform: "none",
+        fontWeight: weight.semiBold,
+        borderColor: color.outline.fixed,
         overflow: "clip",
+        color: color.type.default,
         "&:hover": { background: color.surface.variant },
       }}
     >
-      <Box sx={{ display: "flex", alignItems: "center", height: "36px", px: "8px" }}>
-        <Typography
-          sx={{
-            fontWeight: weight.semiBold,
-            fontSize: "14px",
-            lineHeight: "20px",
-            letterSpacing: "0.2px",
-            color: color.type.default,
-            whiteSpace: "nowrap",
-          }}
-        >
-          {label}
-        </Typography>
+      <Box sx={{ display: "flex", alignItems: "center", height: "36px", px: "8px", whiteSpace: "nowrap" }}>
+        {label}
       </Box>
       <Box sx={{ display: "flex", alignItems: "center", height: "36px", px: 0 }}>
         <NorthEastIcon sx={{ fontSize: 16, color: color.type.default }} />
       </Box>
-    </Box>
+    </Button>
   );
 }

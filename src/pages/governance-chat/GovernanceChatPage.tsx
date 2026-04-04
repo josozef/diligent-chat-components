@@ -1,14 +1,13 @@
-import { Box, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import { AiSparkle, ChatPrompt } from "../../components/ai";
 import { SuggestionChip } from "../../components/common";
 import ChatThread from "../../components/ai/ChatThread";
 import useChatSimulation from "../../hooks/useChatSimulation";
 import { GOVERNANCE_THINKING_STEPS } from "./thinkingSteps";
 import { GOVERNANCE_RESPONSE_SECTIONS } from "./responseSections";
-import {
-  atlasSemanticColor as color,
-  atlasFontWeight as weight,
-} from "../../tokens/atlasLight";
+import TradAtlasText from "../../components/common/TradAtlasText";
+import { SF } from "../../tokens/tradAtlasSemanticTypography";
+import { atlasSemanticColor as color } from "../../tokens/atlasLight";
 
 const CHAT_WIDTH = 640;
 
@@ -57,30 +56,26 @@ export default function GovernanceChatPage() {
             }}
           >
             <AiSparkle size="2xl" />
-            <Typography
+            <TradAtlasText
+              semanticFont={SF.displayLgEmphasis}
               sx={{
-                fontSize: "24px",
-                lineHeight: "32px",
-                fontWeight: weight.semiBold,
                 letterSpacing: "-0.2px",
                 color: color.type.default,
                 textAlign: "center",
               }}
             >
               How can I help you today?
-            </Typography>
-            <Typography
+            </TradAtlasText>
+            <TradAtlasText
+              semanticFont={SF.textLg}
               sx={{
-                fontSize: "16px",
-                lineHeight: "24px",
-                letterSpacing: "0.2px",
                 color: color.type.muted,
                 textAlign: "center",
                 maxWidth: 480,
               }}
             >
               Ask a question, draft a document, or explore legal requirements — I&apos;m here to assist.
-            </Typography>
+            </TradAtlasText>
           </Box>
         ) : (
           <Box sx={{ px: "24px" }}>

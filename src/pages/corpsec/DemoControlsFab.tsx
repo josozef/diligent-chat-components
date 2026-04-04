@@ -5,14 +5,17 @@ import {
   IconButton,
   Popover,
   Stack,
-  Typography,
 } from "@mui/material";
-import LightbulbOutlinedIcon from "@mui/icons-material/LightbulbOutlined";
-import CloseIcon from "@mui/icons-material/Close";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
+import {
+  LightbulbOutlinedIcon,
+  CloseIcon,
+  CheckCircleIcon,
+  RadioButtonUncheckedIcon,
+} from "@/icons";
 import { useDemo } from "../../DemoContext";
 import { useTokens } from "../../hooks/useTokens";
+import TradAtlasText from "../../components/common/TradAtlasText";
+import { SF } from "../../tokens/tradAtlasSemanticTypography";
 
 interface SelectableCardProps {
   selected: boolean;
@@ -43,7 +46,7 @@ function SwatchRow({ colors }: { colors: string[] }) {
 }
 
 function SelectableCard({ selected, onClick, title, description, swatches }: SelectableCardProps) {
-  const { color, radius, weight } = useTokens();
+  const { color, radius } = useTokens();
 
   return (
     <Box
@@ -71,14 +74,12 @@ function SelectableCard({ selected, onClick, title, description, swatches }: Sel
       <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
         <Box>
           <SwatchRow colors={swatches} />
-          <Typography
-            sx={{ fontSize: "13px", fontWeight: weight.semiBold, color: color.type.default, mt: "8px" }}
-          >
+          <TradAtlasText semanticFont={SF.labelMdEmphasis} sx={{ color: color.type.default, mt: "8px" }}>
             {title}
-          </Typography>
-          <Typography sx={{ fontSize: "12px", color: color.type.muted, mt: "2px" }}>
+          </TradAtlasText>
+          <TradAtlasText semanticFont={SF.textSm} sx={{ color: color.type.muted, mt: "2px" }}>
             {description}
-          </Typography>
+          </TradAtlasText>
         </Box>
         {selected ? (
           <CheckCircleIcon sx={{ fontSize: 20, color: color.action.primary.default, flexShrink: 0 }} />
@@ -107,7 +108,7 @@ const FAB_EMERALD_DARK = {
 } as const;
 
 export default function DemoControlsFab() {
-  const { color, radius, weight, isDark } = useTokens();
+  const { color, radius, isDark } = useTokens();
   const { hasAlerts, setHasAlerts, themeMode, setThemeMode } = useDemo();
   const fabRef = useRef<HTMLButtonElement>(null);
   const [open, setOpen] = useState(false);
@@ -161,17 +162,25 @@ export default function DemoControlsFab() {
       >
         <Box sx={{ p: "16px" }}>
           <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: "16px" }}>
-            <Typography sx={{ fontSize: "14px", fontWeight: weight.semiBold, color: color.type.default }}>
+            <TradAtlasText semanticFont={SF.textMdEmphasis} sx={{ color: color.type.default }}>
               Demo settings
-            </Typography>
+            </TradAtlasText>
             <IconButton size="small" onClick={() => setOpen(false)} sx={{ color: color.type.muted }}>
               <CloseIcon fontSize="small" />
             </IconButton>
           </Stack>
 
-          <Typography sx={{ fontSize: "12px", fontWeight: weight.semiBold, color: color.type.muted, mb: "8px", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+          <TradAtlasText
+            semanticFont={SF.textSmEmphasis}
+            sx={{
+              color: color.type.muted,
+              mb: "8px",
+              textTransform: "uppercase",
+              letterSpacing: "0.5px",
+            }}
+          >
             Scenario
-          </Typography>
+          </TradAtlasText>
           <Stack spacing={1} sx={{ mb: "20px" }}>
             <SelectableCard
               selected={hasAlerts}
@@ -189,9 +198,17 @@ export default function DemoControlsFab() {
             />
           </Stack>
 
-          <Typography sx={{ fontSize: "12px", fontWeight: weight.semiBold, color: color.type.muted, mb: "8px", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+          <TradAtlasText
+            semanticFont={SF.textSmEmphasis}
+            sx={{
+              color: color.type.muted,
+              mb: "8px",
+              textTransform: "uppercase",
+              letterSpacing: "0.5px",
+            }}
+          >
             Theme
-          </Typography>
+          </TradAtlasText>
           <Stack spacing={1}>
             <SelectableCard
               selected={themeMode === "atlas-light"}

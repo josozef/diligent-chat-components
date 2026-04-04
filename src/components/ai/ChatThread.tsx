@@ -1,13 +1,12 @@
-import { Box, Stack, Typography } from "@mui/material";
-import NorthEastIcon from "@mui/icons-material/NorthEast";
+import { Box, Stack } from "@mui/material";
+import { NorthEastIcon } from "@/icons";
+import TradAtlasText from "../common/TradAtlasText";
+import { SF } from "@/tokens/tradAtlasSemanticTypography";
 import ThinkingPanel from "./ThinkingPanel";
 import MessageBubble from "./MessageBubble";
 import FeedbackBar from "./FeedbackBar";
 import RevealSection from "./RevealSection";
-import {
-  atlasSemanticColor as color,
-  atlasFontWeight as weight,
-} from "../../tokens/atlasLight";
+import { atlasSemanticColor as color } from "../../tokens/atlasLight";
 
 export type ChatPhase = "idle" | "thinking" | "responding" | "done";
 
@@ -31,18 +30,9 @@ function SuggestionChipFooter({ label }: { label: string }) {
         "&:hover": { background: color.surface.variant },
       }}
     >
-      <Typography
-        sx={{
-          fontWeight: weight.semiBold,
-          fontSize: "14px",
-          lineHeight: "20px",
-          letterSpacing: "0.2px",
-          color: color.type.default,
-          px: "8px",
-        }}
-      >
+      <TradAtlasText semanticFont={SF.textMdEmphasis} sx={{ px: "8px" }}>
         {label}
-      </Typography>
+      </TradAtlasText>
       <NorthEastIcon sx={{ fontSize: 16, color: color.type.default }} />
     </Box>
   );
@@ -115,17 +105,9 @@ export default function ChatThread({
               <Box sx={{ display: "flex", flexDirection: "column", gap: "16px", width: "100%", pt: "8px" }}>
                 <FeedbackBar />
                 <Box sx={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                  <Typography
-                    sx={{
-                      fontSize: "14px",
-                      lineHeight: "20px",
-                      letterSpacing: "0.2px",
-                      fontWeight: weight.regular,
-                      color: color.type.muted,
-                    }}
-                  >
+                  <TradAtlasText semanticFont={SF.textMd} sx={{ color: color.type.muted }}>
                     Suggested actions
-                  </Typography>
+                  </TradAtlasText>
                   <Box sx={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
                     {suggestedActions.map((label) => (
                       <SuggestionChipFooter key={label} label={label} />

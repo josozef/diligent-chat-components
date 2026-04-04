@@ -7,10 +7,17 @@
  * Core palette references are resolved to hex/RGBA here so the app does not
  * depend on runtime token resolution.
  *
- * **Typography family:** Figma semantic tokens reference Plus Jakarta Sans; this
- * app’s MUI theme uses **Inter** as the product standard—sizes and weights below
- * still match Atlas semantic steps.
+ * **Typography:** Use `tradAtlasSemanticTypography.ts` (Semantic/Font/* from Trad Atlas
+ * Foundation). This file only exports `atlasFontFamily` / `atlasFontFamilyMono` for
+ * non-semantic contexts (e.g. CSS baseline).
  */
+
+/** Inter stack — use everywhere sans-serif Atlas text is rendered (not the Jakarta font from atlas-react-bundle). */
+export const atlasFontFamily = '"Inter", system-ui, -apple-system, sans-serif';
+
+/** Monospace — code / IDs; not the Atlas UI sans scale. */
+export const atlasFontFamilyMono =
+  '"SF Mono", "Fira Code", "Fira Mono", "Roboto Mono", monospace';
 
 /** Core spacing scale (Foundation → core.spacing) */
 export const atlasCoreSpacing = {
@@ -35,7 +42,11 @@ export const atlasCoreSpacing = {
 /** Semantic radius → resolved from core.spacing (Atlas Light) */
 export const atlasSemanticRadius = {
   none: "0px",
+  /** Trad / Figma radius/tiny — XS button */
+  tiny: "3px",
   sm: atlasCoreSpacing["0_5"], // 4px
+  /** Trad — M button (between sm and md) */
+  smmd: "6px",
   md: atlasCoreSpacing["1"], // 8px
   lg: atlasCoreSpacing["1_5"], // 12px
   xl: atlasCoreSpacing["3"], // 24px
@@ -137,31 +148,5 @@ export const atlasSemanticColor = {
       text: "#19519d",
       background: "#ecf0ff",
     },
-  },
-} as const;
-
-/** Typography: sizes from semantic.font.* (Atlas); family overridden in theme to Inter */
-export const atlasTypography = {
-  fontSize: {
-    body: "1rem",
-    md: "0.875rem",
-    sm: "0.75rem",
-    h1Billboard: "1.875rem",
-    h2Display: "1.625rem",
-    h3Lg: "1.375rem",
-    h4Md: "1.125rem",
-    h5Sm: "1rem",
-    h6Xs: "0.875rem",
-  },
-  lineHeight: {
-    body: "1.5rem",
-    md: "1.25rem",
-    sm: "1rem",
-    h1Billboard: "2.375rem",
-    h2Display: "2.125rem",
-    h3Lg: "1.75rem",
-    h4Md: "1.75rem",
-    h5Sm: "1.5rem",
-    h6Xs: "1.25rem",
   },
 } as const;

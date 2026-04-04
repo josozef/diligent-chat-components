@@ -1,12 +1,9 @@
-import { Box, Collapse, Typography } from "@mui/material";
-import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
-import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import { Box, Collapse } from "@mui/material";
+import { ArrowDropUpIcon, ArrowDropDownIcon } from "@/icons";
+import TradAtlasText from "../common/TradAtlasText";
+import { SF } from "@/tokens/tradAtlasSemanticTypography";
 import AiSparkle from "./AiSparkle";
-import {
-  atlasSemanticColor as color,
-  atlasFontWeight as weight,
-  atlasSemanticRadius as radius,
-} from "../../tokens/atlasLight";
+import { atlasSemanticColor as color, atlasSemanticRadius as radius } from "../../tokens/atlasLight";
 
 export interface ThinkingStep {
   title: string;
@@ -23,24 +20,12 @@ interface ThinkingPanelProps {
   onToggle: () => void;
 }
 
-const bodySm = {
-  fontSize: "12px",
-  lineHeight: "16px",
-  letterSpacing: "0.3px",
-  color: color.type.default,
-} as const;
-
-const labelSmEmphasis = {
-  ...bodySm,
-  fontWeight: weight.semiBold,
-} as const;
-
 export default function ThinkingPanel({ steps, isThinking, activeStep, open, onToggle }: ThinkingPanelProps) {
   const toggleLabel = isThinking
     ? steps[Math.max(0, activeStep)]?.title ?? "Thinking..."
     : open
-    ? "Hide thinking"
-    : "Show thinking";
+      ? "Hide thinking"
+      : "Show thinking";
 
   const stepsToShow = isThinking ? Math.min(activeStep + 1, steps.length) : steps.length;
 
@@ -70,18 +55,16 @@ export default function ThinkingPanel({ steps, isThinking, activeStep, open, onT
             "&:hover": { background: color.action.secondary.hoverFill },
           }}
         >
-          <Typography
+          <TradAtlasText
+            semanticFont={SF.textMdEmphasis}
             sx={{
-              fontWeight: weight.semiBold,
-              fontSize: "14px",
-              lineHeight: "20px",
               letterSpacing: "0.14px",
               color: isThinking ? color.type.muted : color.type.default,
               transition: "color 0.3s ease",
             }}
           >
             {toggleLabel}
-          </Typography>
+          </TradAtlasText>
           {open ? (
             <ArrowDropUpIcon sx={{ fontSize: 24, color: isThinking ? color.type.muted : color.type.default }} />
           ) : (
@@ -116,8 +99,10 @@ export default function ThinkingPanel({ steps, isThinking, activeStep, open, onT
                   transition: "opacity 0.3s ease",
                 }}
               >
-                <Typography sx={labelSmEmphasis}>{step.title}</Typography>
-                <Typography sx={{ ...bodySm, fontWeight: weight.regular }}>
+                <TradAtlasText semanticFont={SF.textSmEmphasis} sx={{ color: color.type.default }}>
+                  {step.title}
+                </TradAtlasText>
+                <TradAtlasText semanticFont={SF.textSm} sx={{ color: color.type.default }}>
                   {step.body}
                   {isActiveStep && (
                     <Box
@@ -137,7 +122,7 @@ export default function ThinkingPanel({ steps, isThinking, activeStep, open, onT
                       }}
                     />
                   )}
-                </Typography>
+                </TradAtlasText>
               </Box>
             );
           })}

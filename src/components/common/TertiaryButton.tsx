@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import { useTokens } from "../../hooks/useTokens";
 
 export default function TertiaryButton({
@@ -12,13 +12,17 @@ export default function TertiaryButton({
   trailingIcon?: React.ReactNode;
   onClick?: () => void;
 }) {
-  const { color, weight } = useTokens();
+  const { color } = useTokens();
 
   return (
-    <Box
-      component="button"
+    <Button
       type="button"
+      variant="text"
+      color="inherit"
+      size="medium"
       onClick={onClick}
+      data-atlas-component="Button"
+      data-atlas-variant="text - tertiary - md"
       sx={{
         display: "inline-flex",
         alignItems: "center",
@@ -26,30 +30,15 @@ export default function TertiaryButton({
         gap: "8px",
         px: "12px",
         py: "8px",
-        borderRadius: "6px",
-        border: "none",
-        background: "transparent",
-        cursor: "pointer",
+        minWidth: 0,
+        textTransform: "none",
         color: color.action.secondary.onSecondary,
         "&:hover": { background: color.action.secondary.hoverFill },
       }}
     >
       {leadingIcon}
-      <Box sx={{ display: "flex", alignItems: "center", height: "24px", px: "4px", pb: "2px" }}>
-        <Typography
-          sx={{
-            fontWeight: weight.semiBold,
-            fontSize: "16px",
-            lineHeight: "24px",
-            letterSpacing: "0.2px",
-            color: color.action.secondary.onSecondary,
-            whiteSpace: "nowrap",
-          }}
-        >
-          {label}
-        </Typography>
-      </Box>
+      <Box sx={{ display: "flex", alignItems: "center", height: "24px", px: "4px", pb: "2px" }}>{label}</Box>
       {trailingIcon}
-    </Box>
+    </Button>
   );
 }

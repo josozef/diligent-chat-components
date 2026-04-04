@@ -1,17 +1,22 @@
-import { Box, Chip, Divider, Typography } from "@mui/material";
-import AutoAwesomeOutlinedIcon from "@mui/icons-material/AutoAwesomeOutlined";
-import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
-import WarningAmberIcon from "@mui/icons-material/WarningAmber";
-import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
-import BusinessOutlinedIcon from "@mui/icons-material/BusinessOutlined";
-import PublicOutlinedIcon from "@mui/icons-material/PublicOutlined";
-import EventOutlinedIcon from "@mui/icons-material/EventOutlined";
-import GavelOutlinedIcon from "@mui/icons-material/GavelOutlined";
-import HowToVoteOutlinedIcon from "@mui/icons-material/HowToVoteOutlined";
-import UploadFileOutlinedIcon from "@mui/icons-material/UploadFileOutlined";
-import StorageOutlinedIcon from "@mui/icons-material/StorageOutlined";
-import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
+import { Box, Button, Chip, Divider } from "@mui/material";
+import type { SxProps, Theme } from "@mui/material/styles";
+import {
+  AutoAwesomeOutlinedIcon,
+  CheckCircleOutlineIcon,
+  RadioButtonUncheckedIcon,
+  WarningAmberIcon,
+  PersonOutlinedIcon,
+  BusinessOutlinedIcon,
+  PublicOutlinedIcon,
+  EventOutlinedIcon,
+  GavelOutlinedIcon,
+  HowToVoteOutlinedIcon,
+  UploadFileOutlinedIcon,
+  StorageOutlinedIcon,
+  SearchOutlinedIcon,
+} from "@/icons";
+import TradAtlasText from "@/components/common/TradAtlasText";
+import { DATA_SEMANTIC_FONT, SF, semanticFontStyle } from "@/tokens/tradAtlasSemanticTypography";
 import { useTokens } from "../../../hooks/useTokens";
 import type { WorkflowStep, WorkflowStepId } from "./AppointmentWorkspace";
 
@@ -70,6 +75,8 @@ function SummaryCard({ children, sx }: { children: React.ReactNode; sx?: object 
   const { color, radius } = useTokens();
   return (
     <Box
+      data-atlas-component="SummaryCard"
+      data-atlas-variant="surface - card - lg"
       sx={{
         borderRadius: radius.lg,
         border: `1px solid ${color.outline.fixed}`,
@@ -105,32 +112,32 @@ function StepHeader({
   return (
     <Box sx={{ mb: "20px" }}>
       <Box sx={{ display: "flex", alignItems: "center", gap: "10px", mb: "4px" }}>
-        <Typography
+        <TradAtlasText
+          semanticFont={SF.titleH4Emphasis}
           sx={{
-            fontSize: "18px",
-            lineHeight: "28px",
             fontWeight: weight.semiBold,
             color: color.type.default,
           }}
         >
           {title}
-        </Typography>
+        </TradAtlasText>
         <Chip
           label={statusLabel}
           size="small"
+          {...{ [DATA_SEMANTIC_FONT]: SF.textXs }}
           sx={{
+            ...semanticFontStyle(SF.textXs),
             backgroundColor: chipColor,
             color: "#fff",
             fontWeight: weight.semiBold,
-            fontSize: "10px",
             height: 20,
             letterSpacing: "0.5px",
           }}
         />
       </Box>
-      <Typography sx={{ fontSize: "14px", lineHeight: "20px", color: color.type.muted }}>
+      <TradAtlasText semanticFont={SF.textMd} sx={{ color: color.type.muted }}>
         {subtitle}
-      </Typography>
+      </TradAtlasText>
     </Box>
   );
 }
@@ -151,22 +158,22 @@ function DetailRow({
     <Box sx={{ display: "flex", alignItems: "flex-start", gap: "8px" }}>
       <Box sx={{ color: color.type.muted, mt: "2px" }}>{icon}</Box>
       <Box>
-        <Typography
-          sx={{ fontSize: "11px", lineHeight: "16px", color: color.type.muted, fontWeight: weight.medium }}
+        <TradAtlasText
+          semanticFont={SF.textMicroEmphasis}
+          sx={{ color: color.type.muted, fontWeight: weight.medium }}
         >
           {label}
-        </Typography>
-        <Typography
+        </TradAtlasText>
+        <TradAtlasText
+          semanticFont={SF.labelMd}
           sx={{
-            fontSize: "13px",
-            lineHeight: "20px",
             color: muted ? color.type.disabled : color.type.default,
             fontWeight: weight.medium,
             fontStyle: muted ? "italic" : "normal",
           }}
         >
           {value}
-        </Typography>
+        </TradAtlasText>
       </Box>
     </Box>
   );
@@ -186,24 +193,24 @@ function OverviewContent({
   return (
     <Box sx={{ maxWidth: 720, display: "flex", flexDirection: "column", gap: "24px" }}>
       <Box sx={{ display: "flex", alignItems: "center", gap: "10px" }}>
-        <Typography
+        <TradAtlasText
+          semanticFont={SF.titleH4Emphasis}
           sx={{
-            fontSize: "18px",
-            lineHeight: "28px",
             fontWeight: weight.semiBold,
             color: color.type.default,
           }}
         >
           Board appointment overview
-        </Typography>
+        </TradAtlasText>
         <Chip
           label="IN PROGRESS"
           size="small"
+          {...{ [DATA_SEMANTIC_FONT]: SF.textXs }}
           sx={{
+            ...semanticFontStyle(SF.textXs),
             backgroundColor: color.action.primary.default,
             color: "#fff",
             fontWeight: weight.semiBold,
-            fontSize: "10px",
             height: 20,
             letterSpacing: "0.5px",
           }}
@@ -216,40 +223,39 @@ function OverviewContent({
           <AutoAwesomeOutlinedIcon
             sx={{ fontSize: 18, color: color.action.primary.default, mt: "2px" }}
           />
-          <Typography sx={{ fontSize: "14px", lineHeight: "22px", color: color.type.default }}>
-            <Box component="span" sx={{ fontWeight: weight.semiBold }}>
+          <TradAtlasText semanticFont={SF.textMdLoose} sx={{ color: color.type.default }}>
+            <TradAtlasText component="span" semanticFont={SF.textMdLoose} sx={{ fontWeight: weight.semiBold }}>
               Workday has reported
-            </Box>{" "}
+            </TradAtlasText>{" "}
             that Wei "David" Chen, Vice President of Commercial Operations (APAC), has submitted his
             resignation from Pacific Polymer Logistics Pte. Ltd. His last working day is{" "}
-            <Box component="span" sx={{ fontWeight: weight.semiBold }}>
+            <TradAtlasText component="span" semanticFont={SF.textMdLoose} sx={{ fontWeight: weight.semiBold }}>
               April 17, 2026
-            </Box>{" "}
+            </TradAtlasText>{" "}
             — 14 days from now. The board will need to appoint a replacement director to maintain
             governance compliance with ACRA requirements in Singapore.
-          </Typography>
+          </TradAtlasText>
         </Box>
         <Divider sx={{ borderColor: color.outline.fixed, my: "12px" }} />
-        <Typography sx={{ fontSize: "13px", lineHeight: "20px", color: color.type.muted }}>
+        <TradAtlasText semanticFont={SF.labelMd} sx={{ color: color.type.muted }}>
           This workspace will guide you through identifying a qualified replacement candidate,
           collecting appointment data, routing the board resolution for approval, filing with ACRA,
           and updating entity records. The AI assistant on the right can answer questions at any step.
-        </Typography>
+        </TradAtlasText>
       </SummaryCard>
 
       {/* Key details */}
       <SummaryCard>
-        <Typography
+        <TradAtlasText
+          semanticFont={SF.textMd}
           sx={{
-            fontSize: "14px",
-            lineHeight: "20px",
             fontWeight: weight.semiBold,
             color: color.type.default,
             mb: "16px",
           }}
         >
           Appointment details
-        </Typography>
+        </TradAtlasText>
         <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
           <DetailRow
             icon={<BusinessOutlinedIcon sx={{ fontSize: 16 }} />}
@@ -288,17 +294,16 @@ function OverviewContent({
 
       {/* Jurisdictional requirements */}
       <SummaryCard>
-        <Typography
+        <TradAtlasText
+          semanticFont={SF.textMd}
           sx={{
-            fontSize: "14px",
-            lineHeight: "20px",
             fontWeight: weight.semiBold,
             color: color.type.default,
             mb: "12px",
           }}
         >
           Singapore jurisdictional requirements
-        </Typography>
+        </TradAtlasText>
         <Box sx={{ display: "flex", flexDirection: "column", gap: "8px" }}>
           {[
             "Director must be a natural person, at least 18 years of age",
@@ -319,9 +324,9 @@ function OverviewContent({
                   mt: "7px",
                 }}
               />
-              <Typography sx={{ fontSize: "13px", lineHeight: "20px", color: color.type.muted }}>
+              <TradAtlasText semanticFont={SF.labelMd} sx={{ color: color.type.muted }}>
                 {req}
-              </Typography>
+              </TradAtlasText>
             </Box>
           ))}
         </Box>
@@ -329,17 +334,16 @@ function OverviewContent({
 
       {/* Workflow status */}
       <SummaryCard>
-        <Typography
+        <TradAtlasText
+          semanticFont={SF.textMd}
           sx={{
-            fontSize: "14px",
-            lineHeight: "20px",
             fontWeight: weight.semiBold,
             color: color.type.default,
             mb: "16px",
           }}
         >
           Workflow progress
-        </Typography>
+        </TradAtlasText>
         <Box sx={{ display: "flex", flexDirection: "column", gap: "8px" }}>
           {steps.map((step) => (
             <Box
@@ -360,20 +364,19 @@ function OverviewContent({
               ) : (
                 <RadioButtonUncheckedIcon sx={{ fontSize: 18, color: color.outline.fixed }} />
               )}
-              <Typography
+              <TradAtlasText
+                semanticFont={SF.labelMdRelaxed}
                 sx={{
-                  fontSize: "13px",
-                  lineHeight: "18px",
                   color: step.status === "not_started" ? color.type.muted : color.type.default,
                   fontWeight: step.status === "in_progress" ? weight.semiBold : weight.regular,
                   flex: 1,
                 }}
               >
                 {step.name}
-              </Typography>
-              <Typography
+              </TradAtlasText>
+              <TradAtlasText
+                semanticFont={SF.textMicro}
                 sx={{
-                  fontSize: "11px",
                   color:
                     step.status === "completed"
                       ? color.status.success.text
@@ -388,7 +391,7 @@ function OverviewContent({
                   : step.status === "in_progress"
                     ? "In progress"
                     : "Not started"}
-              </Typography>
+              </TradAtlasText>
             </Box>
           ))}
         </Box>
@@ -454,23 +457,22 @@ function IdentifyCandidateStep({
             sx={{ fontSize: 18, color: color.action.primary.default, mt: "2px" }}
           />
           <Box>
-            <Typography
+            <TradAtlasText
+              semanticFont={SF.textMdLoose}
               sx={{
-                fontSize: "14px",
-                lineHeight: "22px",
                 color: color.type.default,
                 fontWeight: weight.semiBold,
                 mb: "4px",
               }}
             >
               Workday integration
-            </Typography>
-            <Typography sx={{ fontSize: "13px", lineHeight: "20px", color: color.type.muted }}>
+            </TradAtlasText>
+            <TradAtlasText semanticFont={SF.labelMd} sx={{ color: color.type.muted }}>
               Connected to Acme, Inc. Workday tenant. Queried employees associated with Pacific
               Polymer Logistics Pte. Ltd. who hold eligible titles and meet minimum tenure
               requirements. Results filtered against Singapore Companies Act director eligibility
               criteria.
-            </Typography>
+            </TradAtlasText>
           </Box>
         </Box>
       </SummaryCard>
@@ -497,25 +499,19 @@ function IdentifyCandidateStep({
             >
               <Box>
                 <Box sx={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                  <Typography
-                    sx={{
-                      fontSize: "15px",
-                      lineHeight: "22px",
-                      fontWeight: weight.semiBold,
-                      color: color.type.default,
-                    }}
-                  >
+                  <TradAtlasText semanticFont={SF.bodyLeadEmphasis} sx={{ color: color.type.default }}>
                     {c.name}
-                  </Typography>
+                  </TradAtlasText>
                   {c.recommended && (
                     <Chip
                       label="Recommended"
                       size="small"
+                      {...{ [DATA_SEMANTIC_FONT]: SF.textMicro }}
                       sx={{
+                        ...semanticFontStyle(SF.textMicro),
                         backgroundColor: color.status.success.background,
                         color: color.status.success.text,
                         fontWeight: weight.semiBold,
-                        fontSize: "11px",
                         height: 20,
                         border: `1px solid ${color.status.success.default}`,
                       }}
@@ -525,26 +521,25 @@ function IdentifyCandidateStep({
                     <Chip
                       label="Selected"
                       size="small"
+                      {...{ [DATA_SEMANTIC_FONT]: SF.textMicro }}
                       sx={{
+                        ...semanticFontStyle(SF.textMicro),
                         backgroundColor: color.action.primary.default,
                         color: "#fff",
                         fontWeight: weight.semiBold,
-                        fontSize: "11px",
                         height: 20,
                       }}
                     />
                   )}
                 </Box>
-                <Typography sx={{ fontSize: "13px", color: color.type.muted, mt: "2px" }}>
+                <TradAtlasText semanticFont={SF.labelMd} sx={{ color: color.type.muted, mt: "2px" }}>
                   {c.title} · {c.company}
-                </Typography>
+                </TradAtlasText>
               </Box>
               <Box sx={{ textAlign: "right" }}>
-                <Typography
+                <TradAtlasText
+                  semanticFont={SF.titleMdEmphasis}
                   sx={{
-                    fontSize: "20px",
-                    lineHeight: "24px",
-                    fontWeight: weight.bold,
                     color:
                       c.match >= 90
                         ? color.status.success.text
@@ -554,8 +549,10 @@ function IdentifyCandidateStep({
                   }}
                 >
                   {c.match}%
-                </Typography>
-                <Typography sx={{ fontSize: "11px", color: color.type.muted }}>match</Typography>
+                </TradAtlasText>
+                <TradAtlasText semanticFont={SF.textMicro} sx={{ color: color.type.muted }}>
+                  match
+                </TradAtlasText>
               </Box>
             </Box>
 
@@ -565,11 +562,10 @@ function IdentifyCandidateStep({
                   flag.toLowerCase().includes("non-resident") ||
                   flag.toLowerCase().includes("may not");
                 return (
-                  <Typography
+                  <TradAtlasText
                     key={flag}
+                    semanticFont={SF.textSmEmphasis}
                     sx={{
-                      fontSize: "12px",
-                      lineHeight: "16px",
                       px: "8px",
                       py: "3px",
                       borderRadius: radius.sm,
@@ -578,51 +574,52 @@ function IdentifyCandidateStep({
                         ? color.status.warning.background
                         : color.surface.subtle,
                       color: isWarning ? color.status.warning.text : color.type.muted,
-                      fontWeight: weight.medium,
                     }}
                   >
                     {flag}
-                  </Typography>
+                  </TradAtlasText>
                 );
               })}
             </Box>
 
             <Box sx={{ mt: "12px" }}>
-              <Box
-                component="button"
+              <Button
                 onClick={() => onSelectCandidate(c.name)}
-                sx={{
-                  px: "14px",
-                  py: "6px",
-                  borderRadius: radius.lg,
-                  border:
-                    c.recommended && !isSelected
-                      ? "none"
-                      : `1px solid ${isSelected ? color.action.primary.default : color.outline.fixed}`,
-                  background: isSelected
-                    ? color.surface.default
+                variant={isSelected ? "outlined" : c.recommended ? "contained" : "outlined"}
+                color={isSelected || c.recommended ? "primary" : "inherit"}
+                size="small"
+                data-atlas-component="Button"
+                {...{ [DATA_SEMANTIC_FONT]: SF.labelMd }}
+                data-atlas-variant={
+                  isSelected
+                    ? "outlined - primary - sm - selected"
                     : c.recommended
-                      ? color.action.primary.default
-                      : color.surface.default,
-                  color: isSelected
-                    ? color.action.primary.default
-                    : c.recommended
-                      ? color.action.primary.onPrimary
-                      : color.type.default,
-                  fontSize: "13px",
-                  fontWeight: weight.semiBold,
-                  cursor: "pointer",
-                  "&:hover": {
-                    background: isSelected
-                      ? color.surface.subtle
-                      : c.recommended
-                        ? color.action.primary.hover
-                        : color.surface.variant,
-                  },
-                }}
+                      ? "contained - primary - sm"
+                      : "outlined - secondary - sm"
+                }
+                sx={
+                  [
+                    semanticFontStyle(SF.labelMd),
+                    {
+                      px: "14px",
+                      py: "6px",
+                      textTransform: "none",
+                      fontWeight: weight.semiBold,
+                      ...(isSelected
+                        ? {}
+                        : c.recommended
+                          ? {}
+                          : {
+                              borderColor: color.outline.fixed,
+                              color: color.type.default,
+                              "&:hover": { background: color.surface.variant },
+                            }),
+                    },
+                  ] as SxProps<Theme>
+                }
               >
                 {isSelected ? "Selected" : c.recommended ? "Select candidate" : "Select"}
-              </Box>
+              </Button>
             </Box>
           </SummaryCard>
         );
@@ -674,17 +671,16 @@ function CollectDataStep({ selectedCandidate }: { selectedCandidate: string | nu
       </SummaryCard>
 
       <SummaryCard>
-        <Typography
+        <TradAtlasText
+          semanticFont={SF.textMd}
           sx={{
-            fontSize: "14px",
-            lineHeight: "20px",
             fontWeight: weight.semiBold,
             color: color.type.default,
             mb: "8px",
           }}
         >
           What happens at this step
-        </Typography>
+        </TradAtlasText>
         <Box sx={{ display: "flex", flexDirection: "column", gap: "6px" }}>
           {[
             "Confirm the company and appointee selections",
@@ -703,9 +699,9 @@ function CollectDataStep({ selectedCandidate }: { selectedCandidate: string | nu
                   mt: "7px",
                 }}
               />
-              <Typography sx={{ fontSize: "13px", lineHeight: "20px", color: color.type.muted }}>
+              <TradAtlasText semanticFont={SF.labelMd} sx={{ color: color.type.muted }}>
                 {item}
-              </Typography>
+              </TradAtlasText>
             </Box>
           ))}
         </Box>
@@ -729,17 +725,16 @@ function ConfigureApproversStep() {
       />
 
       <SummaryCard>
-        <Typography
+        <TradAtlasText
+          semanticFont={SF.textMd}
           sx={{
-            fontSize: "14px",
-            lineHeight: "20px",
             fontWeight: weight.semiBold,
             color: color.type.default,
             mb: "8px",
           }}
         >
           What happens at this step
-        </Typography>
+        </TradAtlasText>
         <Box sx={{ display: "flex", flexDirection: "column", gap: "6px" }}>
           {[
             "Select one of four committees: Nomination, Audit, Compensation, or Governance",
@@ -758,9 +753,9 @@ function ConfigureApproversStep() {
                   mt: "7px",
                 }}
               />
-              <Typography sx={{ fontSize: "13px", lineHeight: "20px", color: color.type.muted }}>
+              <TradAtlasText semanticFont={SF.labelMd} sx={{ color: color.type.muted }}>
                 {item}
-              </Typography>
+              </TradAtlasText>
             </Box>
           ))}
         </Box>
@@ -789,23 +784,22 @@ function BoardApprovalStep() {
             sx={{ fontSize: 18, color: color.type.muted, mt: "2px" }}
           />
           <Box>
-            <Typography
+            <TradAtlasText
+              semanticFont={SF.textMdLoose}
               sx={{
-                fontSize: "14px",
-                lineHeight: "22px",
                 color: color.type.default,
                 fontWeight: weight.semiBold,
                 mb: "4px",
               }}
             >
               Automated approval process
-            </Typography>
-            <Typography sx={{ fontSize: "13px", lineHeight: "20px", color: color.type.muted }}>
+            </TradAtlasText>
+            <TradAtlasText semanticFont={SF.labelMd} sx={{ color: color.type.muted }}>
               Once started, the system sends the Board Resolution to each selected approver and
               collects their votes. A running tally tracks progress (e.g. "2/4 Approved"). When all
               approvers respond, the resolution is marked as signed and documents become available
               for filing.
-            </Typography>
+            </TradAtlasText>
           </Box>
         </Box>
       </SummaryCard>
@@ -833,38 +827,36 @@ function RegulatoryFilingStep() {
             sx={{ fontSize: 18, color: color.type.muted, mt: "2px" }}
           />
           <Box>
-            <Typography
+            <TradAtlasText
+              semanticFont={SF.textMdLoose}
               sx={{
-                fontSize: "14px",
-                lineHeight: "22px",
                 color: color.type.default,
                 fontWeight: weight.semiBold,
                 mb: "4px",
               }}
             >
               Manual filing with ACRA
-            </Typography>
-            <Typography sx={{ fontSize: "13px", lineHeight: "20px", color: color.type.muted }}>
+            </TradAtlasText>
+            <TradAtlasText semanticFont={SF.labelMd} sx={{ color: color.type.muted }}>
               After the board resolution is signed, you will need to download the signed Board
               Resolution and Form 45 — Notification of Change of Director. File these documents with
               ACRA via their e-Filing system. Once complete, confirm the filing here to proceed.
-            </Typography>
+            </TradAtlasText>
           </Box>
         </Box>
       </SummaryCard>
 
       <SummaryCard>
-        <Typography
+        <TradAtlasText
+          semanticFont={SF.textMd}
           sx={{
-            fontSize: "14px",
-            lineHeight: "20px",
             fontWeight: weight.semiBold,
             color: color.type.default,
             mb: "8px",
           }}
         >
           Documents required
-        </Typography>
+        </TradAtlasText>
         <Box sx={{ display: "flex", flexDirection: "column", gap: "6px" }}>
           {[
             "Board Resolution (Signed) — Board_Resolution_PacificPolymer.pdf",
@@ -882,9 +874,9 @@ function RegulatoryFilingStep() {
                   mt: "7px",
                 }}
               />
-              <Typography sx={{ fontSize: "13px", lineHeight: "20px", color: color.type.muted }}>
+              <TradAtlasText semanticFont={SF.labelMd} sx={{ color: color.type.muted }}>
                 {doc}
-              </Typography>
+              </TradAtlasText>
             </Box>
           ))}
         </Box>
@@ -917,24 +909,23 @@ function UpdateEntitiesStep({
             sx={{ fontSize: 18, color: color.type.muted, mt: "2px" }}
           />
           <Box>
-            <Typography
+            <TradAtlasText
+              semanticFont={SF.textMdLoose}
               sx={{
-                fontSize: "14px",
-                lineHeight: "22px",
                 color: color.type.default,
                 fontWeight: weight.semiBold,
                 mb: "4px",
               }}
             >
               Automated entity updates
-            </Typography>
-            <Typography sx={{ fontSize: "13px", lineHeight: "20px", color: color.type.muted }}>
+            </TradAtlasText>
+            <TradAtlasText semanticFont={SF.labelMd} sx={{ color: color.type.muted }}>
               After filing is confirmed, the system will automatically update Pacific Polymer
               Logistics Pte. Ltd.'s entity records. First, it will record David Chen's resignation.
               Then it will record{" "}
               {selectedCandidate ? `${selectedCandidate}'s` : "the new appointee's"} appointment as
               director. Each substep shows a timestamp when completed.
-            </Typography>
+            </TradAtlasText>
           </Box>
         </Box>
       </SummaryCard>
