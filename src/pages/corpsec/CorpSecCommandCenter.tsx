@@ -21,6 +21,43 @@ import { ChatPrompt } from "../../components/ai";
 import GlobalHeader from "./GlobalHeader";
 import DemoControlsFab from "./DemoControlsFab";
 
+/**
+ * Command center typography scale. Line-heights use ~1.45–1.5 on body sizes so wrapped
+ * lines stay readable; uppercase styles are reserved for data tile labels and table headers.
+ */
+const ccType = {
+  section: { fontSize: "18px", lineHeight: 1.35 },
+  hero: { fontSize: "20px", lineHeight: 1.35 },
+  cardTitle: { fontSize: "15px", lineHeight: 1.4 },
+  body: { fontSize: "14px", lineHeight: 1.5 },
+  bodySm: { fontSize: "13px", lineHeight: 1.5 },
+  caption: { fontSize: "12px", lineHeight: 1.45 },
+  captionDense: { fontSize: "12px", lineHeight: 1.33 },
+  mono: { fontSize: "12px", lineHeight: 1.5 },
+  metric: { fontSize: "28px", lineHeight: 1.15 },
+  /** KPI / trend tile labels (uppercase) */
+  dataTileLabel: {
+    fontSize: "11px",
+    lineHeight: 1.35,
+    letterSpacing: "0.06em",
+    textTransform: "uppercase" as const,
+  },
+  /** Column headers, activity categories */
+  tableHeader: {
+    fontSize: "11px",
+    lineHeight: 1.35,
+    letterSpacing: "0.08em",
+    textTransform: "uppercase" as const,
+  },
+  /** Eyebrows, “Or start with”, meta rows */
+  overline: {
+    fontSize: "11px",
+    lineHeight: 1.35,
+    letterSpacing: "0.04em",
+    textTransform: "uppercase" as const,
+  },
+} as const;
+
 function ContentCard({ children, sx }: { children: React.ReactNode; sx?: object }) {
   const { color, radius } = useTokens();
   return (
@@ -92,8 +129,7 @@ function IncidentTile({
           {icon}
           <Typography
             sx={{
-              fontSize: "15px",
-              lineHeight: "22px",
+              ...ccType.cardTitle,
               fontWeight: weight.bold,
               color: color.type.default,
             }}
@@ -107,29 +143,22 @@ function IncidentTile({
           sx={{
             ...severityStyles,
             fontWeight: weight.semiBold,
-            fontSize: "11px",
+            fontSize: ccType.dataTileLabel.fontSize,
+            lineHeight: 1.2,
             height: 22,
             flexShrink: 0,
           }}
         />
       </Box>
 
-      <Typography
-        sx={{
-          fontSize: "14px",
-          lineHeight: "20px",
-          color: color.type.muted,
-        }}
-      >
-        {subtitle}
-      </Typography>
+      <Typography sx={{ ...ccType.body, color: color.type.muted }}>{subtitle}</Typography>
 
       <Typography
         sx={{
-          fontSize: "13px",
-          lineHeight: "18px",
+          ...ccType.bodySm,
           color: color.type.muted,
           fontWeight: weight.medium,
+          fontFeatureSettings: '"tnum"',
         }}
       >
         {stats}
@@ -149,8 +178,9 @@ function IncidentTile({
               border: "none",
               background: color.action.primary.default,
               color: color.action.primary.onPrimary,
-              fontSize: "14px",
+              ...ccType.body,
               fontWeight: weight.semiBold,
+              lineHeight: 1.4,
               cursor: "pointer",
               "&:hover": { background: color.action.primary.hover },
             }}
@@ -216,8 +246,7 @@ function HeroBanner() {
       <CheckCircleOutlineIcon sx={{ color: color.type.disabled, fontSize: 48 }} />
       <Typography
         sx={{
-          fontSize: "20px",
-          lineHeight: "28px",
+          ...ccType.hero,
           fontWeight: weight.bold,
           color: color.type.default,
         }}
@@ -226,8 +255,7 @@ function HeroBanner() {
       </Typography>
       <Typography
         sx={{
-          fontSize: "14px",
-          lineHeight: "22px",
+          ...ccType.body,
           color: color.type.muted,
           maxWidth: 560,
         }}
@@ -270,15 +298,14 @@ function EntityPortfolio() {
         <Box>
           <Typography
             sx={{
-              fontSize: "15px",
-              lineHeight: "22px",
+              ...ccType.cardTitle,
               fontWeight: weight.semiBold,
               color: color.type.default,
             }}
           >
             Entity portfolio at a glance
           </Typography>
-          <Typography sx={{ fontSize: "13px", lineHeight: "16px", color: color.type.muted }}>
+          <Typography sx={{ ...ccType.bodySm, color: color.type.muted }}>
             Your corporate structure summary
           </Typography>
         </Box>
@@ -298,8 +325,7 @@ function EntityPortfolio() {
           <Box key={s.label}>
             <Typography
               sx={{
-                fontSize: "28px",
-                lineHeight: "36px",
+                ...ccType.metric,
                 fontWeight: weight.bold,
                 color: s.valueColor,
               }}
@@ -308,11 +334,10 @@ function EntityPortfolio() {
             </Typography>
             <Typography
               sx={{
-                fontSize: "12px",
-                lineHeight: "16px",
+                ...ccType.dataTileLabel,
                 color: color.type.muted,
                 fontWeight: weight.medium,
-                mt: "4px",
+                mt: "6px",
               }}
             >
               {s.label}
@@ -366,8 +391,7 @@ function ChatSection() {
       <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: "4px" }}>
         <Typography
           sx={{
-            fontSize: "18px",
-            lineHeight: "28px",
+            ...ccType.section,
             fontWeight: weight.semiBold,
             color: color.type.default,
           }}
@@ -383,14 +407,14 @@ function ChatSection() {
             borderColor: color.outline.fixed,
             color: color.type.default,
             fontWeight: weight.semiBold,
-            fontSize: "12px",
+            ...ccType.captionDense,
+            lineHeight: 1.2,
           }}
         />
       </Box>
       <Typography
         sx={{
-          fontSize: "14px",
-          lineHeight: "20px",
+          ...ccType.body,
           color: color.type.muted,
           mb: "16px",
         }}
@@ -409,8 +433,7 @@ function ChatSection() {
 
       <Typography
         sx={{
-          fontSize: "13px",
-          lineHeight: "16px",
+          ...ccType.overline,
           fontWeight: weight.semiBold,
           color: color.type.muted,
           mt: "16px",
@@ -452,23 +475,14 @@ function ChatSection() {
             <Box sx={{ color: color.type.muted }}>{s.icon}</Box>
             <Typography
               sx={{
-                fontSize: "13px",
-                lineHeight: "18px",
+                ...ccType.bodySm,
                 fontWeight: weight.semiBold,
                 color: color.type.default,
               }}
             >
               {s.label}
             </Typography>
-            <Typography
-              sx={{
-                fontSize: "12px",
-                lineHeight: "16px",
-                color: color.type.muted,
-              }}
-            >
-              {s.description}
-            </Typography>
+            <Typography sx={{ ...ccType.caption, color: color.type.muted }}>{s.description}</Typography>
           </Box>
         ))}
       </Box>
@@ -489,8 +503,7 @@ function EntityStatusSummary() {
       <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: "16px" }}>
         <Typography
           sx={{
-            fontSize: "18px",
-            lineHeight: "28px",
+            ...ccType.section,
             fontWeight: weight.semiBold,
             color: color.type.default,
           }}
@@ -499,8 +512,7 @@ function EntityStatusSummary() {
         </Typography>
         <Typography
           sx={{
-            fontSize: "13px",
-            lineHeight: "16px",
+            ...ccType.bodySm,
             color: color.action.link.default,
             cursor: "pointer",
             fontWeight: weight.medium,
@@ -511,7 +523,7 @@ function EntityStatusSummary() {
         </Typography>
       </Box>
 
-      <Typography sx={{ fontSize: "14px", lineHeight: "20px", color: color.type.muted, mb: "16px" }}>
+      <Typography sx={{ ...ccType.body, color: color.type.muted, mb: "16px" }}>
         {flaggedEntities.length} entities flagged — 45 entities in good standing are not shown.
       </Typography>
 
@@ -536,12 +548,9 @@ function EntityStatusSummary() {
             <Typography
               key={h}
               sx={{
-                fontSize: "12px",
-                lineHeight: "16px",
+                ...ccType.tableHeader,
                 fontWeight: weight.semiBold,
                 color: color.type.muted,
-                textTransform: "uppercase",
-                letterSpacing: "0.5px",
               }}
             >
               {h}
@@ -564,17 +573,14 @@ function EntityStatusSummary() {
           >
             <Typography
               sx={{
-                fontSize: "14px",
-                lineHeight: "20px",
+                ...ccType.body,
                 fontWeight: weight.medium,
                 color: color.type.default,
               }}
             >
               {e.name}
             </Typography>
-            <Typography sx={{ fontSize: "14px", lineHeight: "20px", color: color.type.muted }}>
-              {e.jurisdiction}
-            </Typography>
+            <Typography sx={{ ...ccType.body, color: color.type.muted }}>{e.jurisdiction}</Typography>
             <Box sx={{ display: "flex", alignItems: "center", gap: "6px" }}>
               <Box
                 sx={{
@@ -585,17 +591,12 @@ function EntityStatusSummary() {
                   flexShrink: 0,
                 }}
               />
-              <Typography sx={{ fontSize: "13px", lineHeight: "16px", color: color.type.default }}>
-                {e.status}
-              </Typography>
+              <Typography sx={{ ...ccType.bodySm, color: color.type.default }}>{e.status}</Typography>
             </Box>
-            <Typography sx={{ fontSize: "13px", lineHeight: "18px", color: color.type.muted }}>
-              {e.issue}
-            </Typography>
+            <Typography sx={{ ...ccType.bodySm, color: color.type.muted }}>{e.issue}</Typography>
             <Typography
               sx={{
-                fontSize: "14px",
-                lineHeight: "20px",
+                ...ccType.body,
                 color: e.nextDeadline === "Overdue" ? color.status.error.text : color.type.muted,
                 fontWeight: e.nextDeadline === "Overdue" ? weight.semiBold : weight.regular,
               }}
@@ -646,8 +647,7 @@ function AgentActivity() {
     <ContentCard>
       <Typography
         sx={{
-          fontSize: "18px",
-          lineHeight: "28px",
+          ...ccType.section,
           fontWeight: weight.semiBold,
           color: color.type.default,
           mb: "16px",
@@ -674,7 +674,15 @@ function AgentActivity() {
               <Box sx={{ flex: 1 }}>
                 <Box sx={{ display: "flex", alignItems: "center", gap: "8px", mb: "4px" }}>
                   <AutoAwesomeOutlinedIcon sx={{ fontSize: 16, color: color.action.primary.default }} />
-                  <Typography sx={{ fontSize: "12px", color: color.type.muted, fontWeight: weight.medium }}>
+                  <Typography
+                    sx={{
+                      ...ccType.captionDense,
+                      color: color.type.muted,
+                      fontWeight: weight.medium,
+                      textTransform: "none",
+                      letterSpacing: "normal",
+                    }}
+                  >
                     {a.agent}
                   </Typography>
                   <Chip
@@ -684,15 +692,15 @@ function AgentActivity() {
                       backgroundColor: a.statusColor,
                       color: "#fff",
                       fontWeight: weight.semiBold,
-                      fontSize: "11px",
+                      fontSize: ccType.dataTileLabel.fontSize,
+                      lineHeight: 1.2,
                       height: 20,
                     }}
                   />
                 </Box>
                 <Typography
                   sx={{
-                    fontSize: "15px",
-                    lineHeight: "22px",
+                    ...ccType.cardTitle,
                     fontWeight: weight.semiBold,
                     color: color.type.default,
                   }}
@@ -707,10 +715,16 @@ function AgentActivity() {
 
             <Box>
               <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: "6px" }}>
-                <Typography sx={{ fontSize: "13px", color: color.type.muted }}>
-                  {a.step}
-                </Typography>
-                <Typography sx={{ fontSize: "12px", color: color.type.muted, fontWeight: weight.semiBold, flexShrink: 0, ml: "16px" }}>
+                <Typography sx={{ ...ccType.bodySm, color: color.type.muted }}>{a.step}</Typography>
+                <Typography
+                  sx={{
+                    ...ccType.caption,
+                    color: color.type.muted,
+                    fontWeight: weight.semiBold,
+                    flexShrink: 0,
+                    ml: "16px",
+                  }}
+                >
                   {a.progress}%
                 </Typography>
               </Box>
@@ -729,9 +743,7 @@ function AgentActivity() {
               />
             </Box>
 
-            <Typography sx={{ fontSize: "12px", color: color.type.muted }}>
-              Updated {a.updated}
-            </Typography>
+            <Typography sx={{ ...ccType.caption, color: color.type.muted }}>Updated {a.updated}</Typography>
           </Box>
         ))}
       </Box>
@@ -766,8 +778,7 @@ function ProactiveTasks() {
       <Box sx={{ mb: "16px" }}>
         <Typography
           sx={{
-            fontSize: "18px",
-            lineHeight: "28px",
+            ...ccType.section,
             fontWeight: weight.semiBold,
             color: color.type.default,
           }}
@@ -776,8 +787,7 @@ function ProactiveTasks() {
         </Typography>
         <Typography
           sx={{
-            fontSize: "14px",
-            lineHeight: "20px",
+            ...ccType.body,
             color: color.type.muted,
             mt: "4px",
           }}
@@ -802,23 +812,14 @@ function ProactiveTasks() {
           >
             <Typography
               sx={{
-                fontSize: "15px",
-                lineHeight: "22px",
+                ...ccType.cardTitle,
                 fontWeight: weight.semiBold,
                 color: color.type.default,
               }}
             >
               {t.title}
             </Typography>
-            <Typography
-              sx={{
-                fontSize: "14px",
-                lineHeight: "20px",
-                color: color.type.muted,
-              }}
-            >
-              {t.description}
-            </Typography>
+            <Typography sx={{ ...ccType.body, color: color.type.muted }}>{t.description}</Typography>
             <Box sx={{ display: "flex", gap: "8px", mt: "4px" }}>
               <Box
                 component="button"
@@ -829,8 +830,9 @@ function ProactiveTasks() {
                   border: `1px solid ${color.outline.fixed}`,
                   background: color.surface.default,
                   color: color.type.default,
-                  fontSize: "13px",
+                  ...ccType.bodySm,
                   fontWeight: weight.semiBold,
+                  lineHeight: 1.45,
                   cursor: "pointer",
                   "&:hover": { borderColor: color.outline.hover },
                 }}
@@ -846,8 +848,9 @@ function ProactiveTasks() {
                   border: "none",
                   background: "transparent",
                   color: color.type.muted,
-                  fontSize: "13px",
+                  ...ccType.bodySm,
                   fontWeight: weight.medium,
+                  lineHeight: 1.45,
                   cursor: "pointer",
                   "&:hover": { color: color.type.default },
                 }}
@@ -876,8 +879,7 @@ function RecentActivity() {
     <ContentCard sx={{ flex: 1 }}>
       <Typography
         sx={{
-          fontSize: "18px",
-          lineHeight: "28px",
+          ...ccType.section,
           fontWeight: weight.semiBold,
           color: color.type.default,
           mb: "16px",
@@ -914,14 +916,26 @@ function RecentActivity() {
             {item.icon}
           </Box>
           <Box sx={{ flex: 1 }}>
-            <Typography sx={{ fontSize: "12px", fontWeight: weight.semiBold, color: color.type.default }}>
+            <Typography
+              sx={{
+                ...ccType.caption,
+                fontWeight: weight.semiBold,
+                color: color.type.default,
+                letterSpacing: "0.01em",
+              }}
+            >
               {item.category}
             </Typography>
-            <Typography sx={{ fontSize: "14px", lineHeight: "20px", color: color.type.muted, mt: "2px" }}>
-              {item.text}
-            </Typography>
+            <Typography sx={{ ...ccType.body, color: color.type.muted, mt: "4px" }}>{item.text}</Typography>
           </Box>
-          <Typography sx={{ fontSize: "12px", color: color.type.muted, whiteSpace: "nowrap", flexShrink: 0 }}>
+          <Typography
+            sx={{
+              ...ccType.captionDense,
+              color: color.type.muted,
+              whiteSpace: "nowrap",
+              flexShrink: 0,
+            }}
+          >
             {item.time}
           </Typography>
         </Box>
@@ -981,8 +995,7 @@ function OperationalTrends() {
     <ContentCard>
       <Typography
         sx={{
-          fontSize: "18px",
-          lineHeight: "28px",
+          ...ccType.section,
           fontWeight: weight.semiBold,
           color: color.type.default,
           mb: "4px",
@@ -992,8 +1005,7 @@ function OperationalTrends() {
       </Typography>
       <Typography
         sx={{
-          fontSize: "14px",
-          lineHeight: "20px",
+          ...ccType.body,
           color: color.type.muted,
           mb: "16px",
         }}
@@ -1023,8 +1035,7 @@ function OperationalTrends() {
           >
             <Typography
               sx={{
-                fontSize: "13px",
-                lineHeight: "16px",
+                ...ccType.dataTileLabel,
                 fontWeight: weight.semiBold,
                 color: color.type.muted,
               }}
@@ -1034,8 +1045,7 @@ function OperationalTrends() {
             <Box sx={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
               <Typography
                 sx={{
-                  fontSize: "28px",
-                  lineHeight: "32px",
+                  ...ccType.metric,
                   fontWeight: weight.bold,
                   color: color.type.default,
                 }}
@@ -1044,9 +1054,7 @@ function OperationalTrends() {
               </Typography>
               {miniChart(t.trend)}
             </Box>
-            <Typography sx={{ fontSize: "12px", color: color.type.muted }}>
-              {t.description}
-            </Typography>
+            <Typography sx={{ ...ccType.caption, color: color.type.muted }}>{t.description}</Typography>
             <Box sx={{ display: "flex", alignItems: "center", gap: "4px" }}>
               {t.trend === "up" ? (
                 <TrendingUpOutlinedIcon sx={{ fontSize: 16, color: color.status.success.default }} />
@@ -1055,7 +1063,7 @@ function OperationalTrends() {
               )}
               <Typography
                 sx={{
-                  fontSize: "12px",
+                  ...ccType.caption,
                   color: t.trend === "up" ? color.status.success.text : color.status.error.text,
                   fontWeight: weight.medium,
                 }}
@@ -1085,8 +1093,7 @@ function SystemLog() {
     <ContentCard>
       <Typography
         sx={{
-          fontSize: "14px",
-          lineHeight: "20px",
+          ...ccType.body,
           fontWeight: weight.semiBold,
           color: color.type.default,
           mb: "4px",
@@ -1094,7 +1101,7 @@ function SystemLog() {
       >
         System log
       </Typography>
-      <Typography sx={{ fontSize: "12px", color: color.type.muted, mb: "12px" }}>
+      <Typography sx={{ ...ccType.caption, color: color.type.muted, mb: "12px" }}>
         Recent agent activity (last 24 hours)
       </Typography>
       <Box
@@ -1115,8 +1122,7 @@ function SystemLog() {
           <Typography
             key={i}
             sx={{
-              fontSize: "12px",
-              lineHeight: "18px",
+              ...ccType.mono,
               color: color.type.muted,
               fontFamily: "inherit",
             }}
