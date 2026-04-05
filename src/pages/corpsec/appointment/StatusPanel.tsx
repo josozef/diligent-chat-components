@@ -1,6 +1,7 @@
-import { Box, Button, CircularProgress, LinearProgress } from "@mui/material";
+import { Box, Button, LinearProgress } from "@mui/material";
 import { ArrowForwardIcon, CheckCircleIcon, RadioButtonUncheckedIcon } from "@/icons";
 import TradAtlasText from "../../../components/common/TradAtlasText";
+import StatusSubstepRow from "@/components/common/StatusSubstepRow";
 import { SF, semanticFontStyle } from "@/tokens/tradAtlasSemanticTypography";
 import { useTokens } from "../../../hooks/useTokens";
 import type { WorkflowStep, WorkflowStepId, AgenticProcessState } from "./AppointmentWorkspace";
@@ -278,72 +279,25 @@ export default function StatusPanel({
                               done = i === 0 ? approverTabStatus.approversConfirmed : i === 1 ? approverTabStatus.resolutionSent : false;
                             }
                             return (
-                              <Box
-                                key={sub}
-                                sx={{ display: "flex", alignItems: "center", gap: "6px", pl: "2px" }}
-                              >
-                                {done ? (
-                                  <CheckCircleIcon sx={{ fontSize: 14, color: color.status.success.default }} />
-                                ) : (
-                                  <RadioButtonUncheckedIcon sx={{ fontSize: 14, color: color.outline.fixed }} />
-                                )}
-                                <TradAtlasText semanticFont={SF.textMicro} sx={{ color: color.type.muted }}>
-                                  {sub}
-                                </TradAtlasText>
-                              </Box>
+                              <StatusSubstepRow key={sub} status={done ? "completed" : "pending"} label={sub} size="sm" />
                             );
                           })
                         : step.id === "board-approval" && agenticState.active
                           ? agenticState.votes.map((v) => (
-                              <Box
+                              <StatusSubstepRow
                                 key={v.id}
-                                sx={{ display: "flex", alignItems: "center", gap: "6px", pl: "2px" }}
-                              >
-                                {v.status === "approved" ? (
-                                  <CheckCircleIcon sx={{ fontSize: 14, color: color.status.success.default }} />
-                                ) : (
-                                  <CircularProgress size={12} thickness={5} sx={{ color: color.outline.fixed, ml: "1px", mr: "1px" }} />
-                                )}
-                                <TradAtlasText semanticFont={SF.textMicro} sx={{ color: color.type.muted }}>
-                                  {v.name}{v.status === "approved" ? " — approved" : ""}
-                                </TradAtlasText>
-                              </Box>
+                                status={v.status === "approved" ? "completed" : "in_progress"}
+                                label={`${v.name}${v.status === "approved" ? " — approved" : ""}`}
+                                size="sm"
+                              />
                             ))
                           : step.id === "filing" && agenticState.active
                             ? agenticState.filingSubsteps.map((s) => (
-                                <Box
-                                  key={s.name}
-                                  sx={{ display: "flex", alignItems: "center", gap: "6px", pl: "2px" }}
-                                >
-                                  {s.status === "completed" ? (
-                                    <CheckCircleIcon sx={{ fontSize: 14, color: color.status.success.default }} />
-                                  ) : s.status === "in_progress" ? (
-                                    <CircularProgress size={12} thickness={5} sx={{ color: color.action.primary.default, ml: "1px", mr: "1px" }} />
-                                  ) : (
-                                    <RadioButtonUncheckedIcon sx={{ fontSize: 14, color: color.outline.fixed }} />
-                                  )}
-                                  <TradAtlasText semanticFont={SF.textMicro} sx={{ color: color.type.muted }}>
-                                    {s.name}
-                                  </TradAtlasText>
-                                </Box>
+                                <StatusSubstepRow key={s.name} status={s.status} label={s.name} size="sm" />
                               ))
                             : step.id === "update-entities" && agenticState.active
                               ? agenticState.entitySubsteps.map((s) => (
-                                  <Box
-                                    key={s.name}
-                                    sx={{ display: "flex", alignItems: "center", gap: "6px", pl: "2px" }}
-                                  >
-                                    {s.status === "completed" ? (
-                                      <CheckCircleIcon sx={{ fontSize: 14, color: color.status.success.default }} />
-                                    ) : s.status === "in_progress" ? (
-                                      <CircularProgress size={12} thickness={5} sx={{ color: color.action.primary.default, ml: "1px", mr: "1px" }} />
-                                    ) : (
-                                      <RadioButtonUncheckedIcon sx={{ fontSize: 14, color: color.outline.fixed }} />
-                                    )}
-                                    <TradAtlasText semanticFont={SF.textMicro} sx={{ color: color.type.muted }}>
-                                      {s.name}
-                                    </TradAtlasText>
-                                  </Box>
+                                  <StatusSubstepRow key={s.name} status={s.status} label={s.name} size="sm" />
                                 ))
                               : step.substeps.map((sub) => (
                                   <TradAtlasText

@@ -1,24 +1,12 @@
-import { Box, Button, Divider, IconButton, Tooltip } from "@mui/material";
-import { useEditor, EditorContent } from "@tiptap/react";
+import { Box, Button } from "@mui/material";
+import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
 import Underline from "@tiptap/extension-underline";
 import TextAlign from "@tiptap/extension-text-align";
-import {
-  FormatBoldIcon,
-  FormatItalicIcon,
-  FormatUnderlinedIcon,
-  FormatListBulletedIcon,
-  FormatListNumberedIcon,
-  UndoIcon,
-  RedoIcon,
-  TitleIcon,
-  FormatClearIcon,
-  HorizontalRuleIcon,
-  CheckCircleIcon,
-  GavelOutlinedIcon,
-} from "@/icons";
+import { CheckCircleIcon, GavelOutlinedIcon } from "@/icons";
 import TradAtlasText from "@/components/common/TradAtlasText";
+import TipTapEditorShell from "@/components/editor/TipTapEditorShell";
 import { SF, semanticFontStyle } from "@/tokens/tradAtlasSemanticTypography";
 import { useTokens } from "@/hooks/useTokens";
 
@@ -151,41 +139,6 @@ function buildResolutionHtml(d: ResolutionData): string {
 `;
 }
 
-interface ToolbarBtnProps {
-  icon: React.ReactNode;
-  label: string;
-  active?: boolean;
-  disabled?: boolean;
-  onClick: () => void;
-  activeColor: string;
-  hoverBg: string;
-}
-
-function ToolbarBtn({ icon, label, active, disabled, onClick, activeColor, hoverBg }: ToolbarBtnProps) {
-  return (
-    <Tooltip title={label} arrow enterDelay={400}>
-      <span>
-        <IconButton
-          size="small"
-          onClick={onClick}
-          disabled={disabled}
-          aria-label={label}
-          sx={{
-            borderRadius: "6px",
-            width: 32,
-            height: 32,
-            border: active ? `1.5px solid ${activeColor}` : `1px solid transparent`,
-            background: active ? `${activeColor}14` : "transparent",
-            color: active ? activeColor : "inherit",
-            "&:hover": { background: hoverBg },
-          }}
-        >
-          {icon}
-        </IconButton>
-      </span>
-    </Tooltip>
-  );
-}
 
 export default function BoardResolutionEditor({
   companyName,
@@ -233,13 +186,6 @@ export default function BoardResolutionEditor({
     [appointeeName],
   );
 
-  const btnProps = {
-    activeColor: color.action.primary.default,
-    hoverBg: color.action.secondary.hoverFill,
-  };
-
-  const iconSz = { fontSize: 18 } as const;
-
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: "16px", height: "100%" }}>
       <TradAtlasText semanticFont={SF.textMd} sx={{ color: color.type.default }}>
@@ -249,110 +195,7 @@ export default function BoardResolutionEditor({
         filings, and includes signature blocks for all selected approvers.
       </TradAtlasText>
 
-      {editor ? (
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            flex: 1,
-            minHeight: 0,
-            border: `1px solid ${color.outline.default}`,
-            borderRadius: radius.lg,
-            background: color.surface.default,
-            overflow: "hidden",
-          }}
-        >
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: "2px",
-              flexWrap: "wrap",
-              px: "10px",
-              py: "6px",
-              borderBottom: `1px solid ${color.outline.fixed}`,
-              background: color.surface.subtle,
-            }}
-          >
-            <ToolbarBtn icon={<UndoIcon sx={iconSz} />} label="Undo" disabled={!editor.can().undo()} onClick={() => editor.chain().focus().undo().run()} {...btnProps} />
-            <ToolbarBtn icon={<RedoIcon sx={iconSz} />} label="Redo" disabled={!editor.can().redo()} onClick={() => editor.chain().focus().redo().run()} {...btnProps} />
-            <Divider orientation="vertical" flexItem sx={{ mx: "4px" }} />
-            <ToolbarBtn icon={<TitleIcon sx={iconSz} />} label="Heading" active={editor.isActive("heading")} onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} {...btnProps} />
-            <Divider orientation="vertical" flexItem sx={{ mx: "4px" }} />
-            <ToolbarBtn icon={<FormatBoldIcon sx={iconSz} />} label="Bold" active={editor.isActive("bold")} onClick={() => editor.chain().focus().toggleBold().run()} {...btnProps} />
-            <ToolbarBtn icon={<FormatItalicIcon sx={iconSz} />} label="Italic" active={editor.isActive("italic")} onClick={() => editor.chain().focus().toggleItalic().run()} {...btnProps} />
-            <ToolbarBtn icon={<FormatUnderlinedIcon sx={iconSz} />} label="Underline" active={editor.isActive("underline")} onClick={() => editor.chain().focus().toggleUnderline().run()} {...btnProps} />
-            <Divider orientation="vertical" flexItem sx={{ mx: "4px" }} />
-            <ToolbarBtn icon={<FormatListBulletedIcon sx={iconSz} />} label="Bullet list" active={editor.isActive("bulletList")} onClick={() => editor.chain().focus().toggleBulletList().run()} {...btnProps} />
-            <ToolbarBtn icon={<FormatListNumberedIcon sx={iconSz} />} label="Numbered list" active={editor.isActive("orderedList")} onClick={() => editor.chain().focus().toggleOrderedList().run()} {...btnProps} />
-            <Divider orientation="vertical" flexItem sx={{ mx: "4px" }} />
-            <ToolbarBtn icon={<HorizontalRuleIcon sx={iconSz} />} label="Horizontal rule" onClick={() => editor.chain().focus().setHorizontalRule().run()} {...btnProps} />
-            <ToolbarBtn icon={<FormatClearIcon sx={iconSz} />} label="Clear formatting" onClick={() => editor.chain().focus().clearNodes().unsetAllMarks().run()} {...btnProps} />
-          </Box>
-
-          <Box
-            sx={{
-              flex: 1,
-              overflow: "auto",
-              px: "32px",
-              py: "24px",
-              background: "#f8f8f8",
-              "& .tiptap": {
-                outline: "none",
-                ...semanticFontStyle(SF.textMd),
-                color: color.type.default,
-                maxWidth: 720,
-                mx: "auto",
-                background: "#fff",
-                border: `1px solid ${color.outline.fixed}`,
-                borderRadius: "4px",
-                padding: "48px 56px",
-                boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
-                minHeight: 900,
-              },
-              "& .tiptap p": { margin: "0 0 12px", lineHeight: 1.7 },
-              "& .tiptap p:last-child": { marginBottom: 0 },
-              "& .tiptap h2": {
-                ...semanticFontStyle(SF.titleH2Emphasis),
-                margin: "0 0 4px",
-                textAlign: "center",
-              },
-              "& .tiptap h3": {
-                ...semanticFontStyle(SF.titleH4Emphasis),
-                margin: "28px 0 12px",
-              },
-              "& .tiptap h4": {
-                ...semanticFontStyle(SF.textMdEmphasis),
-                margin: "16px 0 6px",
-              },
-              "& .tiptap ul, & .tiptap ol": {
-                paddingLeft: "28px",
-                margin: "0 0 12px",
-              },
-              "& .tiptap li": {
-                marginBottom: "6px",
-                lineHeight: 1.7,
-              },
-              "& .tiptap hr": {
-                border: "none",
-                borderTop: `1px solid ${color.outline.fixed}`,
-                margin: "24px 0",
-              },
-              "& .tiptap em": { fontStyle: "italic" },
-              "& .tiptap strong": { fontWeight: 600 },
-              "& .tiptap .is-editor-empty:first-child::before": {
-                content: "attr(data-placeholder)",
-                float: "left",
-                color: color.type.muted,
-                pointerEvents: "none",
-                height: 0,
-              },
-            }}
-          >
-            <EditorContent editor={editor} />
-          </Box>
-        </Box>
-      ) : null}
+      {editor ? <TipTapEditorShell editor={editor} /> : null}
 
       <Box sx={{ display: "flex", flexWrap: "wrap", gap: "12px", alignItems: "center", flexShrink: 0 }}>
         {approved ? (

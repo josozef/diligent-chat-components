@@ -7,8 +7,7 @@ import {
   type ChatConversationItem,
   type ThinkingStep,
 } from "@/components/ai";
-import TradAtlasText from "../../../components/common/TradAtlasText";
-import { SF } from "@/tokens/tradAtlasSemanticTypography";
+import WorkspaceRailHeader from "@/components/common/WorkspaceRailHeader";
 import { useTokens } from "../../../hooks/useTokens";
 
 const WORKSPACE_THINKING_STEPS: ThinkingStep[] = [
@@ -72,26 +71,11 @@ export default function ChatPanel() {
         overflow: "hidden",
       }}
     >
-      <Box
-        sx={{
-          px: "16px",
-          py: "12px",
-          borderBottom: `1px solid ${color.outline.fixed}`,
-          display: "flex",
-          alignItems: "center",
-          gap: "8px",
-        }}
-      >
-        <AutoAwesomeOutlinedIcon sx={{ fontSize: 18, color: color.action.primary.default }} />
-        <Box>
-          <TradAtlasText semanticFont={SF.labelMdEmphasis} sx={{ color: color.type.default }}>
-            AI Governance Assistant
-          </TradAtlasText>
-          <TradAtlasText semanticFont={SF.textMicro} sx={{ color: color.type.muted }}>
-            Context for this appointment
-          </TradAtlasText>
-        </Box>
-      </Box>
+      <WorkspaceRailHeader
+        icon={<AutoAwesomeOutlinedIcon sx={{ fontSize: 18, color: color.action.primary.default }} />}
+        title="AI Governance Assistant"
+        subtitle="Context for this appointment"
+      />
 
       <Box ref={scrollRef} sx={{ flex: 1, overflow: "auto", px: "16px", py: "16px" }}>
         <ChatConversation

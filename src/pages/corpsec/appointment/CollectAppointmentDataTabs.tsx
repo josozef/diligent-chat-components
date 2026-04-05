@@ -2,120 +2,14 @@ import { useState } from "react";
 import { Box, Button, Chip } from "@mui/material";
 import { CheckCircleIcon, WarningAmberIcon } from "@/icons";
 import TradAtlasText from "@/components/common/TradAtlasText";
+import SectionHeader from "@/components/common/SectionHeader";
+import IdeTabs from "@/components/common/IdeTabs";
+import type { TabDef } from "@/components/common/IdeTabs";
 import { AtlasFormField } from "@/components/form";
 import { SF, semanticFontStyle } from "@/tokens/tradAtlasSemanticTypography";
 import { useTokens } from "@/hooks/useTokens";
 import ConsentToActEditor from "./ConsentToActEditor";
 import type { WorkflowStep } from "./AppointmentWorkspace";
-
-interface TabDef {
-  label: string;
-  done: boolean;
-}
-
-function AtlasTabButton({
-  label,
-  selected,
-  done,
-  onClick,
-}: {
-  label: string;
-  selected: boolean;
-  done: boolean;
-  onClick: () => void;
-}) {
-  const { color, radius, weight } = useTokens();
-  return (
-    <Box
-      component="button"
-      type="button"
-      onClick={onClick}
-      data-atlas-component="TabButton"
-      data-atlas-variant={`small - label${done ? " + badge" : ""} - ${selected ? "selected" : "default"}`}
-      sx={{
-        position: "relative",
-        ...semanticFontStyle(SF.textMdEmphasis),
-        display: "inline-flex",
-        alignItems: "center",
-        gap: "8px",
-        px: "16px",
-        py: "6px",
-        border: "none",
-        borderTopLeftRadius: radius.md,
-        borderTopRightRadius: radius.md,
-        borderBottomLeftRadius: 0,
-        borderBottomRightRadius: 0,
-        background: selected ? color.surface.default : "transparent",
-        cursor: "pointer",
-        color: selected ? color.action.secondary.onSecondary : color.type.muted,
-        fontWeight: selected ? weight.semiBold : weight.regular,
-        whiteSpace: "nowrap",
-        transition: "background 0.12s ease, color 0.12s ease",
-        overflow: "clip",
-        "&:hover": {
-          background: selected ? color.surface.default : color.action.secondary.hoverFill,
-          color: color.action.secondary.onSecondary,
-        },
-        "&:active": {
-          background: selected ? color.surface.default : "#e6e6e6",
-        },
-      }}
-    >
-      {label}
-      {done ? (
-        <CheckCircleIcon sx={{ fontSize: 15, color: color.status.success.default }} />
-      ) : null}
-      {selected ? (
-        <Box
-          sx={{
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            right: 0,
-            height: "2px",
-            borderTopLeftRadius: "2px",
-            borderTopRightRadius: "2px",
-            background: color.action.primary.default,
-          }}
-        />
-      ) : null}
-    </Box>
-  );
-}
-
-function IdeTabs({
-  tabs,
-  active,
-  onChange,
-}: {
-  tabs: TabDef[];
-  active: number;
-  onChange: (i: number) => void;
-}) {
-  const { color } = useTokens();
-  return (
-    <Box
-      data-atlas-component="TabBar"
-      data-atlas-variant="horizontal - small"
-      sx={{
-        display: "flex",
-        borderBottom: `1px solid ${color.outline.fixed}`,
-        background: color.surface.subtle,
-        flexShrink: 0,
-      }}
-    >
-      {tabs.map((t, i) => (
-        <AtlasTabButton
-          key={t.label}
-          label={t.label}
-          selected={i === active}
-          done={t.done}
-          onClick={() => onChange(i)}
-        />
-      ))}
-    </Box>
-  );
-}
 
 export default function CollectAppointmentDataTabs({
   steps,
@@ -214,28 +108,12 @@ function AppointeeDetailsTab({
 
   return (
     <Box sx={{ maxWidth: 640, display: "flex", flexDirection: "column", gap: "24px" }}>
-      <Box>
-        <Box sx={{ display: "flex", alignItems: "center", gap: "10px", mb: "4px" }}>
-          <TradAtlasText semanticFont={SF.titleH4Emphasis} sx={{ fontWeight: weight.semiBold, color: color.type.default }}>
-            {appointee || "Appointee"}
-          </TradAtlasText>
-          <Chip
-            label={statusLabel}
-            size="small"
-            sx={{
-              ...semanticFontStyle(SF.textXs),
-              backgroundColor: step?.status === "completed" ? color.status.success.default : color.action.primary.default,
-              color: "#fff",
-              fontWeight: weight.semiBold,
-              height: 20,
-              letterSpacing: "0.5px",
-            }}
-          />
-        </Box>
-        <TradAtlasText semanticFont={SF.textMd} sx={{ color: color.type.muted }}>
-          Confirm the appointee's personal data for the Entities system. Fields sourced from Workday are pre-filled.
-        </TradAtlasText>
-      </Box>
+      <SectionHeader
+        title={appointee || "Appointee"}
+        subtitle="Confirm the appointee's personal data for the Entities system. Fields sourced from Workday are pre-filled."
+        statusLabel={statusLabel}
+        statusVariant={step?.status === "completed" ? "completed" : step?.status === "in_progress" ? "in_progress" : "not_started"}
+      />
 
       <Box
         sx={{

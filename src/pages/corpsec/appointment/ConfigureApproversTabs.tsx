@@ -12,118 +12,12 @@ import {
   RadioButtonUncheckedIcon,
 } from "@/icons";
 import TradAtlasText from "@/components/common/TradAtlasText";
+import SectionHeader from "@/components/common/SectionHeader";
+import IdeTabs from "@/components/common/IdeTabs";
+import type { TabDef } from "@/components/common/IdeTabs";
 import { SF, semanticFontStyle } from "@/tokens/tradAtlasSemanticTypography";
 import { useTokens } from "@/hooks/useTokens";
 import BoardResolutionEditor from "./BoardResolutionEditor";
-
-interface TabDef {
-  label: string;
-  done: boolean;
-}
-
-function AtlasTabButton({
-  label,
-  selected,
-  done,
-  onClick,
-}: {
-  label: string;
-  selected: boolean;
-  done: boolean;
-  onClick: () => void;
-}) {
-  const { color, radius, weight } = useTokens();
-  return (
-    <Box
-      component="button"
-      type="button"
-      onClick={onClick}
-      data-atlas-component="TabButton"
-      data-atlas-variant={`small - label${done ? " + badge" : ""} - ${selected ? "selected" : "default"}`}
-      sx={{
-        position: "relative",
-        ...semanticFontStyle(SF.textMdEmphasis),
-        display: "inline-flex",
-        alignItems: "center",
-        gap: "8px",
-        px: "16px",
-        py: "6px",
-        border: "none",
-        borderTopLeftRadius: radius.md,
-        borderTopRightRadius: radius.md,
-        borderBottomLeftRadius: 0,
-        borderBottomRightRadius: 0,
-        background: selected ? color.surface.default : "transparent",
-        cursor: "pointer",
-        color: selected ? color.action.secondary.onSecondary : color.type.muted,
-        fontWeight: selected ? weight.semiBold : weight.regular,
-        whiteSpace: "nowrap",
-        transition: "background 0.12s ease, color 0.12s ease",
-        overflow: "clip",
-        "&:hover": {
-          background: selected ? color.surface.default : color.action.secondary.hoverFill,
-          color: color.action.secondary.onSecondary,
-        },
-        "&:active": {
-          background: selected ? color.surface.default : "#e6e6e6",
-        },
-      }}
-    >
-      {label}
-      {done ? (
-        <CheckCircleIcon sx={{ fontSize: 15, color: color.status.success.default }} />
-      ) : null}
-      {selected ? (
-        <Box
-          sx={{
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            right: 0,
-            height: "2px",
-            borderTopLeftRadius: "2px",
-            borderTopRightRadius: "2px",
-            background: color.action.primary.default,
-          }}
-        />
-      ) : null}
-    </Box>
-  );
-}
-
-function IdeTabs({
-  tabs,
-  active,
-  onChange,
-}: {
-  tabs: TabDef[];
-  active: number;
-  onChange: (i: number) => void;
-}) {
-  const { color } = useTokens();
-  return (
-    <Box
-      data-atlas-component="TabBar"
-      data-atlas-variant="horizontal - small"
-      sx={{
-        display: "flex",
-        borderBottom: `1px solid ${color.outline.fixed}`,
-        background: color.surface.subtle,
-        flexShrink: 0,
-      }}
-    >
-      {tabs.map((t, i) => (
-        <AtlasTabButton
-          key={t.label}
-          label={t.label}
-          selected={i === active}
-          done={t.done}
-          onClick={() => onChange(i)}
-        />
-      ))}
-    </Box>
-  );
-}
 
 /* ── Shared ────────────────────────────────── */
 
@@ -268,29 +162,12 @@ function OverviewTab({
 
   return (
     <Box sx={{ maxWidth: 680, display: "flex", flexDirection: "column", gap: "20px" }}>
-      <Box>
-        <Box sx={{ display: "flex", alignItems: "center", gap: "10px", mb: "4px" }}>
-          <TradAtlasText semanticFont={SF.titleH4Emphasis} sx={{ fontWeight: weight.semiBold, color: color.type.default }}>
-            Configure approvers
-          </TradAtlasText>
-          <Chip
-            label={allDone ? "COMPLETE" : "IN PROGRESS"}
-            size="small"
-            sx={{
-              ...semanticFontStyle(SF.textXs),
-              backgroundColor: allDone ? color.status.success.default : color.action.primary.default,
-              color: "#fff",
-              fontWeight: weight.semiBold,
-              height: 20,
-              letterSpacing: "0.5px",
-            }}
-          />
-        </Box>
-        <TradAtlasText semanticFont={SF.textMd} sx={{ color: color.type.muted }}>
-          Select the board members who will approve this appointment and review the Board Resolution
-          document before sending it for signature.
-        </TradAtlasText>
-      </Box>
+      <SectionHeader
+        title="Configure approvers"
+        subtitle="Select the board members who will approve this appointment and review the Board Resolution document before sending it for signature."
+        statusLabel={allDone ? "COMPLETE" : "IN PROGRESS"}
+        statusVariant={allDone ? "completed" : "in_progress"}
+      />
 
       {/* Checklist cards */}
       <Box
@@ -460,28 +337,12 @@ function SelectApproversTab({
 
   return (
     <Box sx={{ maxWidth: 680, display: "flex", flexDirection: "column", gap: "20px" }}>
-      <Box>
-        <Box sx={{ display: "flex", alignItems: "center", gap: "10px", mb: "4px" }}>
-          <TradAtlasText semanticFont={SF.titleH4Emphasis} sx={{ fontWeight: weight.semiBold, color: color.type.default }}>
-            Select approvers
-          </TradAtlasText>
-          <Chip
-            label={`${approvers.length} selected`}
-            size="small"
-            sx={{
-              ...semanticFontStyle(SF.textXs),
-              backgroundColor: color.action.primary.default,
-              color: "#fff",
-              fontWeight: weight.semiBold,
-              height: 20,
-            }}
-          />
-        </Box>
-        <TradAtlasText semanticFont={SF.textMd} sx={{ color: color.type.muted }}>
-          Based on previous appointment approvals at Acme, Inc., the following
-          board members from the Nomination Committee have been pre-selected. You can remove or add approvers from any committee below.
-        </TradAtlasText>
-      </Box>
+      <SectionHeader
+        title="Select approvers"
+        subtitle="Based on previous appointment approvals at Acme, Inc., the following board members from the Nomination Committee have been pre-selected. You can remove or add approvers from any committee below."
+        statusLabel={`${approvers.length} selected`}
+        statusVariant="in_progress"
+      />
 
       {/* Selected approvers */}
       <Box

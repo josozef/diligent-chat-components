@@ -20,6 +20,10 @@ import {
   SearchOutlinedIcon,
 } from "@/icons";
 import TradAtlasText from "@/components/common/TradAtlasText";
+import ContentCard from "@/components/common/ContentCard";
+import SectionHeader from "@/components/common/SectionHeader";
+import DetailRow from "@/components/common/DetailRow";
+import StatusSubstepRow from "@/components/common/StatusSubstepRow";
 import { DATA_SEMANTIC_FONT, SF, semanticFontStyle } from "@/tokens/tradAtlasSemanticTypography";
 import { useTokens } from "../../../hooks/useTokens";
 import type { WorkflowStep, WorkflowStepId, AgenticProcessState } from "./AppointmentWorkspace";
@@ -123,113 +127,8 @@ export default function WorkPanel({
 
 /* ── Shared ─────────────────────────────────────────────────────── */
 
-function SummaryCard({ children, sx }: { children: React.ReactNode; sx?: object }) {
-  const { color, radius } = useTokens();
-  return (
-    <Box
-      data-atlas-component="SummaryCard"
-      data-atlas-variant="surface - card - lg"
-      sx={{
-        borderRadius: radius.lg,
-        border: `1px solid ${color.outline.fixed}`,
-        background: color.surface.default,
-        p: "20px",
-        ...sx,
-      }}
-    >
-      {children}
-    </Box>
-  );
-}
 
-function StepHeader({
-  title,
-  subtitle,
-  statusLabel,
-  statusVariant,
-}: {
-  title: string;
-  subtitle: string;
-  statusLabel: string;
-  statusVariant: "in_progress" | "not_started" | "completed";
-}) {
-  const { color, weight } = useTokens();
-  const chipColor =
-    statusVariant === "completed"
-      ? color.status.success.default
-      : statusVariant === "in_progress"
-        ? color.action.primary.default
-        : color.type.disabled;
 
-  return (
-    <Box sx={{ mb: "20px" }}>
-      <Box sx={{ display: "flex", alignItems: "center", gap: "10px", mb: "4px" }}>
-        <TradAtlasText
-          semanticFont={SF.titleH4Emphasis}
-          sx={{
-            fontWeight: weight.semiBold,
-            color: color.type.default,
-          }}
-        >
-          {title}
-        </TradAtlasText>
-        <Chip
-          label={statusLabel}
-          size="small"
-          {...{ [DATA_SEMANTIC_FONT]: SF.textXs }}
-          sx={{
-            ...semanticFontStyle(SF.textXs),
-            backgroundColor: chipColor,
-            color: "#fff",
-            fontWeight: weight.semiBold,
-            height: 20,
-            letterSpacing: "0.5px",
-          }}
-        />
-      </Box>
-      <TradAtlasText semanticFont={SF.textMd} sx={{ color: color.type.muted }}>
-        {subtitle}
-      </TradAtlasText>
-    </Box>
-  );
-}
-
-function DetailRow({
-  icon,
-  label,
-  value,
-  muted,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-  muted?: boolean;
-}) {
-  const { color, weight } = useTokens();
-  return (
-    <Box sx={{ display: "flex", alignItems: "flex-start", gap: "8px" }}>
-      <Box sx={{ color: color.type.muted, mt: "2px" }}>{icon}</Box>
-      <Box>
-        <TradAtlasText
-          semanticFont={SF.textMicroEmphasis}
-          sx={{ color: color.type.muted, fontWeight: weight.medium }}
-        >
-          {label}
-        </TradAtlasText>
-        <TradAtlasText
-          semanticFont={SF.labelMd}
-          sx={{
-            color: muted ? color.type.disabled : color.type.default,
-            fontWeight: weight.medium,
-            fontStyle: muted ? "italic" : "normal",
-          }}
-        >
-          {value}
-        </TradAtlasText>
-      </Box>
-    </Box>
-  );
-}
 
 /* ── Global overview (no step selected) ─────────────────────────── */
 
@@ -274,7 +173,7 @@ function OverviewContent({
       </Box>
 
       {/* AI summary */}
-      <SummaryCard>
+      <ContentCard>
         <Box sx={{ display: "flex", alignItems: "flex-start", gap: "12px", mb: "16px" }}>
           <AutoAwesomeOutlinedIcon
             sx={{ fontSize: 18, color: color.action.primary.default, mt: "2px" }}
@@ -298,10 +197,10 @@ function OverviewContent({
           collecting appointment data, routing the board resolution for approval, filing with ACRA,
           and updating entity records. The AI assistant on the right can answer questions at any step.
         </TradAtlasText>
-      </SummaryCard>
+      </ContentCard>
 
       {/* Key details */}
-      <SummaryCard>
+      <ContentCard>
         <TradAtlasText
           semanticFont={SF.textMd}
           sx={{
@@ -346,10 +245,10 @@ function OverviewContent({
             muted
           />
         </Box>
-      </SummaryCard>
+      </ContentCard>
 
       {/* Jurisdictional requirements */}
-      <SummaryCard>
+      <ContentCard>
         <TradAtlasText
           semanticFont={SF.textMd}
           sx={{
@@ -386,10 +285,10 @@ function OverviewContent({
             </Box>
           ))}
         </Box>
-      </SummaryCard>
+      </ContentCard>
 
       {/* Workflow status */}
-      <SummaryCard>
+      <ContentCard>
         <TradAtlasText
           semanticFont={SF.textMd}
           sx={{
@@ -504,7 +403,7 @@ function OverviewContent({
             </Fragment>
           ))}
         </Box>
-      </SummaryCard>
+      </ContentCard>
     </Box>
   );
 }
@@ -552,7 +451,7 @@ function IdentifyCandidateStep({
 
   return (
     <Box sx={{ maxWidth: 720, display: "flex", flexDirection: "column", gap: "20px" }}>
-      <StepHeader
+      <SectionHeader
         title="Identify replacement candidate"
         subtitle="Source candidates from Workday and screen against Singapore Companies Act requirements. The system ranks candidates by jurisdictional eligibility and role suitability."
         statusLabel="IN PROGRESS"
@@ -560,7 +459,7 @@ function IdentifyCandidateStep({
       />
 
       {/* Workday source card */}
-      <SummaryCard>
+      <ContentCard>
         <Box sx={{ display: "flex", alignItems: "flex-start", gap: "12px" }}>
           <SearchOutlinedIcon
             sx={{ fontSize: 18, color: color.action.primary.default, mt: "2px" }}
@@ -584,13 +483,13 @@ function IdentifyCandidateStep({
             </TradAtlasText>
           </Box>
         </Box>
-      </SummaryCard>
+      </ContentCard>
 
       {/* Candidate cards */}
       {candidates.map((c) => {
         const isSelected = selectedCandidate === c.name;
         return (
-          <SummaryCard
+          <ContentCard
             key={c.name}
             sx={
               isSelected
@@ -730,7 +629,7 @@ function IdentifyCandidateStep({
                 {isSelected ? "Selected" : c.recommended ? "Select candidate" : "Select"}
               </Button>
             </Box>
-          </SummaryCard>
+          </ContentCard>
         );
       })}
     </Box>
@@ -784,7 +683,7 @@ function BoardApprovalStep({ agenticState }: { agenticState: AgenticProcessState
 
   return (
     <Box sx={{ maxWidth: 720, display: "flex", flexDirection: "column", gap: "20px" }}>
-      <StepHeader
+      <SectionHeader
         title="Board approval"
         subtitle="The board resolution has been sent to selected approvers for electronic signature. Progress is tracked in real time."
         statusLabel={allApproved ? "COMPLETE" : "IN PROGRESS"}
@@ -792,7 +691,7 @@ function BoardApprovalStep({ agenticState }: { agenticState: AgenticProcessState
       />
 
       {/* Progress bar */}
-      <SummaryCard>
+      <ContentCard>
         <Box sx={{ display: "flex", alignItems: "center", gap: "12px", mb: "16px" }}>
           <HowToVoteOutlinedIcon sx={{ fontSize: 18, color: allApproved ? color.status.success.default : color.action.primary.default }} />
           <TradAtlasText semanticFont={SF.textMdEmphasis} sx={{ color: color.type.default }}>
@@ -879,10 +778,10 @@ function BoardApprovalStep({ agenticState }: { agenticState: AgenticProcessState
             </Box>
           ))}
         </Box>
-      </SummaryCard>
+      </ContentCard>
 
       {allApproved && (
-        <SummaryCard>
+        <ContentCard>
           <Box sx={{ display: "flex", alignItems: "flex-start", gap: "12px" }}>
             <CheckCircleOutlineIcon sx={{ fontSize: 18, color: color.status.success.default, mt: "2px" }} />
             <Box>
@@ -896,7 +795,7 @@ function BoardApprovalStep({ agenticState }: { agenticState: AgenticProcessState
               </TradAtlasText>
             </Box>
           </Box>
-        </SummaryCard>
+        </ContentCard>
       )}
     </Box>
   );
@@ -912,14 +811,14 @@ function RegulatoryFilingStep({ agenticState }: { agenticState: AgenticProcessSt
 
   return (
     <Box sx={{ maxWidth: 720, display: "flex", flexDirection: "column", gap: "20px" }}>
-      <StepHeader
+      <SectionHeader
         title="Regulatory filing"
         subtitle="The system is automatically preparing and filing documents with ACRA on behalf of Pacific Polymer Logistics Pte. Ltd."
         statusLabel={allDone ? "COMPLETE" : "IN PROGRESS"}
         statusVariant={allDone ? "completed" : "in_progress"}
       />
 
-      <SummaryCard>
+      <ContentCard>
         <Box sx={{ display: "flex", alignItems: "center", gap: "12px", mb: "16px" }}>
           <UploadFileOutlinedIcon sx={{ fontSize: 18, color: allDone ? color.status.success.default : color.action.primary.default }} />
           <TradAtlasText semanticFont={SF.textMdEmphasis} sx={{ color: color.type.default }}>
@@ -931,46 +830,12 @@ function RegulatoryFilingStep({ agenticState }: { agenticState: AgenticProcessSt
 
         <Box sx={{ display: "flex", flexDirection: "column", gap: "2px" }}>
           {agenticState.filingSubsteps.map((sub) => (
-            <Box
-              key={sub.name}
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: "12px",
-                py: "10px",
-                px: "4px",
-                borderBottom: `1px solid ${color.outline.fixed}`,
-                "&:last-child": { borderBottom: "none" },
-              }}
-            >
-              {sub.status === "completed" ? (
-                <CheckCircleIcon sx={{ fontSize: 20, color: color.status.success.default, flexShrink: 0 }} />
-              ) : sub.status === "in_progress" ? (
-                <CircularProgress size={18} thickness={5} sx={{ color: color.action.primary.default, flexShrink: 0, ml: "1px", mr: "1px" }} />
-              ) : (
-                <RadioButtonUncheckedIcon sx={{ fontSize: 20, color: color.outline.fixed, flexShrink: 0 }} />
-              )}
-              <TradAtlasText
-                semanticFont={SF.labelMd}
-                sx={{
-                  color: sub.status === "pending" ? color.type.muted : color.type.default,
-                  fontWeight: sub.status === "in_progress" ? weight.semiBold : weight.regular,
-                  flex: 1,
-                }}
-              >
-                {sub.name}
-              </TradAtlasText>
-              {sub.time && (
-                <TradAtlasText semanticFont={SF.textMicro} sx={{ color: color.type.muted, flexShrink: 0 }}>
-                  {sub.time}
-                </TradAtlasText>
-              )}
-            </Box>
+            <StatusSubstepRow key={sub.name} status={sub.status} label={sub.name} time={sub.time} />
           ))}
         </Box>
-      </SummaryCard>
+      </ContentCard>
 
-      <SummaryCard>
+      <ContentCard>
         <TradAtlasText semanticFont={SF.textMd} sx={{ fontWeight: weight.semiBold, color: color.type.default, mb: "8px" }}>
           Documents filed
         </TradAtlasText>
@@ -1001,7 +866,7 @@ function RegulatoryFilingStep({ agenticState }: { agenticState: AgenticProcessSt
             </Box>
           ))}
         </Box>
-      </SummaryCard>
+      </ContentCard>
     </Box>
   );
 }
@@ -1022,14 +887,14 @@ function UpdateEntitiesStep({
 
   return (
     <Box sx={{ maxWidth: 720, display: "flex", flexDirection: "column", gap: "20px" }}>
-      <StepHeader
+      <SectionHeader
         title="Update entity records"
         subtitle="The system is automatically recording the resignation and new appointment in the entity management system."
         statusLabel={allDone ? "COMPLETE" : "IN PROGRESS"}
         statusVariant={allDone ? "completed" : "in_progress"}
       />
 
-      <SummaryCard>
+      <ContentCard>
         <Box sx={{ display: "flex", alignItems: "center", gap: "12px", mb: "16px" }}>
           <StorageOutlinedIcon sx={{ fontSize: 18, color: allDone ? color.status.success.default : color.action.primary.default }} />
           <TradAtlasText semanticFont={SF.textMdEmphasis} sx={{ color: color.type.default }}>
@@ -1041,47 +906,13 @@ function UpdateEntitiesStep({
 
         <Box sx={{ display: "flex", flexDirection: "column", gap: "2px" }}>
           {agenticState.entitySubsteps.map((sub) => (
-            <Box
-              key={sub.name}
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: "12px",
-                py: "10px",
-                px: "4px",
-                borderBottom: `1px solid ${color.outline.fixed}`,
-                "&:last-child": { borderBottom: "none" },
-              }}
-            >
-              {sub.status === "completed" ? (
-                <CheckCircleIcon sx={{ fontSize: 20, color: color.status.success.default, flexShrink: 0 }} />
-              ) : sub.status === "in_progress" ? (
-                <CircularProgress size={18} thickness={5} sx={{ color: color.action.primary.default, flexShrink: 0, ml: "1px", mr: "1px" }} />
-              ) : (
-                <RadioButtonUncheckedIcon sx={{ fontSize: 20, color: color.outline.fixed, flexShrink: 0 }} />
-              )}
-              <TradAtlasText
-                semanticFont={SF.labelMd}
-                sx={{
-                  color: sub.status === "pending" ? color.type.muted : color.type.default,
-                  fontWeight: sub.status === "in_progress" ? weight.semiBold : weight.regular,
-                  flex: 1,
-                }}
-              >
-                {sub.name}
-              </TradAtlasText>
-              {sub.time && (
-                <TradAtlasText semanticFont={SF.textMicro} sx={{ color: color.type.muted, flexShrink: 0 }}>
-                  {sub.time}
-                </TradAtlasText>
-              )}
-            </Box>
+            <StatusSubstepRow key={sub.name} status={sub.status} label={sub.name} time={sub.time} />
           ))}
         </Box>
-      </SummaryCard>
+      </ContentCard>
 
       {allDone && (
-        <SummaryCard sx={{ border: `1px solid ${color.status.success.default}`, background: color.status.success.background }}>
+        <ContentCard sx={{ border: `1px solid ${color.status.success.default}`, background: color.status.success.background }}>
           <Box sx={{ display: "flex", alignItems: "flex-start", gap: "12px" }}>
             <CheckCircleOutlineIcon sx={{ fontSize: 20, color: color.status.success.default, mt: "2px" }} />
             <Box>
@@ -1097,7 +928,7 @@ function UpdateEntitiesStep({
               </TradAtlasText>
             </Box>
           </Box>
-        </SummaryCard>
+        </ContentCard>
       )}
     </Box>
   );

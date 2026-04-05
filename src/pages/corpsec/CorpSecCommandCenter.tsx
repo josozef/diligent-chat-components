@@ -30,27 +30,9 @@ import { atlasFontFamilyMono } from "@/tokens/atlasLight";
 import { useDemo } from "../../DemoContext";
 import { useTokens } from "../../hooks/useTokens";
 import { ChatPrompt } from "../../components/ai";
+import ContentCard from "@/components/common/ContentCard";
 import GlobalHeader from "./GlobalHeader";
 import DemoControlsFab from "./DemoControlsFab";
-
-function ContentCard({ children, sx }: { children: React.ReactNode; sx?: object }) {
-  const { color, radius } = useTokens();
-  return (
-    <Box
-      data-atlas-component="ContentCard"
-      data-atlas-variant="surface - card - lg"
-      sx={{
-        borderRadius: radius.lg,
-        border: `1px solid ${color.outline.fixed}`,
-        background: color.surface.default,
-        p: "24px",
-        ...sx,
-      }}
-    >
-      {children}
-    </Box>
-  );
-}
 
 function IncidentTile({
   icon,
