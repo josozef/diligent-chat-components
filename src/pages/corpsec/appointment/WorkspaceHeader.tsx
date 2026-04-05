@@ -1,8 +1,8 @@
-import { Box, Button, IconButton } from "@mui/material";
-import { ArrowBackIcon, VisibilityOutlinedIcon } from "@/icons";
+import { Box, IconButton } from "@mui/material";
+import { ArrowBackIcon } from "@/icons";
 import { useNavigate } from "react-router";
 import TradAtlasText from "../../../components/common/TradAtlasText";
-import { DATA_SEMANTIC_FONT, SF, semanticFontStyle } from "@/tokens/tradAtlasSemanticTypography";
+import { SF } from "@/tokens/tradAtlasSemanticTypography";
 import { useTokens } from "../../../hooks/useTokens";
 
 interface WorkspaceHeaderProps {
@@ -49,28 +49,6 @@ export default function WorkspaceHeader({ selectedCandidate }: WorkspaceHeaderPr
         </TradAtlasText>
       </Box>
 
-      <Button
-        variant="outlined"
-        color="inherit"
-        size="small"
-        data-atlas-component="Button"
-        data-atlas-variant="outlined - secondary - sm"
-        {...{ [DATA_SEMANTIC_FONT]: SF.labelMd }}
-        startIcon={<VisibilityOutlinedIcon sx={{ fontSize: 15 }} />}
-        sx={{
-          ...semanticFontStyle(SF.labelMd),
-          textTransform: "none",
-          color: color.type.muted,
-          borderColor: color.outline.fixed,
-          fontWeight: weight.medium,
-          px: "10px",
-          py: "4px",
-          minWidth: 0,
-          "&:hover": { color: color.type.default, borderColor: color.outline.default },
-        }}
-      >
-        Preview
-      </Button>
     </Box>
   );
 }

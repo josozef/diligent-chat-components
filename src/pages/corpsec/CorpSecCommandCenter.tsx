@@ -144,6 +144,7 @@ function IncidentTile({
           data-atlas-component="Button"
           data-atlas-variant="primary - md"
           sx={{
+            alignSelf: "flex-start",
             ...semanticFontStyle(SF.textMdEmphasis),
             textTransform: "none",
           }}
@@ -270,7 +271,7 @@ function EntityPortfolio() {
             <TradAtlasText semanticFont={SF.titleH2Emphasis} sx={{ fontWeight: weight.bold, color: s.valueColor }}>
               {s.value}
             </TradAtlasText>
-            <TradAtlasText semanticFont={SF.textSm} sx={{ color: color.type.muted, fontWeight: weight.medium, mt: "4px" }}>
+            <TradAtlasText semanticFont={SF.textSmUppercase} sx={{ color: color.type.muted, mt: "4px" }}>
               {s.label}
             </TradAtlasText>
           </Box>
@@ -348,11 +349,12 @@ function ChatSection() {
         canSend={input.trim().length > 0}
         placeholder="Ask a question or describe what you need..."
         maxWidth={9999}
+        density="relaxed"
       />
 
       <TradAtlasText
-        semanticFont={SF.labelMdCompact}
-        sx={{ fontWeight: weight.semiBold, color: color.type.muted, mt: "16px", mb: "12px" }}
+        semanticFont={SF.textMdUppercase}
+        sx={{ color: color.type.muted, mt: "16px", mb: "12px" }}
       >
         Or start with
       </TradAtlasText>
@@ -462,13 +464,8 @@ function EntityStatusSummary() {
           {["Entity", "Jurisdiction", "Status", "Issue", "Deadline"].map((h) => (
             <TradAtlasText
               key={h}
-              semanticFont={SF.textMicroEmphasis}
-              sx={{
-                fontWeight: weight.semiBold,
-                color: color.type.muted,
-                textTransform: "uppercase",
-                letterSpacing: "0.5px",
-              }}
+              semanticFont={SF.textSmUppercase}
+              sx={{ color: color.type.muted }}
             >
               {h}
             </TradAtlasText>
@@ -788,7 +785,7 @@ function RecentActivity() {
             {item.icon}
           </Box>
           <Box sx={{ flex: 1 }}>
-            <TradAtlasText semanticFont={SF.textSm} sx={{ fontWeight: weight.semiBold, color: color.type.default }}>
+            <TradAtlasText semanticFont={SF.textSmUppercase} sx={{ color: color.type.default }}>
               {item.category}
             </TradAtlasText>
             <TradAtlasText semanticFont={SF.textMd} sx={{ color: color.type.muted, mt: "2px" }}>
@@ -880,7 +877,7 @@ function OperationalTrends() {
               gap: "10px",
             }}
           >
-            <TradAtlasText semanticFont={SF.labelMdCompact} sx={{ fontWeight: weight.semiBold, color: color.type.muted }}>
+            <TradAtlasText semanticFont={SF.textSmUppercase} sx={{ color: color.type.muted }}>
               {t.label}
             </TradAtlasText>
             <Box sx={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>

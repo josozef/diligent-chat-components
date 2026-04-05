@@ -22,7 +22,7 @@ export const TYPOGRAPHY_PRIMITIVE: Record<string, SystemStyleObject<Theme>> = {
   "Typography/Text/Md": {
     fontFamily: atlasFontFamily,
     fontSize: "14px",
-    lineHeight: "20px",
+    lineHeight: "18px",
     letterSpacing: "0.2px",
   },
   "Typography/Text/Sm": {
@@ -40,7 +40,7 @@ export const TYPOGRAPHY_PRIMITIVE: Record<string, SystemStyleObject<Theme>> = {
   "Typography/Text/Label Md": {
     fontFamily: atlasFontFamily,
     fontSize: "13px",
-    lineHeight: "20px",
+    lineHeight: "17px",
     letterSpacing: "0.2px",
   },
   "Typography/Text/Label Md Compact": {
@@ -58,7 +58,7 @@ export const TYPOGRAPHY_PRIMITIVE: Record<string, SystemStyleObject<Theme>> = {
   "Typography/Text/Xs": {
     fontFamily: atlasFontFamily,
     fontSize: "10px",
-    lineHeight: "14px",
+    lineHeight: "13px",
     letterSpacing: "0.5px",
   },
   "Typography/Title/H1 Billboard": {
@@ -94,7 +94,7 @@ export const TYPOGRAPHY_PRIMITIVE: Record<string, SystemStyleObject<Theme>> = {
   "Typography/Title/H6 Xs": {
     fontFamily: atlasFontFamily,
     fontSize: "14px",
-    lineHeight: "20px",
+    lineHeight: "18px",
     letterSpacing: "0.2px",
   },
 };
@@ -126,6 +126,9 @@ export const SEMANTIC_FONT_STYLES: Record<string, SystemStyleObject<Theme>> = {
   "Semantic/Font/Title/H4 Md - Emphasis": { ...prim("Typography/Title/H4 Md"), fontWeight: atlasFontWeight.semiBold },
   "Semantic/Font/Title/H5 Sm - Emphasis": { ...prim("Typography/Title/H5 Sm"), fontWeight: atlasFontWeight.semiBold },
   "Semantic/Font/Title/H6 Xs - Emphasis": { ...prim("Typography/Title/H6 Xs"), fontWeight: atlasFontWeight.semiBold },
+  /* ── Project extensions (not in Figma baseline — see TypographyChangeLog.md) ── */
+  "Semantic/Font/Text/Md  - Uppercase": { ...prim("Typography/Text/Md"), fontWeight: atlasFontWeight.semiBold, textTransform: "uppercase", letterSpacing: "0.08em" },
+  "Semantic/Font/Text/Sm - Uppercase": { ...prim("Typography/Text/Sm"), fontWeight: atlasFontWeight.semiBold, textTransform: "uppercase", letterSpacing: "0.08em" },
 };
 
 /** Shorter references in code; `data-semantic-font` still uses the full string via `semanticFont`. */
@@ -148,6 +151,8 @@ export const SF = {
   titleH4Emphasis: "Semantic/Font/Title/H4 Md - Emphasis",
   titleH5Emphasis: "Semantic/Font/Title/H5 Sm - Emphasis",
   titleH6Emphasis: "Semantic/Font/Title/H6 Xs - Emphasis",
+  textMdUppercase: "Semantic/Font/Text/Md  - Uppercase",
+  textSmUppercase: "Semantic/Font/Text/Sm - Uppercase",
 } as const;
 
 export type SemanticFontPath = (typeof SF)[keyof typeof SF];

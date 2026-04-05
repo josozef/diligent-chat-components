@@ -1,8 +1,13 @@
 export { default as AiSparkle } from "./AiSparkle";
 export { default as ChatPrompt } from "./ChatPrompt";
+export { default as ChatConversation } from "./ChatConversation";
+export { default as ChatAssistantResponse } from "./ChatAssistantResponse";
 export { default as FeedbackBar } from "./FeedbackBar";
 export { default as MessageBubble } from "./MessageBubble";
 export { default as RevealSection } from "./RevealSection";
 export { default as ThinkingPanel } from "./ThinkingPanel";
 export type { ThinkingStep } from "./ThinkingPanel";
 export type { ChatPhase } from "./ChatThread";
+export type { ChatPresentationDensity } from "./chatPresentation";
+export type { ChatConversationItem, ChatConversationMessage } from "./ChatConversation";
+export { formatChatMarkdownToHtml } from "./chatMarkdown";

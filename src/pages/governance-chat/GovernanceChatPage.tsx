@@ -1,5 +1,5 @@
 import { Box } from "@mui/material";
-import { AiSparkle, ChatPrompt } from "../../components/ai";
+import { ChatPrompt } from "../../components/ai";
 import { SuggestionChip } from "../../components/common";
 import ChatThread from "../../components/ai/ChatThread";
 import useChatSimulation from "../../hooks/useChatSimulation";
@@ -9,16 +9,10 @@ import TradAtlasText from "../../components/common/TradAtlasText";
 import { SF } from "../../tokens/tradAtlasSemanticTypography";
 import { atlasSemanticColor as color } from "../../tokens/atlasLight";
 
-const CHAT_WIDTH = 640;
-
 const DEMO_PROMPT =
   "Summarize the legal requirements of appointing a subsidiary board member in the UK";
 
-const SUGGESTION_PROMPTS = [
-  "Help write prompt",
-  "Summarize article",
-  "Analyze data",
-];
+const SUGGESTION_PROMPTS = ["Help write prompt", "Summarize article", "Analyze data"];
 
 const SECTION_COUNT = GOVERNANCE_RESPONSE_SECTIONS.length + 1;
 
@@ -50,12 +44,11 @@ export default function GovernanceChatPage() {
               flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
-              gap: "16px",
+              gap: "12px",
               px: "24px",
               py: "48px",
             }}
           >
-            <AiSparkle size="2xl" />
             <TradAtlasText
               semanticFont={SF.titleH3Emphasis}
               sx={{
@@ -78,7 +71,7 @@ export default function GovernanceChatPage() {
             </TradAtlasText>
           </Box>
         ) : (
-          <Box sx={{ px: "24px" }}>
+          <Box sx={{ px: "24px", width: "100%", boxSizing: "border-box" }}>
             <ChatThread
               phase={sim.phase}
               userMessage={DEMO_PROMPT}
@@ -88,6 +81,9 @@ export default function GovernanceChatPage() {
               onToggleThinking={() => sim.setThinkingOpen((o) => !o)}
               responseSections={GOVERNANCE_RESPONSE_SECTIONS}
               visibleSections={sim.visibleSections}
+              density="relaxed"
+              userMessageFullWidth
+              onRerunPrompt={sim.handleRerun}
             />
           </Box>
         )}
@@ -112,7 +108,7 @@ export default function GovernanceChatPage() {
           onSend={sim.handleSend}
           disabled={sim.phase !== "idle"}
           canSend={sim.canSend}
-          maxWidth={CHAT_WIDTH}
+          density="relaxed"
         />
 
         {sim.phase === "idle" && (
@@ -121,7 +117,7 @@ export default function GovernanceChatPage() {
               display: "flex",
               gap: "8px",
               alignItems: "start",
-              maxWidth: CHAT_WIDTH,
+              maxWidth: 640,
               width: "100%",
               flexWrap: "wrap",
             }}

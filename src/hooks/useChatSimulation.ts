@@ -18,6 +18,8 @@ export interface ChatSimulation {
   setInput: (value: string) => void;
   canSend: boolean;
   handleSend: () => void;
+  /** Re-run the same conversation flow (e.g. after the thread has finished). */
+  handleRerun: () => void;
   activeThinkingStep: number;
   thinkingOpen: boolean;
   setThinkingOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -55,6 +57,15 @@ export default function useChatSimulation({
     setVisibleSections(0);
     setTimeout(scrollToBottom, 60);
   }, [canSend, scrollToBottom]);
+
+  const handleRerun = useCallback(() => {
+    if (phase === "idle" || phase === "thinking") return;
+    setPhase("thinking");
+    setActiveThinkingStep(0);
+    setThinkingOpen(false);
+    setVisibleSections(0);
+    setTimeout(scrollToBottom, 60);
+  }, [phase, scrollToBottom]);
 
   useEffect(() => {
     if (phase !== "thinking") return;
@@ -103,6 +114,7 @@ export default function useChatSimulation({
     setInput,
     canSend,
     handleSend,
+    handleRerun,
     activeThinkingStep,
     thinkingOpen,
     setThinkingOpen,
