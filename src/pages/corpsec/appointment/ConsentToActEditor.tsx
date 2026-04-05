@@ -12,7 +12,7 @@ import {
 } from "@/icons";
 import TradAtlasText from "@/components/common/TradAtlasText";
 import TipTapEditorShell from "@/components/editor/TipTapEditorShell";
-import { SF, semanticFontStyle } from "@/tokens/tradAtlasSemanticTypography";
+import { SF } from "@/tokens/tradAtlasSemanticTypography";
 import { useTokens } from "@/hooks/useTokens";
 
 interface Form45Data {

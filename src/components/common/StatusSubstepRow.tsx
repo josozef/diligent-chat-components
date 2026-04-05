@@ -14,7 +14,7 @@ export default function StatusSubstepRow({
 }: {
   status: SubstepStatus;
   label: string;
-  time?: string;
+  time?: string | null;
   size?: "sm" | "md";
 }) {
   const { color, weight } = useTokens();
