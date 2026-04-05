@@ -1,7 +1,7 @@
 /**
  * Trad Atlas — semantic typography (Foundation → Trad Atlas).
  *
- * Source of truth: Figma file Foundation—Trad Atlas, frame “Semantic typography”
+ * Source of truth: Figma file Foundation—Trad Atlas, frame "Semantic typography"
  * (node 33011:5716). **Typography/** entries are primitive variables; **Semantic/Font/**
  * entries match the Atlas column of the semantic grid.
  *
@@ -15,7 +15,7 @@
 import type { SystemStyleObject } from "@mui/system";
 import type { Theme } from "@mui/material/styles";
 
-import { atlasFontFamily, atlasFontFamilyMono, atlasFontWeight } from "./atlasLight";
+import { atlasFontFamily, atlasFontWeight } from "./atlasLight";
 
 /** Figma Typography/* primitives — resolved CSS (Atlas column uses Semantic/Font → these). */
 export const TYPOGRAPHY_PRIMITIVE: Record<string, SystemStyleObject<Theme>> = {
@@ -47,12 +47,6 @@ export const TYPOGRAPHY_PRIMITIVE: Record<string, SystemStyleObject<Theme>> = {
     fontFamily: atlasFontFamily,
     fontSize: "13px",
     lineHeight: "16px",
-    letterSpacing: "0.2px",
-  },
-  "Typography/Text/Label Md Relaxed": {
-    fontFamily: atlasFontFamily,
-    fontSize: "13px",
-    lineHeight: "18px",
     letterSpacing: "0.2px",
   },
   "Typography/Text/Micro": {
@@ -103,54 +97,6 @@ export const TYPOGRAPHY_PRIMITIVE: Record<string, SystemStyleObject<Theme>> = {
     lineHeight: "20px",
     letterSpacing: "0.2px",
   },
-  "Typography/Display/Lg": {
-    fontFamily: atlasFontFamily,
-    fontSize: "24px",
-    lineHeight: "32px",
-    letterSpacing: "-0.2px",
-  },
-  "Typography/Title/Stat": {
-    fontFamily: atlasFontFamily,
-    fontSize: "28px",
-    lineHeight: "36px",
-    letterSpacing: "0",
-  },
-  "Typography/Title/Stat Tight": {
-    fontFamily: atlasFontFamily,
-    fontSize: "28px",
-    lineHeight: "32px",
-    letterSpacing: "0",
-  },
-  "Typography/Title/Title Md": {
-    fontFamily: atlasFontFamily,
-    fontSize: "20px",
-    lineHeight: "28px",
-    letterSpacing: "0",
-  },
-  "Typography/Text/Md Loose": {
-    fontFamily: atlasFontFamily,
-    fontSize: "14px",
-    lineHeight: "22px",
-    letterSpacing: "0.2px",
-  },
-  "Typography/Text/Lg Loose": {
-    fontFamily: atlasFontFamily,
-    fontSize: "16px",
-    lineHeight: "22px",
-    letterSpacing: "0.2px",
-  },
-  "Typography/Text/Body Lead": {
-    fontFamily: atlasFontFamily,
-    fontSize: "15px",
-    lineHeight: "22px",
-    letterSpacing: "0.2px",
-  },
-  "Typography/Code/Sm": {
-    fontFamily: atlasFontFamilyMono,
-    fontSize: "12px",
-    lineHeight: "18px",
-    letterSpacing: "0",
-  },
 };
 
 function prim(name: keyof typeof TYPOGRAPHY_PRIMITIVE): SystemStyleObject<Theme> {
@@ -168,14 +114,9 @@ export const SEMANTIC_FONT_STYLES: Record<string, SystemStyleObject<Theme>> = {
   "Semantic/Font/Text/Sm - Emphasis": { ...prim("Typography/Text/Sm"), fontWeight: atlasFontWeight.semiBold },
   "Semantic/Font/Text/Lg": { ...prim("Typography/Text/Lg"), fontWeight: atlasFontWeight.regular },
   "Semantic/Font/Text/Lg - Emphasis": { ...prim("Typography/Text/Lg"), fontWeight: atlasFontWeight.semiBold },
-  "Semantic/Font/Text/Lg Loose": { ...prim("Typography/Text/Lg Loose"), fontWeight: atlasFontWeight.regular },
-  "Semantic/Font/Text/Md Loose": { ...prim("Typography/Text/Md Loose"), fontWeight: atlasFontWeight.regular },
-  "Semantic/Font/Text/Body Lead": { ...prim("Typography/Text/Body Lead"), fontWeight: atlasFontWeight.regular },
-  "Semantic/Font/Text/Body Lead - Emphasis": { ...prim("Typography/Text/Body Lead"), fontWeight: atlasFontWeight.semiBold },
   "Semantic/Font/Text/Label Md": { ...prim("Typography/Text/Label Md"), fontWeight: atlasFontWeight.regular },
   "Semantic/Font/Text/Label Md - Emphasis": { ...prim("Typography/Text/Label Md"), fontWeight: atlasFontWeight.semiBold },
   "Semantic/Font/Text/Label Md Compact": { ...prim("Typography/Text/Label Md Compact"), fontWeight: atlasFontWeight.regular },
-  "Semantic/Font/Text/Label Md Relaxed": { ...prim("Typography/Text/Label Md Relaxed"), fontWeight: atlasFontWeight.regular },
   "Semantic/Font/Text/Micro": { ...prim("Typography/Text/Micro"), fontWeight: atlasFontWeight.regular },
   "Semantic/Font/Text/Micro - Emphasis": { ...prim("Typography/Text/Micro"), fontWeight: atlasFontWeight.semiBold },
   "Semantic/Font/Text/Xs": { ...prim("Typography/Text/Xs"), fontWeight: atlasFontWeight.semiBold },
@@ -185,13 +126,6 @@ export const SEMANTIC_FONT_STYLES: Record<string, SystemStyleObject<Theme>> = {
   "Semantic/Font/Title/H4 Md - Emphasis": { ...prim("Typography/Title/H4 Md"), fontWeight: atlasFontWeight.semiBold },
   "Semantic/Font/Title/H5 Sm - Emphasis": { ...prim("Typography/Title/H5 Sm"), fontWeight: atlasFontWeight.semiBold },
   "Semantic/Font/Title/H6 Xs - Emphasis": { ...prim("Typography/Title/H6 Xs"), fontWeight: atlasFontWeight.semiBold },
-  "Semantic/Font/Display/Lg - Emphasis": { ...prim("Typography/Display/Lg"), fontWeight: atlasFontWeight.semiBold },
-  "Semantic/Font/Title/Stat - Emphasis": { ...prim("Typography/Title/Stat"), fontWeight: atlasFontWeight.bold },
-  "Semantic/Font/Title/Stat Tight - Emphasis": { ...prim("Typography/Title/Stat Tight"), fontWeight: atlasFontWeight.bold },
-  "Semantic/Font/Title/Title Md - Emphasis": { ...prim("Typography/Title/Title Md"), fontWeight: atlasFontWeight.bold },
-  "Semantic/Font/Code/Sm": { ...prim("Typography/Code/Sm"), fontWeight: atlasFontWeight.regular },
-  /** UI control labels that map to Text Md emphasis until a dedicated Semantic/Font/Button/* row exists in Figma. */
-  "Semantic/Font/Action/Label Primary": { ...prim("Typography/Text/Md"), fontWeight: atlasFontWeight.semiBold },
 };
 
 /** Shorter references in code; `data-semantic-font` still uses the full string via `semanticFont`. */
@@ -202,14 +136,9 @@ export const SF = {
   textSmEmphasis: "Semantic/Font/Text/Sm - Emphasis",
   textLg: "Semantic/Font/Text/Lg",
   textLgEmphasis: "Semantic/Font/Text/Lg - Emphasis",
-  textLgLoose: "Semantic/Font/Text/Lg Loose",
-  textMdLoose: "Semantic/Font/Text/Md Loose",
-  bodyLead: "Semantic/Font/Text/Body Lead",
-  bodyLeadEmphasis: "Semantic/Font/Text/Body Lead - Emphasis",
   labelMd: "Semantic/Font/Text/Label Md",
   labelMdEmphasis: "Semantic/Font/Text/Label Md - Emphasis",
   labelMdCompact: "Semantic/Font/Text/Label Md Compact",
-  labelMdRelaxed: "Semantic/Font/Text/Label Md Relaxed",
   textMicro: "Semantic/Font/Text/Micro",
   textMicroEmphasis: "Semantic/Font/Text/Micro - Emphasis",
   textXs: "Semantic/Font/Text/Xs",
@@ -219,12 +148,6 @@ export const SF = {
   titleH4Emphasis: "Semantic/Font/Title/H4 Md - Emphasis",
   titleH5Emphasis: "Semantic/Font/Title/H5 Sm - Emphasis",
   titleH6Emphasis: "Semantic/Font/Title/H6 Xs - Emphasis",
-  displayLgEmphasis: "Semantic/Font/Display/Lg - Emphasis",
-  titleStatEmphasis: "Semantic/Font/Title/Stat - Emphasis",
-  titleStatTightEmphasis: "Semantic/Font/Title/Stat Tight - Emphasis",
-  titleMdEmphasis: "Semantic/Font/Title/Title Md - Emphasis",
-  codeSm: "Semantic/Font/Code/Sm",
-  actionLabelPrimary: "Semantic/Font/Action/Label Primary",
 } as const;
 
 export type SemanticFontPath = (typeof SF)[keyof typeof SF];

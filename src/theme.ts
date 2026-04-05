@@ -16,7 +16,7 @@ type ActionLabelFont = {
   letterSpacing: string;
 };
 
-const actionLabelPrimaryStyle = semanticFontStyle(SF.actionLabelPrimary) as ActionLabelFont;
+const actionLabelPrimaryStyle = semanticFontStyle(SF.textMdEmphasis) as ActionLabelFont;
 import { atlasSemanticColorDark } from "./tokens/atlasDark";
 
 const mdRadiusPx = Number.parseInt(atlasSemanticRadius.md.replace("px", ""), 10) || 8;
@@ -86,7 +86,7 @@ function buildTheme(mode: "light" | "dark", c: SemanticColors): Theme {
       },
       MuiButton: {
         defaultProps: {
-          ...{ [DATA_SEMANTIC_FONT]: SF.actionLabelPrimary },
+          ...{ [DATA_SEMANTIC_FONT]: SF.textMdEmphasis },
         },
         styleOverrides: {
           root: {

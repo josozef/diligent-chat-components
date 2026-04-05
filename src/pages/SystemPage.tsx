@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import type { SxProps, Theme } from "@mui/material/styles";
 
-import { atlasFontFamily, atlasSemanticRadius } from "../tokens/atlasLight";
+import { atlasFontFamily, atlasFontFamilyMono, atlasSemanticRadius } from "../tokens/atlasLight";
 import TradAtlasText from "../components/common/TradAtlasText";
 import {
   DATA_SEMANTIC_FONT,
@@ -442,15 +442,15 @@ export default function SystemPage() {
                   {section.rows.map(([token, value]) => (
                     <TableRow key={token}>
                       <TableCell
-                        {...{ [DATA_SEMANTIC_FONT]: SF.codeSm }}
-                        sx={{ ...semanticFontStyle(SF.codeSm), py: "4px", width: "50%" }}
+                        {...{ [DATA_SEMANTIC_FONT]: SF.textSm }}
+                        sx={{ ...semanticFontStyle(SF.textSm), fontFamily: atlasFontFamilyMono, py: "4px", width: "50%" }}
                       >
                         {token}
                       </TableCell>
                       <TableCell sx={{ py: "4px" }}>
                         <Box sx={{ display: "flex", alignItems: "center", gap: "8px" }}>
                           {!value.endsWith("px") && <Swatch color={value} />}
-                          <TradAtlasText semanticFont={SF.codeSm}>{value}</TradAtlasText>
+                          <TradAtlasText semanticFont={SF.textSm} sx={{ fontFamily: atlasFontFamilyMono }}>{value}</TradAtlasText>
                         </Box>
                       </TableCell>
                     </TableRow>
@@ -496,10 +496,10 @@ export default function SystemPage() {
                     />
                   </TableCell>
                   <TableCell>
-                    <TradAtlasText semanticFont={SF.codeSm}>{variantLabel}</TradAtlasText>
+                    <TradAtlasText semanticFont={SF.textSm} sx={{ fontFamily: atlasFontFamilyMono }}>{variantLabel}</TradAtlasText>
                   </TableCell>
                   <TableCell>
-                    <TradAtlasText semanticFont={SF.codeSm} sx={{ color: "text.secondary" }}>
+                    <TradAtlasText semanticFont={SF.textSm} sx={{ fontFamily: atlasFontFamilyMono, color: "text.secondary" }}>
                       {describeStyle(row)}
                     </TradAtlasText>
                   </TableCell>

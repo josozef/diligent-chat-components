@@ -26,6 +26,7 @@ import {
 } from "@/icons";
 import TradAtlasText from "@/components/common/TradAtlasText";
 import { DATA_SEMANTIC_FONT, SF, semanticFontStyle } from "@/tokens/tradAtlasSemanticTypography";
+import { atlasFontFamilyMono } from "@/tokens/atlasLight";
 import { useDemo } from "../../DemoContext";
 import { useTokens } from "../../hooks/useTokens";
 import { ChatPrompt } from "../../components/ai";
@@ -105,7 +106,7 @@ function IncidentTile({
         <Box sx={{ display: "flex", alignItems: "center", gap: "10px", flex: 1, minWidth: 0 }}>
           {icon}
           <TradAtlasText
-            semanticFont={SF.bodyLead}
+            semanticFont={SF.textMd}
             sx={{ fontWeight: weight.bold, color: color.type.default }}
           >
             {title}
@@ -129,7 +130,7 @@ function IncidentTile({
         {subtitle}
       </TradAtlasText>
 
-      <TradAtlasText semanticFont={SF.labelMdRelaxed} sx={{ color: color.type.muted, fontWeight: weight.medium }}>
+      <TradAtlasText semanticFont={SF.labelMd} sx={{ color: color.type.muted, fontWeight: weight.medium }}>
         {stats}
       </TradAtlasText>
 
@@ -143,7 +144,7 @@ function IncidentTile({
           data-atlas-component="Button"
           data-atlas-variant="primary - md"
           sx={{
-            ...semanticFontStyle(SF.actionLabelPrimary),
+            ...semanticFontStyle(SF.textMdEmphasis),
             textTransform: "none",
           }}
         >
@@ -205,10 +206,10 @@ function HeroBanner() {
       }}
     >
       <CheckCircleOutlineIcon sx={{ color: color.type.disabled, fontSize: 48 }} />
-      <TradAtlasText semanticFont={SF.titleMdEmphasis} sx={{ fontWeight: weight.bold, color: color.type.default }}>
+      <TradAtlasText semanticFont={SF.titleH4Emphasis} sx={{ fontWeight: weight.bold, color: color.type.default }}>
         All clear
       </TradAtlasText>
-      <TradAtlasText semanticFont={SF.textMdLoose} sx={{ color: color.type.muted, maxWidth: 560 }}>
+      <TradAtlasText semanticFont={SF.textMd} sx={{ color: color.type.muted, maxWidth: 560 }}>
         All 47 entities in good standing, 3 filings due this month (all prepared), and 2 KYC requests in progress.
       </TradAtlasText>
     </Box>
@@ -245,7 +246,7 @@ function EntityPortfolio() {
           <DomainOutlinedIcon sx={{ fontSize: 20 }} />
         </Box>
         <Box>
-          <TradAtlasText semanticFont={SF.bodyLeadEmphasis} sx={{ color: color.type.default }}>
+          <TradAtlasText semanticFont={SF.textMdEmphasis} sx={{ color: color.type.default }}>
             Entity portfolio at a glance
           </TradAtlasText>
           <TradAtlasText semanticFont={SF.labelMdCompact} sx={{ color: color.type.muted }}>
@@ -266,7 +267,7 @@ function EntityPortfolio() {
       >
         {stats.map((s) => (
           <Box key={s.label}>
-            <TradAtlasText semanticFont={SF.titleStatEmphasis} sx={{ fontWeight: weight.bold, color: s.valueColor }}>
+            <TradAtlasText semanticFont={SF.titleH2Emphasis} sx={{ fontWeight: weight.bold, color: s.valueColor }}>
               {s.value}
             </TradAtlasText>
             <TradAtlasText semanticFont={SF.textSm} sx={{ color: color.type.muted, fontWeight: weight.medium, mt: "4px" }}>
@@ -393,7 +394,7 @@ function ChatSection() {
             <Box sx={{ color: color.type.muted }}>{s.icon}</Box>
             <TradAtlasText
               component="span"
-              semanticFont={SF.labelMdRelaxed}
+              semanticFont={SF.labelMd}
               sx={{ fontWeight: weight.semiBold, color: color.type.default }}
             >
               {s.label}
@@ -507,7 +508,7 @@ function EntityStatusSummary() {
                 {e.status}
               </TradAtlasText>
             </Box>
-            <TradAtlasText semanticFont={SF.labelMdRelaxed} sx={{ color: color.type.muted }}>
+            <TradAtlasText semanticFont={SF.labelMd} sx={{ color: color.type.muted }}>
               {e.issue}
             </TradAtlasText>
             <TradAtlasText
@@ -599,7 +600,7 @@ function AgentActivity() {
                     }}
                   />
                 </Box>
-                <TradAtlasText semanticFont={SF.bodyLeadEmphasis} sx={{ color: color.type.default }}>
+                <TradAtlasText semanticFont={SF.textMdEmphasis} sx={{ color: color.type.default }}>
                   {a.title}
                 </TradAtlasText>
               </Box>
@@ -692,7 +693,7 @@ function ProactiveTasks() {
               gap: "12px",
             }}
           >
-            <TradAtlasText semanticFont={SF.bodyLeadEmphasis} sx={{ color: color.type.default }}>
+            <TradAtlasText semanticFont={SF.textMdEmphasis} sx={{ color: color.type.default }}>
               {t.title}
             </TradAtlasText>
             <TradAtlasText semanticFont={SF.textMd} sx={{ color: color.type.muted }}>
@@ -883,7 +884,7 @@ function OperationalTrends() {
               {t.label}
             </TradAtlasText>
             <Box sx={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
-              <TradAtlasText semanticFont={SF.titleStatTightEmphasis} sx={{ fontWeight: weight.bold, color: color.type.default }}>
+              <TradAtlasText semanticFont={SF.titleH2Emphasis} sx={{ fontWeight: weight.bold, color: color.type.default }}>
                 {t.value}
               </TradAtlasText>
               {miniChart(t.trend)}
@@ -947,7 +948,7 @@ function SystemLog() {
         }}
       >
         {logs.map((log, i) => (
-          <TradAtlasText key={i} semanticFont={SF.codeSm} sx={{ color: color.type.muted }}>
+          <TradAtlasText key={i} semanticFont={SF.textSm} sx={{ fontFamily: atlasFontFamilyMono, color: color.type.muted }}>
             {log}
           </TradAtlasText>
         ))}

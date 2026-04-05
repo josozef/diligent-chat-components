@@ -223,13 +223,13 @@ function OverviewContent({
           <AutoAwesomeOutlinedIcon
             sx={{ fontSize: 18, color: color.action.primary.default, mt: "2px" }}
           />
-          <TradAtlasText semanticFont={SF.textMdLoose} sx={{ color: color.type.default }}>
-            <TradAtlasText component="span" semanticFont={SF.textMdLoose} sx={{ fontWeight: weight.semiBold }}>
+          <TradAtlasText semanticFont={SF.textMd} sx={{ color: color.type.default }}>
+            <TradAtlasText component="span" semanticFont={SF.textMd} sx={{ fontWeight: weight.semiBold }}>
               Workday has reported
             </TradAtlasText>{" "}
             that Wei "David" Chen, Vice President of Commercial Operations (APAC), has submitted his
             resignation from Pacific Polymer Logistics Pte. Ltd. His last working day is{" "}
-            <TradAtlasText component="span" semanticFont={SF.textMdLoose} sx={{ fontWeight: weight.semiBold }}>
+            <TradAtlasText component="span" semanticFont={SF.textMd} sx={{ fontWeight: weight.semiBold }}>
               April 17, 2026
             </TradAtlasText>{" "}
             — 14 days from now. The board will need to appoint a replacement director to maintain
@@ -365,7 +365,7 @@ function OverviewContent({
                 <RadioButtonUncheckedIcon sx={{ fontSize: 18, color: color.outline.fixed }} />
               )}
               <TradAtlasText
-                semanticFont={SF.labelMdRelaxed}
+                semanticFont={SF.labelMd}
                 sx={{
                   color: step.status === "not_started" ? color.type.muted : color.type.default,
                   fontWeight: step.status === "in_progress" ? weight.semiBold : weight.regular,
@@ -458,7 +458,7 @@ function IdentifyCandidateStep({
           />
           <Box>
             <TradAtlasText
-              semanticFont={SF.textMdLoose}
+              semanticFont={SF.textMd}
               sx={{
                 color: color.type.default,
                 fontWeight: weight.semiBold,
@@ -499,7 +499,7 @@ function IdentifyCandidateStep({
             >
               <Box>
                 <Box sx={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                  <TradAtlasText semanticFont={SF.bodyLeadEmphasis} sx={{ color: color.type.default }}>
+                  <TradAtlasText semanticFont={SF.textMdEmphasis} sx={{ color: color.type.default }}>
                     {c.name}
                   </TradAtlasText>
                   {c.recommended && (
@@ -538,7 +538,7 @@ function IdentifyCandidateStep({
               </Box>
               <Box sx={{ textAlign: "right" }}>
                 <TradAtlasText
-                  semanticFont={SF.titleMdEmphasis}
+                  semanticFont={SF.titleH4Emphasis}
                   sx={{
                     color:
                       c.match >= 90
@@ -785,7 +785,7 @@ function BoardApprovalStep() {
           />
           <Box>
             <TradAtlasText
-              semanticFont={SF.textMdLoose}
+              semanticFont={SF.textMd}
               sx={{
                 color: color.type.default,
                 fontWeight: weight.semiBold,
@@ -828,7 +828,7 @@ function RegulatoryFilingStep() {
           />
           <Box>
             <TradAtlasText
-              semanticFont={SF.textMdLoose}
+              semanticFont={SF.textMd}
               sx={{
                 color: color.type.default,
                 fontWeight: weight.semiBold,
@@ -910,7 +910,7 @@ function UpdateEntitiesStep({
           />
           <Box>
             <TradAtlasText
-              semanticFont={SF.textMdLoose}
+              semanticFont={SF.textMd}
               sx={{
                 color: color.type.default,
                 fontWeight: weight.semiBold,

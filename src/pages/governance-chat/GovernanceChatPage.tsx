@@ -57,7 +57,7 @@ export default function GovernanceChatPage() {
           >
             <AiSparkle size="2xl" />
             <TradAtlasText
-              semanticFont={SF.displayLgEmphasis}
+              semanticFont={SF.titleH3Emphasis}
               sx={{
                 letterSpacing: "-0.2px",
                 color: color.type.default,

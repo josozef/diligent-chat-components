@@ -149,7 +149,7 @@ export default function StatusPanel({
 
                 <Box sx={{ flex: 1, minWidth: 0 }}>
                   <TradAtlasText
-                    semanticFont={SF.labelMdRelaxed}
+                    semanticFont={SF.labelMd}
                     sx={{
                       fontWeight: isActive || isInProgress ? weight.semiBold : weight.regular,
                       color: step.status === "not_started" ? color.type.muted : color.type.default,
