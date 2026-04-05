@@ -14,8 +14,8 @@ export default function WorkspaceHeader({ selectedCandidate }: WorkspaceHeaderPr
   const { color, weight } = useTokens();
 
   const title = selectedCandidate
-    ? `Replace director David Chen with ${selectedCandidate}`
-    : "Replace director David Chen";
+    ? `Board appointment — Replace David Chen with ${selectedCandidate}`
+    : "Board appointment — Replace director David Chen";
 
   return (
     <Box

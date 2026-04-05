@@ -1,5 +1,5 @@
 import { Box, Button, LinearProgress } from "@mui/material";
-import { ArrowForwardIcon, CheckCircleIcon, RadioButtonUncheckedIcon } from "@/icons";
+import { ArrowForwardIcon, CheckCircleIcon, RadioButtonUncheckedIcon, DescriptionOutlinedIcon } from "@/icons";
 import TradAtlasText from "../../../components/common/TradAtlasText";
 import StatusSubstepRow from "@/components/common/StatusSubstepRow";
 import { SF, semanticFontStyle } from "@/tokens/tradAtlasSemanticTypography";
@@ -134,37 +134,13 @@ export default function StatusPanel({
         overflow: "hidden",
       }}
     >
-      {/* Clickable header — returns to overview */}
+      {/* Progress header (non-interactive) */}
       <Box
-        component="button"
-        onClick={() => onStepClick(null)}
         sx={{
           p: "20px",
           borderBottom: `1px solid ${color.outline.fixed}`,
-          background: isOverview ? color.surface.variant : "transparent",
-          borderLeft: isOverview
-            ? `3px solid ${color.action.primary.default}`
-            : "3px solid transparent",
-          border: "none",
-          borderRight: "none",
-          borderTop: "none",
-          borderBottomStyle: "solid",
-          borderBottomWidth: 1,
-          borderBottomColor: color.outline.fixed,
-          borderLeftStyle: "solid",
-          borderLeftWidth: 3,
-          borderLeftColor: isOverview ? color.action.primary.default : "transparent",
-          cursor: "pointer",
-          textAlign: "left",
-          width: "100%",
-          "&:hover": {
-            background: isOverview ? color.surface.variant : color.surface.subtle,
-          },
         }}
       >
-        <TradAtlasText semanticFont={SF.textMdEmphasis} sx={{ color: color.type.default, mb: "4px" }}>
-          Appointment workflow
-        </TradAtlasText>
         <Box sx={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <LinearProgress
             variant="determinate"
@@ -184,6 +160,42 @@ export default function StatusPanel({
             {completedCount}/{totalCount}
           </TradAtlasText>
         </Box>
+      </Box>
+
+      {/* Overview link */}
+      <Box
+        component="button"
+        onClick={() => onStepClick(null)}
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: "12px",
+          width: "100%",
+          px: "20px",
+          py: "12px",
+          border: "none",
+          background: isOverview ? color.surface.variant : "transparent",
+          borderLeft: isOverview
+            ? `3px solid ${color.action.primary.default}`
+            : "3px solid transparent",
+          borderBottom: `1px solid ${color.outline.fixed}`,
+          cursor: "pointer",
+          textAlign: "left",
+          "&:hover": {
+            background: isOverview ? color.surface.variant : color.surface.subtle,
+          },
+        }}
+      >
+        <DescriptionOutlinedIcon sx={{ fontSize: 18, color: isOverview ? color.action.primary.default : color.type.muted }} />
+        <TradAtlasText
+          semanticFont={SF.labelMd}
+          sx={{
+            fontWeight: isOverview ? weight.semiBold : weight.regular,
+            color: color.type.default,
+          }}
+        >
+          Overview
+        </TradAtlasText>
       </Box>
 
       <Box sx={{ flex: 1, overflow: "auto", py: "8px" }}>

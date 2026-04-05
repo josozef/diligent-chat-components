@@ -200,7 +200,8 @@ export default function HubPage() {
             title="CISO"
             description="Security posture overview, threat monitoring, and vulnerability workflow status for the Chief Information Security Officer."
             icon={<SecurityOutlinedIcon sx={{ fontSize: 22 }} />}
-            comingSoon
+            href="/ciso"
+            openInNewTab
           />
           <ProjectCard
             title="Corporate secretary"
@@ -238,7 +239,8 @@ export default function HubPage() {
             title="Security vulnerability resolution"
             description="Guided triage, impact assessment, and remediation planning for security vulnerabilities."
             icon={<SecurityOutlinedIcon sx={{ fontSize: 22 }} />}
-            comingSoon
+            href="/ciso/investigate"
+            openInNewTab
           />
           <ProjectCard
             title="Board member appointment"

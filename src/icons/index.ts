@@ -71,3 +71,14 @@ export { default as HorizontalRuleIcon } from "@diligentcorp/atlas-react-bundle/
 export { default as PersonAddOutlinedIcon } from "@diligentcorp/atlas-react-bundle/icons/PersonAddOutlined";
 export { default as ExpandLessIcon } from "@diligentcorp/atlas-react-bundle/icons/ExpandLess";
 export { default as PlayArrowOutlinedIcon } from "@diligentcorp/atlas-react-bundle/icons/PlayArrowOutlined";
+export { default as ShieldOutlinedIcon } from "@diligentcorp/atlas-react-bundle/icons/ShieldOutlined";
+export { default as BugReportOutlinedIcon } from "@diligentcorp/atlas-react-bundle/icons/BugReportOutlined";
+export { default as VerifiedUserOutlinedIcon } from "@diligentcorp/atlas-react-bundle/icons/VerifiedUserOutlined";
+export { default as AssessmentOutlinedIcon } from "@diligentcorp/atlas-react-bundle/icons/AssessmentOutlined";
+export { default as NotificationsOutlinedIcon } from "@diligentcorp/atlas-react-bundle/icons/NotificationsOutlined";
+export { default as BuildOutlinedIcon } from "@diligentcorp/atlas-react-bundle/icons/BuildOutlined";
+export { default as HandshakeOutlinedIcon } from "@diligentcorp/atlas-react-bundle/icons/HandshakeOutlined";
+export { default as TaskAltOutlinedIcon } from "@diligentcorp/atlas-react-bundle/icons/TaskAltOutlined";
+export { default as SummarizeOutlinedIcon } from "@diligentcorp/atlas-react-bundle/icons/SummarizeOutlined";
+export { default as PolicyOutlinedIcon } from "@diligentcorp/atlas-react-bundle/icons/PolicyOutlined";
+export { default as SpeedOutlinedIcon } from "@diligentcorp/atlas-react-bundle/icons/SpeedOutlined";
