@@ -1,4 +1,4 @@
-import { Box, Button, Divider } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
@@ -111,8 +111,8 @@ export default function FinalReportPanel({ completed, onProceed }: FinalReportPa
   const [tab, setTab] = useState(0);
 
   const tabs: TabDef[] = [
-    { label: "Report editor" },
-    { label: "Engagement timeline" },
+    { label: "Report editor", done: false },
+    { label: "Engagement timeline", done: false },
   ];
 
   return (
