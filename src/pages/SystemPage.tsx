@@ -626,7 +626,7 @@ const EXT_STATUS_PATTERNS: {
     id: "check-icons",
     pattern: "CheckCircle / RadioButtonUnchecked icons",
     visual: "Green filled check or gray empty circle — binary complete/incomplete",
-    locations: "StatusPanel, WorkPanel, IdeTabs, ConfigureApproversTabs, StakeholderBriefingTabs, ThinkingPanel",
+    locations: "StatusPanel, WorkPanel, IdeTabs, ConfigureApproversTabs, StakeholderBriefingTabs (CISO), EditAuthorizePanel (Audit), ThinkingPanel",
   },
   {
     id: "warning-icon",
@@ -662,7 +662,7 @@ const EXT_STATUS_PATTERNS: {
     id: "card-borders",
     pattern: "Status-colored card borders",
     visual: "1px border changes color: success/warning/error based on state",
-    locations: "StakeholderBriefingTabs, ConfigureApproversTabs, CollectAppointmentDataTabs, WorkPanel",
+    locations: "StakeholderBriefingTabs (CISO), EditAuthorizePanel (Audit), ConfigureApproversTabs, CollectAppointmentDataTabs, WorkPanel",
   },
   {
     id: "sparkline",

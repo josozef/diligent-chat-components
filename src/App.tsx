@@ -8,6 +8,7 @@ import AppointmentWorkspace from "./pages/corpsec/appointment/AppointmentWorkspa
 import CisoCommandCenter from "./pages/ciso/CisoCommandCenter";
 import InvestigateWorkspace from "./pages/ciso/investigate/InvestigateWorkspace";
 import AuditCommandCenter from "./pages/audit/AuditCommandCenter";
+import AssuranceReportWorkspace from "./pages/audit/assurance/AssuranceReportWorkspace";
 
 export default function App() {
   return (
@@ -20,6 +21,7 @@ export default function App() {
       <Route path="ciso" element={<CisoCommandCenter />} />
       <Route path="ciso/investigate" element={<InvestigateWorkspace />} />
       <Route path="audit" element={<AuditCommandCenter />} />
+      <Route path="audit/assurance" element={<AssuranceReportWorkspace />} />
     </Routes>
   );
 }
