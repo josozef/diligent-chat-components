@@ -279,7 +279,7 @@ function HeroBanner() {
           subtitle="Thomas Chen asked you to assess cybersecurity control posture and SEC disclosure readiness before Thursday's Audit Committee meeting."
           stats="Requested by Thomas Chen · Audit Committee · Thursday"
           actionLabel="Review"
-          actionHref="/audit"
+          actionHref="/audit/assurance"
         />
       </Box>
     );
