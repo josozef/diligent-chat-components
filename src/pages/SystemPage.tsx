@@ -597,7 +597,6 @@ import {
   AutoAwesomeOutlinedIcon,
   CheckCircleIcon,
   CheckCircleOutlineIcon,
-  ChevronRightIcon,
   ContentCopyIcon,
   DescriptionOutlinedIcon,
   ExpandMoreIcon,
