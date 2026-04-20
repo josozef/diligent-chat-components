@@ -112,6 +112,51 @@ function buildTheme(mode: "light" | "dark", c: SemanticColors): Theme {
           },
         },
       },
+      /** Data tables: white body rows, subtle header, horizontal rules only (Atlas Storybook-style; Atlas Light tokens). */
+      MuiTableContainer: {
+        styleOverrides: {
+          root: {
+            backgroundColor: c.surface.default,
+          },
+        },
+      },
+      MuiTable: {
+        styleOverrides: {
+          root: {
+            borderCollapse: "collapse",
+          },
+        },
+      },
+      MuiTableCell: {
+        styleOverrides: {
+          root: {
+            borderRight: "none",
+            borderBottom: `1px solid ${c.outline.fixed}`,
+            verticalAlign: "middle",
+          },
+          head: {
+            backgroundColor: c.surface.subtle,
+            fontWeight: 600,
+            color: c.type.default,
+          },
+          body: {
+            backgroundColor: c.surface.default,
+            color: c.type.default,
+          },
+          footer: {
+            backgroundColor: c.surface.default,
+          },
+        },
+      },
+      MuiTableRow: {
+        styleOverrides: {
+          root: {
+            "&:hover .MuiTableCell-body, &:hover .MuiTableCell-footer": {
+              backgroundColor: c.surface.subtle,
+            },
+          },
+        },
+      },
     },
   });
 }
