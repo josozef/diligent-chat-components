@@ -2,6 +2,7 @@ import { Box, Button, LinearProgress } from "@mui/material";
 import { ArrowForwardIcon, CheckCircleIcon, RadioButtonUncheckedIcon, DescriptionOutlinedIcon } from "@/icons";
 import TradAtlasText from "../../../components/common/TradAtlasText";
 import StatusSubstepRow from "@/components/common/StatusSubstepRow";
+import PulsingStatusDot from "@/components/common/PulsingStatusDot";
 import { SF, semanticFontStyle } from "@/tokens/tradAtlasSemanticTypography";
 import { useTokens } from "../../../hooks/useTokens";
 import type { WorkflowStep, WorkflowStepId, AgenticProcessState } from "./AppointmentWorkspace";
@@ -228,31 +229,25 @@ export default function StatusPanel({
                   },
                 }}
               >
-                <Box sx={{ mt: "2px", flexShrink: 0 }}>
+                <Box
+                  sx={{
+                    mt: "2px",
+                    flexShrink: 0,
+                    width: 18,
+                    height: 18,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
                   {isCompleted ? (
                     <CheckCircleIcon sx={{ fontSize: 18, color: color.status.success.default }} />
                   ) : isInProgress ? (
-                    <Box
-                      sx={{
-                        width: 18,
-                        height: 18,
-                        borderRadius: "50%",
-                        border: `2px solid ${color.action.primary.default}`,
-                        background: "transparent",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <Box
-                        sx={{
-                          width: 8,
-                          height: 8,
-                          borderRadius: "50%",
-                          background: color.action.primary.default,
-                        }}
-                      />
-                    </Box>
+                    <PulsingStatusDot
+                      size="md"
+                      tone="info"
+                      aria-label={`${step.name} — agent working`}
+                    />
                   ) : (
                     <RadioButtonUncheckedIcon sx={{ fontSize: 18, color: color.outline.fixed }} />
                   )}

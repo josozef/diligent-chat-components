@@ -118,7 +118,16 @@ export default function FinalReportPanel({ completed, onProceed }: FinalReportPa
   return (
     <Box sx={{ display: "flex", flexDirection: "column", flex: 1, overflow: "hidden" }}>
       <IdeTabs tabs={tabs} active={tab} onChange={setTab} />
-      <Box sx={{ flex: 1, overflow: "auto", p: "24px" }}>
+      <Box
+        sx={{
+          flex: 1,
+          minHeight: 0,
+          display: "flex",
+          flexDirection: "column",
+          overflow: tab === 0 ? "hidden" : "auto",
+          p: tab === 0 ? 0 : "24px",
+        }}
+      >
         {tab === 0 ? (
           <ReportEditorTab completed={completed} onProceed={onProceed} />
         ) : (
@@ -130,8 +139,6 @@ export default function FinalReportPanel({ completed, onProceed }: FinalReportPa
 }
 
 function ReportEditorTab({ completed, onProceed }: { completed: boolean; onProceed: () => void }) {
-  const { color, radius } = useTokens();
-
   const editor = useEditor({
     extensions: [
       StarterKit.configure({ heading: { levels: [3, 4] } }),
@@ -143,29 +150,22 @@ function ReportEditorTab({ completed, onProceed }: { completed: boolean; onProce
     editable: !completed,
   }, []);
 
-  return (
-    <Box sx={{ display: "flex", flexDirection: "column", gap: "0", height: "100%" }}>
-      <Box
-        sx={{
-          flex: 1,
-          minHeight: 0,
-          border: `1px solid ${color.outline.fixed}`,
-          borderRadius: radius.lg,
-          overflow: "hidden",
-        }}
-      >
-        {editor ? <TipTapEditorShell editor={editor} /> : null}
-      </Box>
+  if (!editor) return null;
 
-      {!completed && (
-        <Box sx={{ display: "flex", justifyContent: "flex-end", mt: "16px", flexShrink: 0 }}>
-          <Button variant="contained" color="primary" onClick={onProceed} sx={{ textTransform: "none", ...semanticFontStyle(SF.textMdEmphasis) }}>
-            Finalize report
-          </Button>
-        </Box>
-      )}
+  const footer = !completed ? (
+    <Box sx={{ display: "flex", justifyContent: "flex-end", flex: 1 }}>
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={onProceed}
+        sx={{ textTransform: "none", ...semanticFontStyle(SF.textMdEmphasis) }}
+      >
+        Finalize report
+      </Button>
     </Box>
-  );
+  ) : null;
+
+  return <TipTapEditorShell editor={editor} footer={footer} />;
 }
 
 function TimelineTab() {

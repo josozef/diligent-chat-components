@@ -5,7 +5,6 @@ import {
   Chip,
   Divider,
   IconButton,
-  LinearProgress,
   Menu,
   MenuItem,
   Stack,
@@ -40,6 +39,8 @@ import { useDemo } from "../../DemoContext";
 import { useTokens } from "../../hooks/useTokens";
 import { ChatPrompt } from "../../components/ai";
 import ContentCard from "@/components/common/ContentCard";
+import PulsingStatusDot from "@/components/common/PulsingStatusDot";
+import type { PulsingStatusTone } from "@/components/common/PulsingStatusDot";
 import DemoControlsFab from "../corpsec/DemoControlsFab";
 
 /* ─── GlobalHeader (CISO variant) ──────────────────────────────────────────── */
@@ -654,78 +655,111 @@ function AgentActivity() {
         Agent activity
       </TradAtlasText>
 
-      <Box sx={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-        {activities.map((a) => (
-          <Box
-            key={a.title}
-            sx={{
-              borderRadius: radius.md,
-              border: `1px solid ${color.outline.fixed}`,
-              background: color.surface.subtle,
-              p: "16px",
-              display: "flex",
-              flexDirection: "column",
-              gap: "12px",
-            }}
-          >
-            <Box sx={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
-              <Box sx={{ flex: 1 }}>
-                <Box sx={{ display: "flex", alignItems: "center", gap: "8px", mb: "4px" }}>
-                  <AutoAwesomeOutlinedIcon sx={{ fontSize: 16, color: color.action.primary.default }} />
-                  <TradAtlasText semanticFont={SF.textSm} sx={{ color: color.type.muted, fontWeight: weight.medium }}>
-                    {a.agent}
-                  </TradAtlasText>
-                  <Chip
-                    label={a.status}
-                    size="small"
-                    slotProps={{ label: { [DATA_SEMANTIC_FONT]: SF.textMicro } as React.HTMLAttributes<HTMLSpanElement> }}
-                    sx={{
-                      backgroundColor: a.statusColor,
-                      color: "#fff",
-                      fontWeight: weight.semiBold,
-                      height: 20,
-                      ...semanticFontStyle(SF.textMicro),
-                    }}
-                  />
+      <Box sx={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+        {activities.map((a) => {
+          const tone: PulsingStatusTone =
+            a.statusColor === color.status.warning.default ? "warning" : "info";
+          const statusTextColor =
+            tone === "warning" ? color.status.warning.text : color.action.primary.default;
+          return (
+            <Box
+              key={a.title}
+              sx={{
+                borderRadius: radius.md,
+                border: `1px solid ${color.outline.fixed}`,
+                background: color.surface.subtle,
+                p: "14px",
+                display: "flex",
+                flexDirection: "column",
+                gap: "6px",
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  gap: "8px",
+                }}
+              >
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "12px",
+                    flexWrap: "wrap",
+                    minWidth: 0,
+                    flex: 1,
+                  }}
+                >
+                  <Box sx={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                    <AutoAwesomeOutlinedIcon
+                      sx={{ fontSize: 16, color: color.action.primary.default }}
+                    />
+                    <TradAtlasText
+                      semanticFont={SF.textSm}
+                      sx={{ color: color.type.muted, fontWeight: weight.medium }}
+                    >
+                      {a.agent}
+                    </TradAtlasText>
+                  </Box>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                    <PulsingStatusDot
+                      size="sm"
+                      tone={tone}
+                      aria-label={`${a.agent} — ${a.status}`}
+                    />
+                    <TradAtlasText
+                      semanticFont={SF.textMicroEmphasis}
+                      sx={{
+                        color: statusTextColor,
+                        textTransform: "uppercase",
+                        letterSpacing: "0.04em",
+                      }}
+                    >
+                      {a.status}
+                    </TradAtlasText>
+                  </Box>
                 </Box>
-                <TradAtlasText semanticFont={SF.textMdEmphasis} sx={{ color: color.type.default }}>
-                  {a.title}
-                </TradAtlasText>
+                <IconButton
+                  size="small"
+                  sx={{ color: color.type.muted, mt: "-4px", mr: "-4px" }}
+                >
+                  <MoreHorizIcon fontSize="small" />
+                </IconButton>
               </Box>
-              <IconButton size="small" sx={{ color: color.type.muted }}>
-                <MoreHorizIcon fontSize="small" />
-              </IconButton>
-            </Box>
 
-            <Box>
-              <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: "6px" }}>
-                <TradAtlasText semanticFont={SF.labelMd} sx={{ color: color.type.muted }}>
+              <TradAtlasText
+                semanticFont={SF.textMdEmphasis}
+                sx={{ color: color.type.default }}
+              >
+                {a.title}
+              </TradAtlasText>
+
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "baseline",
+                  justifyContent: "space-between",
+                  gap: "12px",
+                }}
+              >
+                <TradAtlasText
+                  semanticFont={SF.textSm}
+                  sx={{ color: color.type.muted, flex: 1, minWidth: 0 }}
+                >
                   {a.step}
                 </TradAtlasText>
                 <TradAtlasText
-                  semanticFont={SF.textSm}
-                  sx={{ color: color.type.muted, fontWeight: weight.semiBold, flexShrink: 0, ml: "16px" }}
+                  semanticFont={SF.textMicro}
+                  sx={{ color: color.type.muted, flexShrink: 0 }}
                 >
-                  {a.progress}%
+                  Updated {a.updated}
                 </TradAtlasText>
               </Box>
-              <LinearProgress
-                variant="determinate"
-                value={a.progress}
-                sx={{
-                  height: 4,
-                  borderRadius: 2,
-                  backgroundColor: color.outline.fixed,
-                  "& .MuiLinearProgress-bar": { backgroundColor: a.statusColor, borderRadius: 2 },
-                }}
-              />
             </Box>
-
-            <TradAtlasText semanticFont={SF.textSm} sx={{ color: color.type.muted }}>
-              Updated {a.updated}
-            </TradAtlasText>
-          </Box>
-        ))}
+          );
+        })}
       </Box>
     </ContentCard>
   );

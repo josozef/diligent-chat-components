@@ -4,7 +4,6 @@ import {
   Button,
   Chip,
   CircularProgress,
-  Divider,
   LinearProgress,
   Link,
   Paper,
@@ -26,6 +25,9 @@ import {
 } from "../tokens/atlasLight";
 import { useTokens } from "../hooks/useTokens";
 import TradAtlasText from "../components/common/TradAtlasText";
+import SectionAnnotation from "../components/common/SectionAnnotation";
+import PulsingStatusDot from "../components/common/PulsingStatusDot";
+import type { PulsingStatusTone, PulsingStatusSize } from "../components/common/PulsingStatusDot";
 import {
   DATA_SEMANTIC_FONT,
   SF,
@@ -36,14 +38,19 @@ import {
 /** Design system tables: no outer Paper frame; horizontal rules come from `TableCell` borders in the theme. */
 const SYSTEM_DOC_TABLE_CONTAINER_SX = { border: "none", boxShadow: "none" } as const;
 
-const SYSTEM_PAGE_SCROLL_MARGIN = "24px";
+const SYSTEM_PAGE_SCROLL_MARGIN = "32px";
+
+/** Vertical rhythm between major documentation sections (no dividers — spacing only). */
+const SYSTEM_SECTION_GAP = "80px";
 
 const SYSTEM_PAGE_TOC: { id: string; label: string }[] = [
   { id: "system-design-tokens", label: "Design tokens" },
+  { id: "system-typography", label: "Typography changes" },
   { id: "system-table", label: "Table" },
   { id: "system-button", label: "Button" },
   { id: "system-chip", label: "Chip" },
   { id: "system-progress", label: "Loading indicator" },
+  { id: "system-activity-pulse", label: "Activity pulse" },
   { id: "system-extended-chips", label: "Extended chips" },
   { id: "system-status-indicator", label: "Status indicator" },
   { id: "system-status-patterns", label: "Status patterns" },
@@ -110,6 +117,21 @@ const SIZES: TradSize[] = ["Extra small", "Small", "Medium", "Large"];
 const TYPES: TradType[] = ["Primary", "Secondary", "Tertiary"];
 const STATES: TradState[] = ["Default", "Hover", "Active", "Disabled", "Processing"];
 
+/** Flat primary / destructive fills use the darker anchor of each pair (was
+ *  the bottom stop of the old vertical gradient). */
+function flatActionFill(
+  src: { default: { start: string; end: string }; hover: { start: string; end: string }; active: { start: string; end: string } },
+  state: TradState,
+): string {
+  if (state === "Hover") return src.hover.end;
+  if (state === "Active") return src.active.end;
+  return src.default.end;
+}
+
+/** shadcn-style motion — snappy easing, short duration, no gradient cross-fades. */
+const BUTTON_MOTION =
+  "background-color 150ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 150ms cubic-bezier(0.4, 0, 0.2, 1), color 150ms cubic-bezier(0.4, 0, 0.2, 1), border-color 150ms cubic-bezier(0.4, 0, 0.2, 1), transform 150ms cubic-bezier(0.4, 0, 0.2, 1)";
+
 /* Exact Figma padding per size (from Trad Atlas Figma code output) */
 type TextMetrics = { fontSize: string; lineHeight: string; letterSpacing: string };
 
@@ -145,10 +167,6 @@ function sizeMetrics(size: TradSize) {
   }
 }
 
-function gradient(start: string, end: string) {
-  return `linear-gradient(to bottom, ${start}, ${end})`;
-}
-
 function getButtonSx(p: {
   type: TradType;
   destructive: boolean;
@@ -173,6 +191,7 @@ function getButtonSx(p: {
     minWidth: "auto",
     boxSizing: "border-box",
     border: "none",
+    transformOrigin: "center",
   };
 
   const pri = ATLAS_LIGHT.action.primary;
@@ -184,15 +203,25 @@ function getButtonSx(p: {
     const src = destructive ? des : pri;
     if (state === "Disabled")
       return { ...base, background: src.disabled, color: destructive ? des.onDestructiveDisabled : pri.onPrimaryDisabled, pointerEvents: "none" };
-    const grad =
-      state === "Hover" ? gradient(src.hover.start, src.hover.end) :
-      state === "Active" ? gradient(src.active.start, src.active.end) :
-      gradient(src.default.start, src.default.end);
-    const result: Record<string, unknown> = { ...base, background: grad, color: destructive ? des.onDestructive : pri.onPrimary, pointerEvents: state === "Processing" ? "none" : "auto" };
+    const fill = flatActionFill(src, state);
+    const result: Record<string, unknown> = {
+      ...base,
+      background: fill,
+      backgroundImage: "none",
+      color: destructive ? des.onDestructive : pri.onPrimary,
+      pointerEvents: state === "Processing" ? "none" : "auto",
+    };
     if (state === "Default") {
-      result.transition = "background 0.15s, box-shadow 0.15s";
-      result["&:hover"] = { background: gradient(src.hover.start, src.hover.end) };
-      result["&:active"] = { background: gradient(src.active.start, src.active.end) };
+      result.transition = BUTTON_MOTION;
+      result["&:hover"] = {
+        background: flatActionFill(src, "Hover"),
+        backgroundImage: "none",
+      };
+      result["&:active"] = {
+        background: flatActionFill(src, "Active"),
+        backgroundImage: "none",
+        transform: "scale(0.98)",
+      };
       result["&:focus-visible"] = { outline: `2px solid ${pri.default.start}`, outlineOffset: "2px" };
     }
     return result;
@@ -208,9 +237,9 @@ function getButtonSx(p: {
     if (state === "Active") bg = destructive ? sd.active : sec.activeFill;
     const result: Record<string, unknown> = { ...base, background: bg, color: state === "Hover" && destructive ? sd.hover : label, border: `1px solid ${outline}`, pointerEvents: state === "Processing" ? "none" : "auto" };
     if (state === "Default") {
-      result.transition = "background 0.15s, color 0.15s, box-shadow 0.15s";
+      result.transition = BUTTON_MOTION;
       result["&:hover"] = { background: destructive ? ATLAS_LIGHT.status.error.background : sec.hoverFill, color: destructive ? sd.hover : label };
-      result["&:active"] = { background: destructive ? sd.active : sec.activeFill };
+      result["&:active"] = { background: destructive ? sd.active : sec.activeFill, transform: "scale(0.98)" };
       result["&:focus-visible"] = { outline: `2px solid ${pri.default.start}`, outlineOffset: "2px" };
     }
     return result;
@@ -225,9 +254,9 @@ function getButtonSx(p: {
   if (state === "Active") bg = destructive ? sd.active : sec.activeFill;
   const result: Record<string, unknown> = { ...base, background: bg, color: state === "Hover" && destructive ? sd.hover : label, pointerEvents: state === "Processing" ? "none" : "auto" };
   if (state === "Default") {
-    result.transition = "background 0.15s, color 0.15s, box-shadow 0.15s";
+    result.transition = BUTTON_MOTION;
     result["&:hover"] = { background: destructive ? ATLAS_LIGHT.status.error.background : sec.hoverFill, color: destructive ? sd.hover : label };
-    result["&:active"] = { background: destructive ? sd.active : sec.activeFill };
+    result["&:active"] = { background: destructive ? sd.active : sec.activeFill, transform: "scale(0.98)" };
     result["&:focus-visible"] = { outline: `2px solid ${pri.default.start}`, outlineOffset: "2px" };
   }
   return result;
@@ -255,7 +284,7 @@ function describeStyle(p: {
       parts.push(`background: ${src.disabled}`, `color: ${destructive ? des.onDestructiveDisabled : pri.onPrimaryDisabled}`, "border: none");
     } else {
       const g = state === "Hover" ? src.hover : state === "Active" ? src.active : src.default;
-      parts.push(`background: gradient(${g.start} → ${g.end})`, `color: ${destructive ? des.onDestructive : pri.onPrimary}`, "border: none");
+      parts.push(`background: ${g.end} (flat)`, `color: ${destructive ? des.onDestructive : pri.onPrimary}`, "border: none");
       if (state === "Processing") parts.push("+ spinner");
     }
   } else if (type === "Secondary") {
@@ -286,8 +315,15 @@ function describeStyle(p: {
 }
 
 /* ────────────────────────────────────────────────────────────
- * App button preview — renders a real MUI <Button> with
- * the same sx overrides we apply throughout the app
+ * Atlas button preview — renders a real MUI <Button> with the
+ * **Atlas React Bundle** Primary / Destructive gradient fills.
+ *
+ * The Atlas bundle's Button component ships a vertical linear
+ * gradient on Primary and Destructive `contained` variants
+ * (see `action.primary.default.{start,end}` in the Trad Atlas
+ * Figma export). Stock MUI `<Button>` does not provide this, so
+ * we layer the gradient on via `sx` here — this column is the
+ * authoritative Atlas reference.
  * ──────────────────────────────────────────────────────────── */
 
 function mapVariant(type: TradType): "contained" | "outlined" | "text" {
@@ -308,6 +344,44 @@ function mapSize(size: TradSize): "small" | "medium" | "large" {
   return "medium";
 }
 
+/** Vertical gradient helper — Atlas bundle convention is top-lighter / bottom-darker. */
+function atlasGradient(start: string, end: string): string {
+  return `linear-gradient(to bottom, ${start}, ${end})`;
+}
+
+/** sx overrides that paint the Atlas React Bundle gradient on Primary and
+ *  Destructive `contained` buttons. Non-filled variants and disabled states
+ *  return `undefined` so MUI's default theme fills continue to apply. */
+function atlasGradientSx(
+  type: TradType,
+  destructive: boolean,
+  state: TradState,
+): Record<string, unknown> | undefined {
+  if (type !== "Primary") return undefined;
+  if (state === "Disabled") return undefined;
+
+  const src = destructive ? ATLAS_LIGHT.action.destructive : ATLAS_LIGHT.action.primary;
+  const onColor = destructive
+    ? ATLAS_LIGHT.action.destructive.onDestructive
+    : ATLAS_LIGHT.action.primary.onPrimary;
+  const current =
+    state === "Hover" ? src.hover :
+    state === "Active" ? src.active :
+    src.default;
+
+  const sx: Record<string, unknown> = {
+    backgroundImage: atlasGradient(current.start, current.end),
+    backgroundColor: "transparent",
+    color: onColor,
+    border: "none",
+  };
+  if (state === "Default") {
+    sx["&:hover"] = { backgroundImage: atlasGradient(src.hover.start, src.hover.end) };
+    sx["&:active"] = { backgroundImage: atlasGradient(src.active.start, src.active.end) };
+  }
+  return sx;
+}
+
 function AppButtonPreview(props: {
   type: TradType;
   destructive: boolean;
@@ -321,6 +395,7 @@ function AppButtonPreview(props: {
   const isDisabled = state === "Disabled";
   const isProcessing = state === "Processing";
   const isDefault = state === "Default";
+  const gradientSx = atlasGradientSx(type, destructive, state);
 
   return (
     <Stack direction="column" spacing={0.5} alignItems="flex-start" sx={{ minWidth: 0 }}>
@@ -342,6 +417,7 @@ function AppButtonPreview(props: {
           ...(type === "Secondary" && !destructive && !isDisabled
             ? { borderColor: "#76777a" }
             : {}),
+          ...(gradientSx ?? {}),
         }}
       >
         {"{Button}"}
@@ -908,9 +984,12 @@ const TOKEN_SECTIONS: { heading: string; rows: [string, string][] }[] = [
   {
     heading: "Action — Primary",
     rows: [
-      ["action.primary.default (gradient)", "#1c4ee4 → #0040d5"],
-      ["action.primary.hover (gradient)", "#4069fe → #1c4ee4"],
-      ["action.primary.active (gradient)", "#002585 → #001c6c"],
+      ["action.primary.default (Atlas gradient)", "#1c4ee4 → #0040d5"],
+      ["action.primary.default (Modified flat)", "#0040d5"],
+      ["action.primary.hover (Atlas gradient)", "#4069fe → #1c4ee4"],
+      ["action.primary.hover (Modified flat)", "#1c4ee4"],
+      ["action.primary.active (Atlas gradient)", "#002585 → #001c6c"],
+      ["action.primary.active (Modified flat)", "#001c6c"],
       ["action.primary.disabled", "#e2e2e5"],
       ["action.primary.on-primary", "#ffffff"],
       ["action.primary.on-primary-disabled", "#aaabae"],
@@ -930,9 +1009,12 @@ const TOKEN_SECTIONS: { heading: string; rows: [string, string][] }[] = [
   {
     heading: "Action — Destructive",
     rows: [
-      ["action.destructive.default (gradient)", "#be0c1e → #a90016"],
-      ["action.destructive.hover (gradient)", "#e22e33 → #be0c1e"],
-      ["action.destructive.active (gradient)", "#68000a → #540006"],
+      ["action.destructive.default (Atlas gradient)", "#be0c1e → #a90016"],
+      ["action.destructive.default (Modified flat)", "#a90016"],
+      ["action.destructive.hover (Atlas gradient)", "#e22e33 → #be0c1e"],
+      ["action.destructive.hover (Modified flat)", "#be0c1e"],
+      ["action.destructive.active (Atlas gradient)", "#68000a → #540006"],
+      ["action.destructive.active (Modified flat)", "#540006"],
       ["action.destructive.disabled", "#e2e2e5"],
       ["action.destructive.on-destructive", "#ffffff"],
       ["action.destructive.on-destructive-disabled", "#aaabae"],
@@ -1209,7 +1291,7 @@ function AtlasLightMuiTableSample() {
 /** Atlas Loading Indicator — Linear (determinate)
  *  Figma spec: total height 12px (border-box), border 1px solid outline/default (#6f7377),
  *  border-radius 9999px, 4px padding on all sides inside the border,
- *  inner bar 4px tall, border-radius 9999px, gradient action.primary.default.
+ *  inner bar 4px tall, border-radius 9999px, solid action.primary.default fill.
  *  Built as a custom Box layout because MUI LinearProgress stretches its bar to fill
  *  the full track height — it cannot produce a 4px bar inside a 12px track. */
 function AtlasLinearDeterminate({ value }: { value: number }) {
@@ -2544,8 +2626,8 @@ const AI_COMPONENT_ROWS: {
 function SystemPageToc() {
   const { color } = useTokens();
   return (
-    <Stack component="nav" aria-label="On this page" spacing="2px" sx={{ width: "100%" }}>
-      <TradAtlasText semanticFont={SF.textSmEmphasis} sx={{ mb: "4px", color: color.type.muted }}>
+    <Stack component="nav" aria-label="On this page" spacing="4px" sx={{ width: "100%" }}>
+      <TradAtlasText semanticFont={SF.textSmEmphasis} sx={{ mb: "8px", color: color.type.muted }}>
         On this page
       </TradAtlasText>
       {SYSTEM_PAGE_TOC.map((item) => (
@@ -2560,8 +2642,8 @@ function SystemPageToc() {
           }}
           sx={{
             display: "block",
-            py: "6px",
-            px: "10px",
+            py: "8px",
+            px: "12px",
             borderRadius: "6px",
             ...semanticFontStyle(SF.textSm),
             color: color.type.muted,
@@ -2600,11 +2682,11 @@ export default function SystemPage() {
   const { color } = useTokens();
 
   return (
-    <Box sx={{ py: "32px", px: "24px", maxWidth: 1680, mx: "auto" }}>
-      <TradAtlasText component="h1" semanticFont={SF.titleH4Emphasis} sx={{ mb: "8px" }}>
+    <Box sx={{ py: "48px", px: { xs: "24px", md: "40px" }, maxWidth: 1680, mx: "auto" }}>
+      <TradAtlasText component="h1" semanticFont={SF.titleH4Emphasis} sx={{ mb: "12px" }}>
         Design system reference
       </TradAtlasText>
-      <TradAtlasText semanticFont={SF.textMd} sx={{ color: "text.secondary", mb: "24px" }}>
+      <TradAtlasText semanticFont={SF.textMd} sx={{ color: "text.secondary", mb: "40px", maxWidth: 720 }}>
         Colors resolved from the <strong>Atlas Light</strong> theme. Radii from{" "}
         <strong>Trad Atlas</strong> (2 / 4 / 6 / 8 px). Focus variants omitted.
       </TradAtlasText>
@@ -2613,7 +2695,7 @@ export default function SystemPage() {
         sx={{
           display: "flex",
           flexDirection: { xs: "column", md: "row" },
-          gap: { xs: "20px", md: "32px" },
+          gap: { xs: "28px", md: "48px" },
           alignItems: "flex-start",
         }}
       >
@@ -2637,13 +2719,13 @@ export default function SystemPage() {
           <Box
             component="section"
             id="system-design-tokens"
-            sx={{ scrollMarginTop: SYSTEM_PAGE_SCROLL_MARGIN, mb: "40px" }}
+            sx={{ scrollMarginTop: SYSTEM_PAGE_SCROLL_MARGIN, mb: SYSTEM_SECTION_GAP }}
           >
-            <TradAtlasText semanticFont={SF.titleH5Emphasis} sx={{ mb: "12px" }}>
+            <TradAtlasText semanticFont={SF.titleH5Emphasis} sx={{ mb: "16px" }}>
               Atlas Light design tokens
             </TradAtlasText>
 
-            <Stack spacing="24px">
+            <Stack spacing="32px">
         {TOKEN_SECTIONS.map((section) => (
           <Box key={section.heading}>
             <TradAtlasText semanticFont={SF.textSmEmphasis} sx={{ mb: "4px" }}>
@@ -2674,17 +2756,323 @@ export default function SystemPage() {
           </Box>
         ))}
             </Stack>
+
+            <Box sx={{ mt: "40px" }}>
+              <SectionAnnotation sectionId="system-design-tokens" sectionLabel="Design tokens" />
+            </Box>
           </Box>
 
-          <Divider sx={{ mb: "32px" }} />
+          {/* ── Typography changes (from TypographyChangeLog.md) ── */}
+          <Box
+            component="section"
+            id="system-typography"
+            sx={{ scrollMarginTop: SYSTEM_PAGE_SCROLL_MARGIN, mb: SYSTEM_SECTION_GAP }}
+          >
+            <TradAtlasText semanticFont={SF.titleH5Emphasis} sx={{ mb: "8px" }}>
+              Typography changes
+            </TradAtlasText>
+            <TradAtlasText semanticFont={SF.textMd} sx={{ color: "text.secondary", mb: "28px", maxWidth: 720 }}>
+              Intentional deviations from the <strong>Semantic typography grid — Atlas column</strong>
+              {" "}(Foundation → Trad Atlas, Figma node <code>33011:5716</code>). Source of truth for
+              this list:{" "}
+              <Box component="code" sx={{ fontFamily: atlasFontFamilyMono }}>
+                src/tokens/TypographyChangeLog.md
+              </Box>
+              . Token implementation lives in{" "}
+              <Box component="code" sx={{ fontFamily: atlasFontFamilyMono }}>
+                src/tokens/tradAtlasSemanticTypography.ts
+              </Box>
+              .
+            </TradAtlasText>
+
+            {/* Summary callout */}
+            <Paper
+              variant="outlined"
+              sx={{
+                p: "18px 20px",
+                mb: "24px",
+                borderColor: atlasSemanticColor.outline.fixed,
+                background: atlasSemanticColor.surface.subtle,
+              }}
+            >
+              <TradAtlasText semanticFont={SF.textSmEmphasis} sx={{ mb: "8px", display: "block" }}>
+                Summary of changes vs. Atlas
+              </TradAtlasText>
+              <TradAtlasText semanticFont={SF.textSm} sx={{ color: "text.secondary" }}>
+                1 · Added two <strong>uppercase</strong> semantic font tokens (Text/Md and Text/Sm)
+                that do not exist in the Atlas baseline grid — needed for eyebrow labels, KPI / trend
+                tile headers, and all-caps table column headers. &nbsp;&middot;&nbsp;
+                2 · Tightened <strong>line-height</strong> on four small primitives so leading
+                never exceeds ~1.3× the font size — small type wraps more densely and reads more
+                polished on multi-line blocks. &nbsp;&middot;&nbsp;
+                Font family, weights, and letter-spacing scale otherwise match Atlas exactly.
+              </TradAtlasText>
+            </Paper>
+
+            {/* New semantic tokens (non-Atlas extensions) */}
+            <TradAtlasText semanticFont={SF.textSmEmphasis} sx={{ mt: "8px", mb: "10px", display: "block" }}>
+              New semantic tokens (not in Atlas)
+            </TradAtlasText>
+            <TradAtlasText semanticFont={SF.textSm} sx={{ color: "text.secondary", mb: "16px" }}>
+              Built on the existing{" "}
+              <Box component="code" sx={{ fontFamily: atlasFontFamilyMono }}>- Emphasis</Box> primitives
+              (SemiBold) with <code>text-transform: uppercase</code> and <code>letter-spacing: 0.08em</code>.
+              Use these for eyebrow labels and category tags — not for long-form body copy.
+            </TradAtlasText>
+
+            <TableContainer component={Paper} elevation={0} sx={{ mb: "24px", ...SYSTEM_DOC_TABLE_CONTAINER_SX }}>
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    <TableCell sx={{ fontWeight: 600, minWidth: 240 }}>Semantic path</TableCell>
+                    <TableCell sx={{ fontWeight: 600, minWidth: 96 }}>SF key</TableCell>
+                    <TableCell sx={{ fontWeight: 600, minWidth: 160 }}>Resolved</TableCell>
+                    <TableCell sx={{ fontWeight: 600, minWidth: 200 }}>Live preview</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>Intended use</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {[
+                    {
+                      path: "Semantic/Font/Text/Md - Uppercase",
+                      sfKey: "textMdUppercase",
+                      resolved: "14 / 18 · SemiBold · tracking 0.08em",
+                      preview: "SF.textMdUppercase" as const,
+                      usage: "Section eyebrows, group headings, primary KPI stat labels.",
+                    },
+                    {
+                      path: "Semantic/Font/Text/Sm - Uppercase",
+                      sfKey: "textSmUppercase",
+                      resolved: "12 / 16 · SemiBold · tracking 0.08em",
+                      preview: "SF.textSmUppercase" as const,
+                      usage: "Table column headers, trend tile labels, activity category tags.",
+                    },
+                  ].map((row) => (
+                    <TableRow key={row.path} hover>
+                      <TableCell sx={{ py: "10px", verticalAlign: "top" }}>
+                        <TradAtlasText
+                          semanticFont={SF.textSm}
+                          sx={{ fontFamily: atlasFontFamilyMono }}
+                        >
+                          {row.path}
+                        </TradAtlasText>
+                      </TableCell>
+                      <TableCell sx={{ py: "10px", verticalAlign: "top" }}>
+                        <TradAtlasText
+                          semanticFont={SF.textSm}
+                          sx={{ fontFamily: atlasFontFamilyMono, color: "text.secondary" }}
+                        >
+                          {row.sfKey}
+                        </TradAtlasText>
+                      </TableCell>
+                      <TableCell sx={{ py: "10px", verticalAlign: "top" }}>
+                        <TradAtlasText
+                          semanticFont={SF.textSm}
+                          sx={{ fontFamily: atlasFontFamilyMono, color: "text.secondary" }}
+                        >
+                          {row.resolved}
+                        </TradAtlasText>
+                      </TableCell>
+                      <TableCell sx={{ py: "10px", verticalAlign: "top" }}>
+                        <TradAtlasText
+                          semanticFont={row.preview === "SF.textMdUppercase" ? SF.textMdUppercase : SF.textSmUppercase}
+                          sx={{ color: atlasSemanticColor.type.default }}
+                        >
+                          Active agents · 12
+                        </TradAtlasText>
+                      </TableCell>
+                      <TableCell sx={{ py: "10px", verticalAlign: "top" }}>
+                        <TradAtlasText semanticFont={SF.textSm} sx={{ color: "text.secondary" }}>
+                          {row.usage}
+                        </TradAtlasText>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+
+            {/* Line-height tightening */}
+            <TradAtlasText semanticFont={SF.textSmEmphasis} sx={{ mt: "8px", mb: "10px", display: "block" }}>
+              Tightened line-heights (≤ 1.3× font size on small primitives)
+            </TradAtlasText>
+            <TradAtlasText semanticFont={SF.textSm} sx={{ color: "text.secondary", mb: "16px" }}>
+              Atlas ships small type with ~1.4–2.0× leading which feels loose at 10–14px, particularly
+              when body copy wraps to two or three lines. Primitives below now cap leading at roughly
+              1.3× so dense rows (status cells, micro labels, meta footers) read tighter. Every other
+              primitive — all Titles H1–H5, Text/Lg, and the compact / micro variants — <em>matches Atlas exactly</em>.
+            </TradAtlasText>
+
+            <TableContainer component={Paper} elevation={0} sx={{ mb: "16px", ...SYSTEM_DOC_TABLE_CONTAINER_SX }}>
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    <TableCell sx={{ fontWeight: 600, minWidth: 220 }}>Primitive</TableCell>
+                    <TableCell sx={{ fontWeight: 600, minWidth: 72 }}>Size</TableCell>
+                    <TableCell sx={{ fontWeight: 600, minWidth: 120 }}>Atlas line-height</TableCell>
+                    <TableCell sx={{ fontWeight: 600, minWidth: 120 }}>Modified line-height</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>Δ</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {[
+                    { primitive: "Typography/Text/Md", size: 14, atlasLh: 20, modLh: 18 },
+                    { primitive: "Typography/Text/Label Md", size: 13, atlasLh: 20, modLh: 17 },
+                    { primitive: "Typography/Text/Xs", size: 10, atlasLh: 14, modLh: 13 },
+                    { primitive: "Typography/Title/H6 Xs", size: 14, atlasLh: 20, modLh: 18 },
+                  ].map((row) => {
+                    const delta = row.modLh - row.atlasLh;
+                    const atlasRatio = (row.atlasLh / row.size).toFixed(2);
+                    const modRatio = (row.modLh / row.size).toFixed(2);
+                    return (
+                      <TableRow key={row.primitive} hover>
+                        <TableCell sx={{ py: "8px" }}>
+                          <TradAtlasText
+                            semanticFont={SF.textSm}
+                            sx={{ fontFamily: atlasFontFamilyMono }}
+                          >
+                            {row.primitive}
+                          </TradAtlasText>
+                        </TableCell>
+                        <TableCell sx={{ py: "8px" }}>
+                          <TradAtlasText
+                            semanticFont={SF.textSm}
+                            sx={{ fontFamily: atlasFontFamilyMono, color: "text.secondary" }}
+                          >
+                            {row.size}px
+                          </TradAtlasText>
+                        </TableCell>
+                        <TableCell sx={{ py: "8px" }}>
+                          <TradAtlasText
+                            semanticFont={SF.textSm}
+                            sx={{ fontFamily: atlasFontFamilyMono, color: "text.secondary" }}
+                          >
+                            {row.atlasLh}px &nbsp;·&nbsp; {atlasRatio}×
+                          </TradAtlasText>
+                        </TableCell>
+                        <TableCell sx={{ py: "8px" }}>
+                          <TradAtlasText
+                            semanticFont={SF.textSm}
+                            sx={{
+                              fontFamily: atlasFontFamilyMono,
+                              color: atlasSemanticColor.status.success.text,
+                            }}
+                          >
+                            {row.modLh}px &nbsp;·&nbsp; {modRatio}×
+                          </TradAtlasText>
+                        </TableCell>
+                        <TableCell sx={{ py: "8px" }}>
+                          <TradAtlasText
+                            semanticFont={SF.textSm}
+                            sx={{
+                              fontFamily: atlasFontFamilyMono,
+                              color: atlasSemanticColor.type.muted,
+                            }}
+                          >
+                            {delta}px
+                          </TradAtlasText>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </TableContainer>
+
+            {/* Visual leading comparison */}
+            <TradAtlasText semanticFont={SF.textSmEmphasis} sx={{ mt: "8px", mb: "8px", display: "block" }}>
+              Leading comparison — <code>Text/Md</code> at 14px
+            </TradAtlasText>
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+                gap: "24px",
+                alignItems: "stretch",
+              }}
+            >
+              {[
+                {
+                  label: "Atlas baseline · 20px (1.43×)",
+                  fontSize: "14px",
+                  lineHeight: "20px",
+                  tint: atlasSemanticColor.surface.subtle,
+                },
+                {
+                  label: "Modified · 18px (1.29×)",
+                  fontSize: "14px",
+                  lineHeight: "18px",
+                  tint: atlasSemanticColor.status.success.background,
+                },
+              ].map((s) => (
+                <Paper
+                  key={s.label}
+                  variant="outlined"
+                  sx={{
+                    p: "20px",
+                    borderColor: atlasSemanticColor.outline.fixed,
+                    background: s.tint,
+                  }}
+                >
+                  <TradAtlasText
+                    semanticFont={SF.textSmEmphasis}
+                    sx={{ mb: "10px", display: "block", color: atlasSemanticColor.type.muted }}
+                  >
+                    {s.label}
+                  </TradAtlasText>
+                  <Box
+                    sx={{
+                      fontFamily: atlasFontFamily,
+                      fontSize: s.fontSize,
+                      lineHeight: s.lineHeight,
+                      letterSpacing: "0.2px",
+                      color: atlasSemanticColor.type.default,
+                    }}
+                  >
+                    Review and edit the Consent to Act as Director (Form 45) below. All known
+                    particulars of the appointee have been pre-filled. Editable fields are shown
+                    with an underline — edit directly, replace the document entirely, or send it
+                    for electronic signature once ready.
+                  </Box>
+                </Paper>
+              ))}
+            </Box>
+
+            <Paper
+              variant="outlined"
+              sx={{
+                p: "18px 20px",
+                mt: "24px",
+                borderColor: atlasSemanticColor.outline.fixed,
+                background: atlasSemanticColor.surface.subtle,
+              }}
+            >
+              <TradAtlasText semanticFont={SF.textSmEmphasis} sx={{ mb: "8px", display: "block" }}>
+                When adding new typography tokens
+              </TradAtlasText>
+              <TradAtlasText semanticFont={SF.textSm} sx={{ color: "text.secondary" }}>
+                1 · Prefer extending Figma first and pulling the primitive down into{" "}
+                <Box component="code" sx={{ fontFamily: atlasFontFamilyMono }}>TYPOGRAPHY_PRIMITIVE</Box>.
+                &nbsp;2 · If you genuinely need a variant that does not exist in Atlas (e.g. the uppercase
+                tokens above), build it on an existing primitive and <strong>record a new row</strong> in{" "}
+                <Box component="code" sx={{ fontFamily: atlasFontFamilyMono }}>TypographyChangeLog.md</Box>.
+                &nbsp;3 · Do not introduce parallel MUI variant scales or ad-hoc pixel sizes — if the
+                token isn't in this section, it probably shouldn't exist yet.
+              </TradAtlasText>
+            </Paper>
+
+            <Box sx={{ mt: "40px" }}>
+              <SectionAnnotation sectionId="system-typography" sectionLabel="Typography changes" />
+            </Box>
+          </Box>
 
           {/* ── Table: command center vs native MUI (Atlas Light) ── */}
           <Box
             component="section"
             id="system-table"
-            sx={{ scrollMarginTop: SYSTEM_PAGE_SCROLL_MARGIN, mb: "32px" }}
+            sx={{ scrollMarginTop: SYSTEM_PAGE_SCROLL_MARGIN, mb: SYSTEM_SECTION_GAP }}
           >
-            <TradAtlasText semanticFont={SF.titleH5Emphasis} sx={{ mb: "12px" }}>
+            <TradAtlasText semanticFont={SF.titleH5Emphasis} sx={{ mb: "16px" }}>
               Table
             </TradAtlasText>
 
@@ -2709,21 +3097,27 @@ export default function SystemPage() {
           <AtlasLightMuiTableSample />
             </Box>
           </Box>
-          </Box>
 
-          <Divider sx={{ mb: "32px" }} />
+            <Box sx={{ mt: "40px" }}>
+              <SectionAnnotation sectionId="system-table" sectionLabel="Table" />
+            </Box>
+          </Box>
 
           {/* ── Button component grid ── */}
           <Box
             component="section"
             id="system-button"
-            sx={{ scrollMarginTop: SYSTEM_PAGE_SCROLL_MARGIN, mb: "32px" }}
+            sx={{ scrollMarginTop: SYSTEM_PAGE_SCROLL_MARGIN, mb: SYSTEM_SECTION_GAP }}
           >
-            <TradAtlasText semanticFont={SF.titleH5Emphasis} sx={{ mb: "4px" }}>
+            <TradAtlasText semanticFont={SF.titleH5Emphasis} sx={{ mb: "8px" }}>
               Button
             </TradAtlasText>
-            <TradAtlasText semanticFont={SF.textMd} sx={{ color: "text.secondary", mb: "12px" }}>
-              Trad Atlas — Components. Border radii: XS 2px, S 4px, M 6px, L 8px.
+            <TradAtlasText semanticFont={SF.textMd} sx={{ color: "text.secondary", mb: "20px", maxWidth: 900 }}>
+              Trad Atlas — Components. Border radii: XS 2px, S 4px, M 6px, L 8px. The <strong>Atlas</strong>
+              column renders the Atlas React Bundle reference — Primary and Destructive buttons keep the
+              bundle's vertical gradient fills. The <strong>Modified</strong> column is this project's
+              redesigned treatment — flat solids (no gradient) with quick color transitions and a light press
+              scale, similar to shadcn/ui.
             </TradAtlasText>
 
             <TableContainer component={Paper} elevation={0} sx={{ maxHeight: "70vh", ...SYSTEM_DOC_TABLE_CONTAINER_SX }}>
@@ -2772,20 +3166,22 @@ export default function SystemPage() {
           </TableBody>
         </Table>
             </TableContainer>
-          </Box>
 
-          <Divider sx={{ my: "32px" }} />
+            <Box sx={{ mt: "40px" }}>
+              <SectionAnnotation sectionId="system-button" sectionLabel="Button" />
+            </Box>
+          </Box>
 
           {/* ── Chip component grid ── */}
           <Box
             component="section"
             id="system-chip"
-            sx={{ scrollMarginTop: SYSTEM_PAGE_SCROLL_MARGIN, mb: "24px" }}
+            sx={{ scrollMarginTop: SYSTEM_PAGE_SCROLL_MARGIN, mb: SYSTEM_SECTION_GAP }}
           >
-            <TradAtlasText semanticFont={SF.titleH5Emphasis} sx={{ mb: "4px" }}>
+            <TradAtlasText semanticFont={SF.titleH5Emphasis} sx={{ mb: "8px" }}>
               Chip
             </TradAtlasText>
-            <TradAtlasText semanticFont={SF.textMd} sx={{ color: "text.secondary", mb: "12px" }}>
+            <TradAtlasText semanticFont={SF.textMd} sx={{ color: "text.secondary", mb: "20px", maxWidth: 900 }}>
               Atlas chips are monochrome (Outline / Filled) with sizes, states, and a selected toggle.
               Radius: full pill (9999px). Font: Inter 400 12/16 tracking 0.3px.
             </TradAtlasText>
@@ -2842,18 +3238,22 @@ export default function SystemPage() {
           </TableBody>
         </Table>
             </TableContainer>
+
+            <Box sx={{ mt: "40px" }}>
+              <SectionAnnotation sectionId="system-chip" sectionLabel="Chip" />
+            </Box>
           </Box>
 
           {/* ── Loading Indicator (Linear + Circular) — Atlas vs MUI default ── */}
           <Box
             component="section"
             id="system-progress"
-            sx={{ scrollMarginTop: SYSTEM_PAGE_SCROLL_MARGIN, mb: "32px" }}
+            sx={{ scrollMarginTop: SYSTEM_PAGE_SCROLL_MARGIN, mb: SYSTEM_SECTION_GAP }}
           >
-            <TradAtlasText semanticFont={SF.titleH5Emphasis} sx={{ mb: "4px" }}>
+            <TradAtlasText semanticFont={SF.titleH5Emphasis} sx={{ mb: "8px" }}>
               Loading indicator
             </TradAtlasText>
-            <TradAtlasText semanticFont={SF.textMd} sx={{ color: "text.secondary", mb: "12px" }}>
+            <TradAtlasText semanticFont={SF.textMd} sx={{ color: "text.secondary", mb: "20px", maxWidth: 900 }}>
               Atlas uses a <strong>Loading Indicator</strong> component (linear, circular, and AI variants).
               The closest MUI equivalents are <code>LinearProgress</code> and <code>CircularProgress</code>.
               The Atlas pattern differs significantly in geometry: a pill-shaped outlined track with internal
@@ -2908,15 +3308,181 @@ export default function SystemPage() {
                 </TableBody>
               </Table>
             </TableContainer>
+
+            <Box sx={{ mt: "40px" }}>
+              <SectionAnnotation sectionId="system-progress" sectionLabel="Loading indicator" />
+            </Box>
+          </Box>
+
+          {/* ── Activity pulse — long-horizon progress dot (new pattern) ── */}
+          <Box
+            component="section"
+            id="system-activity-pulse"
+            sx={{ scrollMarginTop: SYSTEM_PAGE_SCROLL_MARGIN, mb: SYSTEM_SECTION_GAP }}
+          >
+            <TradAtlasText semanticFont={SF.titleH5Emphasis} sx={{ mb: "8px" }}>
+              Activity pulse
+            </TradAtlasText>
+            <TradAtlasText semanticFont={SF.textMd} sx={{ color: "text.secondary", mb: "20px", maxWidth: 900 }}>
+              A low-attention status signal for <strong>long-horizon</strong> work — agentic runs, background
+              monitors, continuous watchers. Unlike a spinner, the pulse is calm enough to leave on a screen
+              for hours, days, or weeks without becoming visual noise. The core dot stays still; a soft halo
+              blooms outward and fades every 2.4s. Honors <code>prefers-reduced-motion</code> by swapping the
+              halo bloom for a very slow opacity pulse on the dot itself.
+            </TradAtlasText>
+
+            <Paper variant="outlined" sx={{ p: "20px", mb: "24px", borderColor: "divider" }}>
+              <Stack spacing="28px">
+                <Box>
+                  <TradAtlasText semanticFont={SF.textSmEmphasis} sx={{ mb: "10px", display: "block" }}>
+                    In-context example — agentic progress
+                  </TradAtlasText>
+                  <Stack
+                    direction="row"
+                    spacing="12px"
+                    alignItems="center"
+                    sx={{
+                      p: "12px 16px",
+                      borderRadius: atlasSemanticRadius.md,
+                      border: `1px solid ${atlasSemanticColor.outline.fixed}`,
+                      background: atlasSemanticColor.surface.subtle,
+                      maxWidth: 480,
+                    }}
+                  >
+                    <PulsingStatusDot
+                      size="md"
+                      tone="info"
+                      label={
+                        <Box component="span" sx={{ display: "inline-flex", alignItems: "baseline", gap: "8px" }}>
+                          <Box component="span" sx={{ fontWeight: 600 }}>Auditor agent</Box>
+                          <Box component="span" sx={{ color: atlasSemanticColor.type.muted }}>
+                            · running for 2d 14h · last activity 3m ago
+                          </Box>
+                        </Box>
+                      }
+                      aria-label="Auditor agent running"
+                    />
+                  </Stack>
+                </Box>
+
+                <Box>
+                  <TradAtlasText semanticFont={SF.textSmEmphasis} sx={{ mb: "10px", display: "block" }}>
+                    Tones
+                  </TradAtlasText>
+                  <Stack direction="row" spacing="24px" flexWrap="wrap" rowGap="12px" alignItems="center">
+                    {(["info", "success", "warning", "error", "neutral"] as PulsingStatusTone[]).map((tone) => (
+                      <PulsingStatusDot key={tone} tone={tone} size="md" label={tone} />
+                    ))}
+                  </Stack>
+                </Box>
+
+                <Box>
+                  <TradAtlasText semanticFont={SF.textSmEmphasis} sx={{ mb: "10px", display: "block" }}>
+                    Sizes
+                  </TradAtlasText>
+                  <Stack direction="row" spacing="24px" flexWrap="wrap" rowGap="12px" alignItems="center">
+                    {(["sm", "md", "lg"] as PulsingStatusSize[]).map((size) => (
+                      <PulsingStatusDot key={size} size={size} label={`size="${size}"`} />
+                    ))}
+                  </Stack>
+                </Box>
+
+                <Box>
+                  <TradAtlasText semanticFont={SF.textSmEmphasis} sx={{ mb: "10px", display: "block" }}>
+                    States
+                  </TradAtlasText>
+                  <Stack direction="row" spacing="24px" flexWrap="wrap" rowGap="12px" alignItems="center">
+                    <PulsingStatusDot tone="info" label="Running" />
+                    <PulsingStatusDot tone="info" running={false} label="Paused" />
+                    <PulsingStatusDot tone="success" label="Monitor healthy" />
+                    <PulsingStatusDot tone="error" label="Run failing — retrying" />
+                  </Stack>
+                </Box>
+              </Stack>
+            </Paper>
+
+            <TableContainer component={Paper} elevation={0} sx={{ mb: "16px", ...SYSTEM_DOC_TABLE_CONTAINER_SX }}>
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    <TableCell sx={{ fontWeight: 600, minWidth: 160 }}>Prop</TableCell>
+                    <TableCell sx={{ fontWeight: 600, minWidth: 220 }}>Values</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>Notes</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {[
+                    {
+                      prop: "tone",
+                      values: "info · success · warning · error · neutral",
+                      notes: "Maps to status.notification / success / warning / error / outline tokens. info is the agentic-progress default.",
+                    },
+                    {
+                      prop: "size",
+                      values: "sm (6px) · md (8px) · lg (10px)",
+                      notes: "Core dot diameter. Halo max footprint is 14 / 18 / 24px respectively so surrounding text does not reflow.",
+                    },
+                    {
+                      prop: "running",
+                      values: "boolean (default true)",
+                      notes: "When false, the halo stops and the dot drops to 0.45 opacity — a quiet 'paused / idle' state that still reads as a status dot.",
+                    },
+                    {
+                      prop: "label",
+                      values: "ReactNode",
+                      notes: "Optional inline text rendered to the right. Strings are used as the default aria-label.",
+                    },
+                    {
+                      prop: "aria-label",
+                      values: "string",
+                      notes: "Screen-reader description for the status region. Required if label is absent or non-textual. Defaults to 'Working'.",
+                    },
+                  ].map((row) => (
+                    <TableRow key={row.prop} hover>
+                      <TableCell sx={{ py: "8px", verticalAlign: "top" }}>
+                        <TradAtlasText semanticFont={SF.textSm} sx={{ fontFamily: atlasFontFamilyMono }}>
+                          {row.prop}
+                        </TradAtlasText>
+                      </TableCell>
+                      <TableCell sx={{ py: "8px", verticalAlign: "top" }}>
+                        <TradAtlasText semanticFont={SF.textSm} sx={{ fontFamily: atlasFontFamilyMono }}>
+                          {row.values}
+                        </TradAtlasText>
+                      </TableCell>
+                      <TableCell sx={{ py: "8px", verticalAlign: "top" }}>
+                        <TradAtlasText semanticFont={SF.textSm} sx={{ color: "text.secondary" }}>
+                          {row.notes}
+                        </TradAtlasText>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+
+            <Paper variant="outlined" sx={{ p: "16px 20px", mt: "8px", borderColor: atlasSemanticColor.outline.fixed, background: atlasSemanticColor.surface.subtle }}>
+              <TradAtlasText semanticFont={SF.textSmEmphasis} sx={{ mb: "4px", display: "block" }}>
+                When to use what
+              </TradAtlasText>
+              <TradAtlasText semanticFont={SF.textSm} sx={{ color: "text.secondary" }}>
+                <strong>Spinner</strong> (<code>CircularProgress</code>) — blocking operations expected to resolve in seconds; the user is waiting on this specific action. {" "}
+                <strong>Linear progress</strong> — determinate work with known steps or percentage. {" "}
+                <strong>Activity pulse</strong> — ambient, non-blocking, long-horizon signals: an agent that will run for hours, a watcher that polls an inbox, a sync that reconciles nightly. Pair with a last-activity timestamp or elapsed-time label so users can gauge freshness at a glance.
+              </TradAtlasText>
+            </Paper>
+
+            <Box sx={{ mt: "40px" }}>
+              <SectionAnnotation sectionId="system-activity-pulse" sectionLabel="Activity pulse" />
+            </Box>
           </Box>
 
           {/* ── Extended color chips — NOT in Atlas ── */}
           <Box
             component="section"
             id="system-extended-chips"
-            sx={{ scrollMarginTop: SYSTEM_PAGE_SCROLL_MARGIN, mb: "32px" }}
+            sx={{ scrollMarginTop: SYSTEM_PAGE_SCROLL_MARGIN, mb: SYSTEM_SECTION_GAP }}
           >
-            <Paper variant="outlined" sx={{ p: "16px", mt: "24px", mb: "8px", bgcolor: "#fff8e1", borderColor: "#ffe082" }}>
+            <Paper variant="outlined" sx={{ p: "18px 20px", mb: "16px", bgcolor: "#fff8e1", borderColor: "#ffe082" }}>
         <TradAtlasText semanticFont={SF.textSmEmphasis} sx={{ mb: "4px", display: "block" }}>
           Extended color variants (not in Atlas)
         </TradAtlasText>
@@ -2972,21 +3538,23 @@ export default function SystemPage() {
           </TableBody>
         </Table>
             </TableContainer>
-          </Box>
 
-          <Divider sx={{ my: "32px" }} />
+            <Box sx={{ mt: "40px" }}>
+              <SectionAnnotation sectionId="system-extended-chips" sectionLabel="Extended chips" />
+            </Box>
+          </Box>
 
           {/* ── Status Indicator grid ── */}
           <Box
             component="section"
             id="system-status-indicator"
-            sx={{ scrollMarginTop: SYSTEM_PAGE_SCROLL_MARGIN, mb: "24px" }}
+            sx={{ scrollMarginTop: SYSTEM_PAGE_SCROLL_MARGIN, mb: SYSTEM_SECTION_GAP }}
           >
-            <TradAtlasText semanticFont={SF.titleH5Emphasis} sx={{ mb: "4px" }}>
+            <TradAtlasText semanticFont={SF.titleH5Emphasis} sx={{ mb: "8px" }}>
               Status indicator
             </TradAtlasText>
 
-            <Paper variant="outlined" sx={{ p: "16px", mb: "16px", bgcolor: "#fff8e1", borderColor: "#ffe082" }}>
+            <Paper variant="outlined" sx={{ p: "18px 20px", mb: "20px", bgcolor: "#fff8e1", borderColor: "#ffe082" }}>
         <TradAtlasText semanticFont={SF.textSmEmphasis} sx={{ mb: "4px", display: "block" }}>
           No status indicator component in Atlas
         </TradAtlasText>
@@ -2997,7 +3565,7 @@ export default function SystemPage() {
         </TradAtlasText>
       </Paper>
 
-      <TradAtlasText semanticFont={SF.textMd} sx={{ color: "text.secondary", mb: "12px" }}>
+      <TradAtlasText semanticFont={SF.textMd} sx={{ color: "text.secondary", mb: "20px", maxWidth: 900 }}>
         Dot + label pairs used in entity tables, agent status rows, and vulnerability summaries.
         The "Atlas" column shows our best-guess rendering using Atlas tokens; the "Modified" column
         shows how the app actually renders them.
@@ -3047,15 +3615,19 @@ export default function SystemPage() {
           </TableBody>
         </Table>
             </TableContainer>
+
+            <Box sx={{ mt: "40px" }}>
+              <SectionAnnotation sectionId="system-status-indicator" sectionLabel="Status indicator" />
+            </Box>
           </Box>
 
           {/* ── Extended status patterns ── */}
           <Box
             component="section"
             id="system-status-patterns"
-            sx={{ scrollMarginTop: SYSTEM_PAGE_SCROLL_MARGIN, mb: "32px" }}
+            sx={{ scrollMarginTop: SYSTEM_PAGE_SCROLL_MARGIN, mb: SYSTEM_SECTION_GAP }}
           >
-            <TradAtlasText semanticFont={SF.textSmEmphasis} sx={{ mt: "24px", mb: "8px", display: "block" }}>
+            <TradAtlasText semanticFont={SF.textSmEmphasis} sx={{ mb: "12px", display: "block" }}>
               Additional visual status patterns used in the app
             </TradAtlasText>
 
@@ -3095,21 +3667,23 @@ export default function SystemPage() {
           </TableBody>
         </Table>
             </TableContainer>
-          </Box>
 
-          <Divider sx={{ my: "32px" }} />
+            <Box sx={{ mt: "40px" }}>
+              <SectionAnnotation sectionId="system-status-patterns" sectionLabel="Status patterns" />
+            </Box>
+          </Box>
 
           {/* ── Badge grid ── */}
           <Box
             component="section"
             id="system-badge"
-            sx={{ scrollMarginTop: SYSTEM_PAGE_SCROLL_MARGIN }}
+            sx={{ scrollMarginTop: SYSTEM_PAGE_SCROLL_MARGIN, mb: SYSTEM_SECTION_GAP }}
           >
-            <TradAtlasText semanticFont={SF.titleH5Emphasis} sx={{ mb: "4px" }}>
+            <TradAtlasText semanticFont={SF.titleH5Emphasis} sx={{ mb: "8px" }}>
               Badge
             </TradAtlasText>
 
-            <Paper variant="outlined" sx={{ p: "16px", mb: "16px", bgcolor: "#fff8e1", borderColor: "#ffe082" }}>
+            <Paper variant="outlined" sx={{ p: "18px 20px", mb: "20px", bgcolor: "#fff8e1", borderColor: "#ffe082" }}>
         <TradAtlasText semanticFont={SF.textSmEmphasis} sx={{ mb: "4px", display: "block" }}>
           No Badge component in Trad Atlas
         </TradAtlasText>
@@ -3120,7 +3694,7 @@ export default function SystemPage() {
         </TradAtlasText>
       </Paper>
 
-      <TradAtlasText semanticFont={SF.textMd} sx={{ color: "text.secondary", mb: "12px" }}>
+      <TradAtlasText semanticFont={SF.textMd} sx={{ color: "text.secondary", mb: "20px", maxWidth: 900 }}>
         Count and dot badge variants anchored to a placeholder element. The "Atlas" column shows
         a proposed rendering using Atlas status tokens; the "Modified" column shows MUI default badge styling.
       </TradAtlasText>
@@ -3173,20 +3747,22 @@ export default function SystemPage() {
           </TableBody>
         </Table>
             </TableContainer>
-          </Box>
 
-          <Divider sx={{ my: "32px" }} />
+            <Box sx={{ mt: "40px" }}>
+              <SectionAnnotation sectionId="system-badge" sectionLabel="Badge" />
+            </Box>
+          </Box>
 
           {/* ── AI components ── */}
           <Box
             component="section"
             id="system-ai"
-            sx={{ scrollMarginTop: SYSTEM_PAGE_SCROLL_MARGIN }}
+            sx={{ scrollMarginTop: SYSTEM_PAGE_SCROLL_MARGIN, mb: "48px" }}
           >
-            <TradAtlasText semanticFont={SF.titleH5Emphasis} sx={{ mb: "4px" }}>
+            <TradAtlasText semanticFont={SF.titleH5Emphasis} sx={{ mb: "8px" }}>
               AI components
             </TradAtlasText>
-            <TradAtlasText semanticFont={SF.textMd} sx={{ color: "text.secondary", mb: "12px" }}>
+            <TradAtlasText semanticFont={SF.textMd} sx={{ color: "text.secondary", mb: "20px", maxWidth: 900 }}>
               Atlas groups four components as the AI surface: the <strong>Chat Prompt</strong>{" "}
               (<code>AI / Chat Prompt</code>, Input composite — relaxed and compact densities),
               the <strong>user prompt record</strong> shown in the chat thread, the{" "}
@@ -3199,7 +3775,7 @@ export default function SystemPage() {
 
             <Paper
               variant="outlined"
-              sx={{ p: "16px", mb: "16px", bgcolor: "#fff8e1", borderColor: "#ffe082" }}
+              sx={{ p: "18px 20px", mb: "24px", bgcolor: "#fff8e1", borderColor: "#ffe082" }}
             >
               <TradAtlasText semanticFont={SF.textSmEmphasis} sx={{ mb: "4px", display: "block" }}>
                 Large gradient shadow on the Chat Prompt
@@ -3218,7 +3794,7 @@ export default function SystemPage() {
             <TableContainer
               component={Paper}
               elevation={0}
-              sx={{ mb: "8px", ...SYSTEM_DOC_TABLE_CONTAINER_SX }}
+              sx={{ mb: "16px", ...SYSTEM_DOC_TABLE_CONTAINER_SX }}
             >
               <Table size="small">
                 <TableHead>
@@ -3262,6 +3838,10 @@ export default function SystemPage() {
                 </TableBody>
               </Table>
             </TableContainer>
+
+            <Box sx={{ mt: "40px" }}>
+              <SectionAnnotation sectionId="system-ai" sectionLabel="AI components" />
+            </Box>
           </Box>
         </Box>
       </Box>

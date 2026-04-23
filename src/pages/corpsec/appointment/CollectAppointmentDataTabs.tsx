@@ -34,17 +34,45 @@ export default function CollectAppointmentDataTabs({
 }) {
   const [tab, setTab] = useState(0);
 
+  const collectStep = steps.find((s) => s.id === "collect-data");
+  const collectInProgress = collectStep?.status === "in_progress";
+
+  // Mark the currently-focused unfinished tab as "running" while the overall
+  // Collect step is in-progress — the activity pulse signals the agent is
+  // assisting on this tab's work.
   const tabs: TabDef[] = [
-    { label: "Appointee details", done: entitiesComplete },
-    { label: "Consent to act", done: consentComplete },
+    {
+      label: "Appointee details",
+      done: entitiesComplete,
+      running: collectInProgress && tab === 0 && !entitiesComplete,
+    },
+    {
+      label: "Consent to act",
+      done: consentComplete,
+      running: collectInProgress && tab === 1 && !consentComplete,
+    },
   ];
 
   const appointee = selectedCandidate ?? "";
 
+  // The Consent tab hosts a full-bleed TipTap editor that owns its own
+  // padding + pinned footer, so we drop the 24px tab-panel padding for that
+  // view to avoid a double-padded / boxed-in look.
+  const isEditorTab = tab === 1 && Boolean(appointee);
+
   return (
     <Box sx={{ display: "flex", flexDirection: "column", flex: 1, overflow: "hidden" }}>
       <IdeTabs tabs={tabs} active={tab} onChange={setTab} />
-      <Box sx={{ flex: 1, overflow: "auto", p: "24px" }}>
+      <Box
+        sx={{
+          flex: 1,
+          minHeight: 0,
+          display: "flex",
+          flexDirection: "column",
+          overflow: isEditorTab ? "hidden" : "auto",
+          p: isEditorTab ? 0 : "24px",
+        }}
+      >
         {tab === 0 ? (
           <AppointeeDetailsTab
             steps={steps}

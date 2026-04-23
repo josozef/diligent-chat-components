@@ -82,3 +82,4 @@ export { default as TaskAltOutlinedIcon } from "@diligentcorp/atlas-react-bundle
 export { default as SummarizeOutlinedIcon } from "@diligentcorp/atlas-react-bundle/icons/SummarizeOutlined";
 export { default as PolicyOutlinedIcon } from "@diligentcorp/atlas-react-bundle/icons/PolicyOutlined";
 export { default as SpeedOutlinedIcon } from "@diligentcorp/atlas-react-bundle/icons/SpeedOutlined";
+export { default as EditOutlinedIcon } from "@diligentcorp/atlas-react-bundle/icons/EditOutlined";
