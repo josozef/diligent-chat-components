@@ -2,21 +2,30 @@ import { Box } from "@mui/material";
 import { CheckCircleIcon } from "@/icons";
 import { semanticFontStyle, SF } from "@/tokens/tradAtlasSemanticTypography";
 import { useTokens } from "@/hooks/useTokens";
+import PulsingStatusDot from "./PulsingStatusDot";
 
 export interface TabDef {
   label: string;
   done: boolean;
+  /**
+   * When true, the tab shows an activity-pulse dot before the label to
+   * indicate an agent is currently processing work on this tab. Takes
+   * visual precedence over the `done` checkmark when both are true.
+   */
+  running?: boolean;
 }
 
 export function AtlasTabButton({
   label,
   selected,
   done,
+  running = false,
   onClick,
 }: {
   label: string;
   selected: boolean;
   done: boolean;
+  running?: boolean;
   onClick: () => void;
 }) {
   const { color, radius, weight } = useTokens();
@@ -26,7 +35,7 @@ export function AtlasTabButton({
       type="button"
       onClick={onClick}
       data-atlas-component="TabButton"
-      data-atlas-variant={`small - label${done ? " + badge" : ""} - ${selected ? "selected" : "default"}`}
+      data-atlas-variant={`small - label${running ? " + pulse" : done ? " + badge" : ""} - ${selected ? "selected" : "default"}`}
       sx={{
         position: "relative",
         ...semanticFontStyle(SF.textMdEmphasis),
@@ -56,8 +65,11 @@ export function AtlasTabButton({
         },
       }}
     >
+      {running ? (
+        <PulsingStatusDot size="sm" tone="info" aria-label={`${label} — agent working`} />
+      ) : null}
       {label}
-      {done ? (
+      {!running && done ? (
         <CheckCircleIcon sx={{ fontSize: 15, color: color.status.success.default }} />
       ) : null}
       {selected ? (
@@ -105,6 +117,7 @@ export default function IdeTabs({
           label={t.label}
           selected={i === active}
           done={t.done}
+          running={t.running}
           onClick={() => onChange(i)}
         />
       ))}

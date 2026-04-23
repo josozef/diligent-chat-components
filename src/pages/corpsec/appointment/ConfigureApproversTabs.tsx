@@ -113,16 +113,41 @@ export default function ConfigureApproversTabs({
 }) {
   const [tab, setTab] = useState(0);
 
+  const overviewDone = tabStatus.approversConfirmed && tabStatus.resolutionSent;
+
+  // Pulse the currently-focused unfinished tab to signal the agent is
+  // actively processing its work. Overview is never "running" on its own.
   const tabs: TabDef[] = [
-    { label: "Overview", done: tabStatus.approversConfirmed && tabStatus.resolutionSent },
-    { label: "Select approvers", done: tabStatus.approversConfirmed },
-    { label: "Board resolution", done: tabStatus.resolutionSent },
+    { label: "Overview", done: overviewDone },
+    {
+      label: "Select approvers",
+      done: tabStatus.approversConfirmed,
+      running: tab === 1 && !tabStatus.approversConfirmed,
+    },
+    {
+      label: "Board resolution",
+      done: tabStatus.resolutionSent,
+      running: tab === 2 && !tabStatus.resolutionSent,
+    },
   ];
+
+  // The Board resolution tab hosts a full-bleed TipTap editor that owns
+  // its own padding + pinned footer, so drop the 24px panel padding there.
+  const isEditorTab = tab === 2;
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", flex: 1, overflow: "hidden" }}>
       <IdeTabs tabs={tabs} active={tab} onChange={setTab} />
-      <Box sx={{ flex: 1, overflow: "auto", p: "24px" }}>
+      <Box
+        sx={{
+          flex: 1,
+          minHeight: 0,
+          display: "flex",
+          flexDirection: "column",
+          overflow: isEditorTab ? "hidden" : "auto",
+          p: isEditorTab ? 0 : "24px",
+        }}
+      >
         {tab === 0 ? (
           <OverviewTab
             tabStatus={tabStatus}

@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Box, Divider } from "@mui/material";
 import { EditorContent, type Editor } from "@tiptap/react";
 import {
@@ -20,19 +21,39 @@ const iconSz = { fontSize: 18 } as const;
 
 /**
  * Shared shell for TipTap-based document editors.
- * Provides the outer frame, standard formatting toolbar, and paper-on-grey
- * editor surface used by both the Consent-to-Act and Board Resolution editors.
  *
- * Pass `extraToolbar` to append additional buttons after the standard set.
+ * Layout model — top to bottom, all edge-to-edge:
+ *   1. Optional `header` slot for descriptive copy / recipient controls
+ *      (rendered on `surface.default`, generous padding).
+ *   2. Formatting toolbar (flat — no outer container border, just a thin
+ *      bottom divider separating it from the document surface).
+ *   3. Document surface — the paper sits centered on `surface.subtle`
+ *      with comfortable breathing room on all sides.
+ *   4. Optional `footer` slot, pinned with a `surface.default` bar,
+ *      top border, for primary/secondary actions.
+ *
+ * Consumers own what goes in the slots; the shell owns the framing.
  */
 export default function TipTapEditorShell({
   editor,
   extraToolbar,
+  header,
+  footer,
 }: {
   editor: Editor;
-  extraToolbar?: React.ReactNode;
+  extraToolbar?: ReactNode;
+  /**
+   * Descriptive copy, recipient controls, or anything else that belongs
+   * above the toolbar. Rendered in a padded white header region.
+   */
+  header?: ReactNode;
+  /**
+   * Primary/secondary actions pinned to the bottom of the editor, on
+   * `surface.default` with a thin top border.
+   */
+  footer?: ReactNode;
 }) {
-  const { color, radius } = useTokens();
+  const { color } = useTokens();
 
   const btnProps = {
     activeColor: color.action.primary.default,
@@ -46,23 +67,36 @@ export default function TipTapEditorShell({
         flexDirection: "column",
         flex: 1,
         minHeight: 0,
-        border: `1px solid ${color.outline.default}`,
-        borderRadius: radius.lg,
         background: color.surface.default,
         overflow: "hidden",
       }}
     >
-      {/* Toolbar */}
+      {header ? (
+        <Box
+          sx={{
+            flexShrink: 0,
+            px: "32px",
+            pt: "32px",
+            pb: "20px",
+            background: color.surface.default,
+          }}
+        >
+          {header}
+        </Box>
+      ) : null}
+
+      {/* Toolbar — flat, no boxing; just a subtle hairline below */}
       <Box
         sx={{
+          flexShrink: 0,
           display: "flex",
           alignItems: "center",
           gap: "2px",
           flexWrap: "wrap",
-          px: "10px",
-          py: "6px",
+          px: "24px",
+          py: "8px",
           borderBottom: `1px solid ${color.outline.fixed}`,
-          background: color.surface.subtle,
+          background: color.surface.default,
         }}
       >
         <RichDocumentToolbarButton icon={<UndoIcon sx={iconSz} />} label="Undo" disabled={!editor.can().undo()} onClick={() => editor.chain().focus().undo().run()} {...btnProps} />
@@ -82,21 +116,22 @@ export default function TipTapEditorShell({
         {extraToolbar}
       </Box>
 
-      {/* Paper-on-grey editor surface */}
+      {/* Paper on surface.subtle — the document floats on a soft tint rather
+          than a heavy neutral gray, with extra room above and below. */}
       <Box
         sx={{
           flex: 1,
           overflow: "auto",
-          px: "32px",
-          py: "24px",
-          background: "#f8f8f8",
+          px: "40px",
+          py: "40px",
+          background: color.surface.subtle,
           "& .tiptap": {
             outline: "none",
             ...semanticFontStyle(SF.textMd),
             color: color.type.default,
             maxWidth: 720,
             mx: "auto",
-            background: "#fff",
+            background: color.surface.default,
             border: `1px solid ${color.outline.fixed}`,
             borderRadius: "4px",
             padding: "48px 56px",
@@ -148,6 +183,24 @@ export default function TipTapEditorShell({
       >
         <EditorContent editor={editor} />
       </Box>
+
+      {footer ? (
+        <Box
+          sx={{
+            flexShrink: 0,
+            display: "flex",
+            alignItems: "center",
+            flexWrap: "wrap",
+            gap: "12px",
+            px: "32px",
+            py: "16px",
+            background: color.surface.default,
+            borderTop: `1px solid ${color.outline.fixed}`,
+          }}
+        >
+          {footer}
+        </Box>
+      ) : null}
     </Box>
   );
 }

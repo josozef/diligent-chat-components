@@ -1,6 +1,7 @@
-import { Box, CircularProgress } from "@mui/material";
+import { Box } from "@mui/material";
 import { CheckCircleIcon, RadioButtonUncheckedIcon } from "@/icons";
 import TradAtlasText from "./TradAtlasText";
+import PulsingStatusDot from "./PulsingStatusDot";
 import { SF } from "@/tokens/tradAtlasSemanticTypography";
 import { useTokens } from "@/hooks/useTokens";
 
@@ -20,8 +21,8 @@ export default function StatusSubstepRow({
   const { color, weight } = useTokens();
 
   const iconSize = size === "sm" ? 16 : 20;
-  const spinnerSize = size === "sm" ? 14 : 18;
-  const spinnerOffset = size === "sm" ? "1px" : "1px";
+  // Center the status glyph in a fixed slot so rows align regardless of variant.
+  const slotSize = iconSize;
 
   return (
     <Box
@@ -35,17 +36,24 @@ export default function StatusSubstepRow({
         "&:last-child": { borderBottom: "none" },
       }}
     >
-      {status === "completed" ? (
-        <CheckCircleIcon sx={{ fontSize: iconSize, color: color.status.success.default, flexShrink: 0 }} />
-      ) : status === "in_progress" ? (
-        <CircularProgress
-          size={spinnerSize}
-          thickness={5}
-          sx={{ color: color.action.primary.default, flexShrink: 0, ml: spinnerOffset, mr: spinnerOffset }}
-        />
-      ) : (
-        <RadioButtonUncheckedIcon sx={{ fontSize: iconSize, color: color.outline.fixed, flexShrink: 0 }} />
-      )}
+      <Box
+        sx={{
+          width: slotSize,
+          height: slotSize,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexShrink: 0,
+        }}
+      >
+        {status === "completed" ? (
+          <CheckCircleIcon sx={{ fontSize: iconSize, color: color.status.success.default }} />
+        ) : status === "in_progress" ? (
+          <PulsingStatusDot size={size === "sm" ? "sm" : "md"} tone="info" aria-label={`${label} in progress`} />
+        ) : (
+          <RadioButtonUncheckedIcon sx={{ fontSize: iconSize, color: color.outline.fixed }} />
+        )}
+      </Box>
       <TradAtlasText
         semanticFont={size === "sm" ? SF.textSm : SF.labelMd}
         sx={{
