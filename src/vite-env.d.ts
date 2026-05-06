@@ -21,3 +21,4 @@ declare module "@mui/material/InputBase" {
     "data-semantic-font"?: string;
   }
 }
+

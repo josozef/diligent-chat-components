@@ -21,6 +21,7 @@
     "@tiptap/pm": "^3.22.2",
     "@tiptap/react": "^3.22.2",
     "@tiptap/starter-kit": "^3.22.2",
+    "@turbodocx/html-to-docx": "^1.20.1",
     "react": "^19",
     "react-dom": "^19",
     "react-router": "^7"

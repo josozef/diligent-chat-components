@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Box } from "@mui/material";
 import { useTokens } from "../../../hooks/useTokens";
+import GlobalHeader from "@/components/common/GlobalHeader";
 import WorkspaceHeader from "./WorkspaceHeader";
 import StatusPanel from "./StatusPanel";
 import WorkPanel from "./WorkPanel";
@@ -298,6 +299,7 @@ export default function AppointmentWorkspace() {
         overflow: "hidden",
       }}
     >
+      <GlobalHeader currentApp="corpsec" />
       <WorkspaceHeader selectedCandidate={selectedCandidate} />
 
       <Box sx={{ flex: 1, display: "flex", overflow: "hidden" }}>

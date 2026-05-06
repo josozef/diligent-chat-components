@@ -32,7 +32,7 @@ import { ChatPrompt } from "../../components/ai";
 import ContentCard from "@/components/common/ContentCard";
 import PulsingStatusDot from "@/components/common/PulsingStatusDot";
 import type { PulsingStatusTone } from "@/components/common/PulsingStatusDot";
-import GlobalHeader from "./GlobalHeader";
+import GlobalHeader from "@/components/common/GlobalHeader";
 import DemoControlsFab from "./DemoControlsFab";
 
 function IncidentTile({
@@ -987,7 +987,7 @@ export default function CorpSecCommandCenter() {
         flexDirection: "column",
       }}
     >
-      <GlobalHeader />
+      <GlobalHeader currentApp="corpsec" />
 
       <Box
         sx={{

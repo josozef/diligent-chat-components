@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Box, Divider } from "@mui/material";
+import { Box, Button, Divider } from "@mui/material";
 import { EditorContent, type Editor } from "@tiptap/react";
 import {
   FormatBoldIcon,
@@ -12,10 +12,12 @@ import {
   TitleIcon,
   HorizontalRuleIcon,
   FormatClearIcon,
+  FileDownloadOutlinedIcon,
 } from "@/icons";
 import RichDocumentToolbarButton from "@/components/common/RichDocumentToolbarButton";
 import { SF, semanticFontStyle } from "@/tokens/tradAtlasSemanticTypography";
 import { useTokens } from "@/hooks/useTokens";
+import { exportEditorHtmlToDocx } from "@/utils/exportToDocx";
 
 const iconSz = { fontSize: 18 } as const;
 
@@ -39,6 +41,8 @@ export default function TipTapEditorShell({
   extraToolbar,
   header,
   footer,
+  documentTitle,
+  exportFileName,
 }: {
   editor: Editor;
   extraToolbar?: ReactNode;
@@ -52,8 +56,28 @@ export default function TipTapEditorShell({
    * `surface.default` with a thin top border.
    */
   footer?: ReactNode;
+  /**
+   * Title written into the exported `.docx` file (used in the document's
+   * `<title>` and shown in Word's properties). Defaults to `exportFileName`.
+   */
+  documentTitle?: string;
+  /**
+   * When set, a "Download .docx" action is added to the right side of the
+   * toolbar. The current editor HTML is exported with this name (the
+   * `.docx` extension is appended automatically).
+   */
+  exportFileName?: string;
 }) {
-  const { color } = useTokens();
+  const { color, weight } = useTokens();
+
+  const handleDownloadDocx = () => {
+    if (!exportFileName) return;
+    void exportEditorHtmlToDocx({
+      html: editor.getHTML(),
+      title: documentTitle ?? exportFileName,
+      fileName: exportFileName,
+    });
+  };
 
   const btnProps = {
     activeColor: color.action.primary.default,
@@ -114,6 +138,26 @@ export default function TipTapEditorShell({
         <RichDocumentToolbarButton icon={<HorizontalRuleIcon sx={iconSz} />} label="Horizontal rule" onClick={() => editor.chain().focus().setHorizontalRule().run()} {...btnProps} />
         <RichDocumentToolbarButton icon={<FormatClearIcon sx={iconSz} />} label="Clear formatting" onClick={() => editor.chain().focus().clearNodes().unsetAllMarks().run()} {...btnProps} />
         {extraToolbar}
+
+        {exportFileName ? (
+          <Box sx={{ ml: "auto", display: "flex", alignItems: "center" }}>
+            <Button
+              variant="outlined"
+              color="inherit"
+              size="small"
+              startIcon={<FileDownloadOutlinedIcon sx={{ fontSize: 18 }} />}
+              onClick={handleDownloadDocx}
+              sx={{
+                textTransform: "none",
+                fontWeight: weight.semiBold,
+                borderColor: color.outline.fixed,
+                ...semanticFontStyle(SF.labelMd),
+              }}
+            >
+              Download .docx
+            </Button>
+          </Box>
+        ) : null}
       </Box>
 
       {/* Paper on surface.subtle — the document floats on a soft tint rather

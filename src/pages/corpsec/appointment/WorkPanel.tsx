@@ -1,5 +1,5 @@
-import { Fragment } from "react";
-import { Box, Button, Chip, CircularProgress, Divider, LinearProgress } from "@mui/material";
+import { Fragment, useState } from "react";
+import { Box, Button, Chip, CircularProgress, Divider, IconButton, LinearProgress } from "@mui/material";
 import CollectAppointmentDataTabs from "./CollectAppointmentDataTabs";
 import ConfigureApproversTabs from "./ConfigureApproversTabs";
 import type { ApproverTabStatus } from "./ConfigureApproversTabs";
@@ -18,6 +18,8 @@ import {
   UploadFileOutlinedIcon,
   StorageOutlinedIcon,
   SearchOutlinedIcon,
+  DescriptionOutlinedIcon,
+  FileDownloadOutlinedIcon,
 } from "@/icons";
 import TradAtlasText from "@/components/common/TradAtlasText";
 import ContentCard from "@/components/common/ContentCard";
@@ -27,6 +29,12 @@ import StatusSubstepRow from "@/components/common/StatusSubstepRow";
 import { DATA_SEMANTIC_FONT, SF, semanticFontStyle } from "@/tokens/tradAtlasSemanticTypography";
 import { useTokens } from "../../../hooks/useTokens";
 import type { WorkflowStep, WorkflowStepId, AgenticProcessState } from "./AppointmentWorkspace";
+import { exportEditorHtmlToDocx } from "@/utils/exportToDocx";
+import {
+  buildBoardResolutionHtml,
+  buildForm45ConsentHtml,
+  buildForm45NotificationHtml,
+} from "./documentTemplates";
 
 export interface CollectDataTabStatus {
   entities: boolean;
@@ -115,7 +123,12 @@ export default function WorkPanel({
           ) : activeStepId === "board-approval" ? (
             <BoardApprovalStep agenticState={agenticState} />
           ) : activeStepId === "filing" ? (
-            <RegulatoryFilingStep agenticState={agenticState} />
+            <RegulatoryFilingStep
+              agenticState={agenticState}
+              selectedCandidate={selectedCandidate}
+              appointmentNric={appointmentNric}
+              appointmentEffectiveDate={appointmentEffectiveDate}
+            />
           ) : activeStepId === "update-entities" ? (
             <UpdateEntitiesStep selectedCandidate={selectedCandidate} agenticState={agenticState} />
           ) : null}
@@ -803,17 +816,100 @@ function BoardApprovalStep({ agenticState }: { agenticState: AgenticProcessState
 
 /* ── Step 5: Regulatory filing ──────────────────────────────────── */
 
-function RegulatoryFilingStep({ agenticState }: { agenticState: AgenticProcessState }) {
+interface FiledDocument {
+  id: string;
+  label: string;
+  fileBaseName: string;
+  documentTitle: string;
+  buildHtml: () => string;
+}
+
+function RegulatoryFilingStep({
+  agenticState,
+  selectedCandidate,
+  appointmentNric,
+  appointmentEffectiveDate,
+}: {
+  agenticState: AgenticProcessState;
+  selectedCandidate: string | null;
+  appointmentNric: string | null;
+  appointmentEffectiveDate: string | null;
+}) {
   const { color, weight } = useTokens();
 
   const completedCount = agenticState.filingSubsteps.filter((s) => s.status === "completed").length;
   const allDone = completedCount === agenticState.filingSubsteps.length;
 
+  const companyName = "Pacific Polymer Logistics Pte. Ltd.";
+  const companyUen = "201812345K";
+  const appointeeName = selectedCandidate ?? "Priya Nair";
+  const appointeeNric = appointmentNric ?? "";
+  const appointeeAddress = "14 Nassim Road, #08-02, Singapore 258395";
+  const appointeeNationality = "Singaporean";
+  const appointeeDob = "12 March 1979";
+  const effectiveDate = appointmentEffectiveDate ?? "";
+  const departingDirector = "David Chen";
+  const departingLastDay = "2026-04-17";
+
+  const docs: FiledDocument[] = [
+    {
+      id: "board-resolution",
+      label: "Board Resolution (Signed)",
+      fileBaseName: "Board_Resolution_PacificPolymer",
+      documentTitle: `Board Resolution — ${companyName}`,
+      buildHtml: () =>
+        buildBoardResolutionHtml({
+          companyName,
+          companyUen,
+          appointeeName,
+          appointeeNric,
+          appointeeAddress,
+          effectiveDate,
+          departingDirector,
+        }),
+    },
+    {
+      id: "form-45-consent",
+      label: "Form 45 — Consent to Act as Director",
+      fileBaseName: "Consent_to_Act",
+      documentTitle: `Consent to Act as Director — ${appointeeName}`,
+      buildHtml: () =>
+        buildForm45ConsentHtml({
+          companyName,
+          companyUen,
+          appointeeName,
+          appointeeNric,
+          appointeeNationality,
+          appointeeAddress,
+          effectiveDate,
+        }),
+    },
+    {
+      id: "form-45-notification",
+      label: "Form 45 — Notification of Change of Director",
+      fileBaseName: "Form_45_PacificPolymer",
+      documentTitle: `Notification of Change of Director — ${companyName}`,
+      buildHtml: () =>
+        buildForm45NotificationHtml({
+          companyName,
+          companyUen,
+          appointeeName,
+          appointeeNric,
+          appointeeNationality,
+          appointeeAddress,
+          appointeeDateOfBirth: appointeeDob,
+          effectiveDate,
+          departingDirectorName: departingDirector,
+          departingDirectorLastDay: departingLastDay,
+        }),
+    },
+  ];
+
   return (
     <Box sx={{ maxWidth: 720, display: "flex", flexDirection: "column", gap: "20px" }}>
       <SectionHeader
         title="Regulatory filing"
-        subtitle="The system is automatically preparing and filing documents with ACRA on behalf of Pacific Polymer Logistics Pte. Ltd."
+        subtitle={`The system is automatically preparing and filing documents with ACRA on behalf of ${companyName}.`}
         statusLabel={allDone ? "COMPLETE" : "IN PROGRESS"}
         statusVariant={allDone ? "completed" : "in_progress"}
       />
@@ -836,37 +932,158 @@ function RegulatoryFilingStep({ agenticState }: { agenticState: AgenticProcessSt
       </ContentCard>
 
       <ContentCard>
-        <TradAtlasText semanticFont={SF.textMd} sx={{ fontWeight: weight.semiBold, color: color.type.default, mb: "8px" }}>
+        <TradAtlasText semanticFont={SF.textMd} sx={{ fontWeight: weight.semiBold, color: color.type.default, mb: "12px" }}>
           Documents filed
         </TradAtlasText>
         <Box sx={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-          {[
-            "Board Resolution (Signed) — Board_Resolution_PacificPolymer.pdf",
-            "Form 45 — Consent to Act as Director — Consent_to_Act.pdf",
-            "Form 45 — Notification of Change of Director — Form_45_PacificPolymer.pdf",
-          ].map((doc) => (
-            <Box key={doc} sx={{ display: "flex", alignItems: "flex-start", gap: "8px" }}>
-              {allDone ? (
-                <CheckCircleIcon sx={{ fontSize: 14, color: color.status.success.default, flexShrink: 0, mt: "3px" }} />
-              ) : (
-                <Box
-                  sx={{
-                    width: 6,
-                    height: 6,
-                    borderRadius: "50%",
-                    background: color.type.muted,
-                    flexShrink: 0,
-                    mt: "7px",
-                  }}
-                />
-              )}
-              <TradAtlasText semanticFont={SF.labelMd} sx={{ color: color.type.muted }}>
-                {doc}
-              </TradAtlasText>
-            </Box>
+          {docs.map((doc) => (
+            <FiledDocumentRow key={doc.id} doc={doc} ready={allDone} />
           ))}
+          {!allDone && (
+            <TradAtlasText
+              semanticFont={SF.labelSm}
+              sx={{ color: color.type.muted, mt: "8px", fontStyle: "italic" }}
+            >
+              Downloads will be available once filing is complete.
+            </TradAtlasText>
+          )}
         </Box>
       </ContentCard>
+    </Box>
+  );
+}
+
+function FiledDocumentRow({ doc, ready }: { doc: FiledDocument; ready: boolean }) {
+  const { color, radius, weight } = useTokens();
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+
+  const fileName = `${doc.fileBaseName}.docx`;
+
+  const handleDownload = async () => {
+    if (busy) return;
+    setBusy(true);
+    setErr(null);
+    try {
+      await exportEditorHtmlToDocx({
+        html: doc.buildHtml(),
+        title: doc.documentTitle,
+        fileName,
+      });
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : "Download failed.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <Box>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: "10px",
+          px: "10px",
+          py: "8px",
+          borderRadius: radius.sm,
+          border: `1px solid ${ready ? color.outline.fixed : "transparent"}`,
+          background: ready ? color.surface.default : "transparent",
+          transition: "background 120ms ease, border-color 120ms ease",
+          "&:hover": ready
+            ? {
+                background: color.surface.subtle,
+                borderColor: color.outline.default,
+              }
+            : undefined,
+        }}
+      >
+        {ready ? (
+          <CheckCircleIcon
+            sx={{ fontSize: 16, color: color.status.success.default, flexShrink: 0 }}
+          />
+        ) : (
+          <Box
+            sx={{
+              width: 6,
+              height: 6,
+              borderRadius: "50%",
+              background: color.type.muted,
+              flexShrink: 0,
+              mx: "5px",
+            }}
+          />
+        )}
+
+        <DescriptionOutlinedIcon
+          sx={{
+            fontSize: 16,
+            color: ready ? color.action.primary.default : color.type.muted,
+            flexShrink: 0,
+          }}
+        />
+
+        <Box sx={{ flex: 1, minWidth: 0 }}>
+          <TradAtlasText
+            semanticFont={SF.labelMd}
+            sx={{
+              color: ready ? color.type.default : color.type.muted,
+              fontWeight: weight.medium,
+            }}
+          >
+            {doc.label}
+          </TradAtlasText>
+          <TradAtlasText
+            semanticFont={SF.labelSm}
+            sx={{ color: color.type.muted, fontFamily: "monospace" }}
+          >
+            {fileName}
+          </TradAtlasText>
+        </Box>
+
+        {ready ? (
+          <Button
+            variant="text"
+            size="small"
+            onClick={handleDownload}
+            disabled={busy}
+            startIcon={
+              busy ? (
+                <CircularProgress size={14} thickness={5} />
+              ) : (
+                <FileDownloadOutlinedIcon sx={{ fontSize: 16 }} />
+              )
+            }
+            sx={{
+              textTransform: "none",
+              fontWeight: weight.semiBold,
+              whiteSpace: "nowrap",
+              color: color.action.primary.default,
+              "&:hover": { background: color.surface.subtle },
+            }}
+          >
+            {busy ? "Preparing…" : "Download"}
+          </Button>
+        ) : (
+          <IconButton
+            size="small"
+            disabled
+            aria-label="Download not yet available"
+            sx={{ color: color.type.muted }}
+          >
+            <FileDownloadOutlinedIcon sx={{ fontSize: 16 }} />
+          </IconButton>
+        )}
+      </Box>
+
+      {err && (
+        <TradAtlasText
+          semanticFont={SF.labelSm}
+          sx={{ color: color.status.error.default, mt: "4px", ml: "10px" }}
+        >
+          {err}
+        </TradAtlasText>
+      )}
     </Box>
   );
 }
