@@ -19,6 +19,7 @@ export default function MessageBubble({
   fullWidth = false,
   htmlContent,
   onRerun,
+  raised = false,
 }: {
   children?: React.ReactNode;
   /** Rich HTML body (e.g. from `formatChatMarkdownToHtml`). Used for assistant turns; also supported on `prompt` cards. */
@@ -32,6 +33,12 @@ export default function MessageBubble({
   density?: ChatPresentationDensity;
   fullWidth?: boolean;
   onRerun?: () => void;
+  /**
+   * Inverse-contrast variant for use on `surface.subtle` / `surface.variant` canvases.
+   * Lifts the prompt bubble from `surface.subtle` (which would merge into the canvas)
+   * to `surface.default` with a more pronounced border + subtle elevation.
+   */
+  raised?: boolean;
 }) {
   const isCompact = density === "compact";
   const isPrompt = messageRole === "prompt";
@@ -61,6 +68,14 @@ export default function MessageBubble({
 
   const bubbleSx = (() => {
     if (isPrompt) {
+      if (raised) {
+        return {
+          background: color.surface.default,
+          borderRadius: radius.md,
+          border: `1px solid ${color.outline.fixed}`,
+          boxShadow: "0 1px 2px rgba(15, 23, 42, 0.04)",
+        };
+      }
       return {
         background: color.surface.subtle,
         borderRadius: radius.md,

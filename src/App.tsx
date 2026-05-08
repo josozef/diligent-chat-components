@@ -5,6 +5,7 @@ import SystemPage from "./pages/SystemPage";
 import GovernanceChatPage from "./pages/governance-chat/GovernanceChatPage";
 import CorpSecCommandCenter from "./pages/corpsec/CorpSecCommandCenter";
 import AppointmentWorkspace from "./pages/corpsec/appointment/AppointmentWorkspace";
+import ConversationalAppointmentWorkspace from "./pages/corpsec/appointment/conversation/ConversationalAppointmentWorkspace";
 import CisoCommandCenter from "./pages/ciso/CisoCommandCenter";
 import InvestigateWorkspace from "./pages/ciso/investigate/InvestigateWorkspace";
 import AuditCommandCenter from "./pages/audit/AuditCommandCenter";
@@ -18,6 +19,10 @@ export default function App() {
       <Route path="governance-chat" element={<GovernanceChatPage />} />
       <Route path="corpsec" element={<CorpSecCommandCenter />} />
       <Route path="corpsec/appointment" element={<AppointmentWorkspace />} />
+      <Route
+        path="corpsec/appointment/conversation"
+        element={<ConversationalAppointmentWorkspace />}
+      />
       <Route path="ciso" element={<CisoCommandCenter />} />
       <Route path="ciso/investigate" element={<InvestigateWorkspace />} />
       <Route path="audit" element={<AuditCommandCenter />} />

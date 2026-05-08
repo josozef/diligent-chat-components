@@ -6,7 +6,7 @@ import {
   IconButton,
   Divider,
 } from "@mui/material";
-import { Link as RouterLink } from "react-router";
+import { Link as RouterLink, useSearchParams } from "react-router";
 import {
   WarningAmberIcon,
   BoltOutlinedIcon,
@@ -33,7 +33,60 @@ import ContentCard from "@/components/common/ContentCard";
 import PulsingStatusDot from "@/components/common/PulsingStatusDot";
 import type { PulsingStatusTone } from "@/components/common/PulsingStatusDot";
 import GlobalHeader from "@/components/common/GlobalHeader";
+import CommandCenterSideNav, {
+  type SideNavChatItem,
+  type SideNavWorkflowItem,
+} from "@/components/common/CommandCenterSideNav";
 import DemoControlsFab from "./DemoControlsFab";
+
+/* ── Sample data shown by the side rail when nav=side ──────────────
+ *
+ * These mirror the running agentic tasks + governance Q&A chats the user
+ * approved as mock data for the new chat/agent navigation. They live next to
+ * the page (rather than inside the side-nav component itself) so each command
+ * center can supply its own canonical list.
+ *
+ * The side-nav variant of the command center is the entry point to the
+ * Conversational version of each workflow — clicking the running "Appoint
+ * Priya Nair…" item drops the user into the conversational appointment
+ * workspace (chat-driven), preserving `?nav=side` semantics throughout.
+ */
+
+const SIDE_NAV_WORKFLOWS: SideNavWorkflowItem[] = [
+  {
+    id: "wf-priya-nair",
+    title: "Replace director David Chen at Pacific Polymer Logistics",
+    status: "Filing Form 45 with ACRA",
+    tone: "info",
+    href: "/corpsec/appointment/conversation",
+  },
+  {
+    id: "wf-pacific-disclosures",
+    title: "Pacific Polymer Logistics — refresh director disclosures",
+    status: "Awaiting permission to update Entities DB",
+    tone: "warning",
+    emphasizeStatus: true,
+  },
+  {
+    id: "wf-entity-sync",
+    title: "Entity records sync — Pacific Polymer Logistics UEN 201812345K",
+    status: "Reconciling Workday → Entities",
+    tone: "info",
+  },
+];
+
+const SIDE_NAV_CHATS: SideNavChatItem[] = [
+  { id: "c1",  title: "Replace a director in Singapore — what do I need before ACRA?" },
+  { id: "c2",  title: "Board resolution vs written resolution — when can we use each?" },
+  { id: "c3",  title: "How do I evidence consent to act and keep an audit trail?" },
+  { id: "c4",  title: "NRIC / ID collection for directors — what's acceptable under our policy?" },
+  { id: "c5",  title: "Who must approve this appointment on our side vs the board?" },
+  { id: "c6",  title: "ACRA Form 45 timing — what's the 14-day rule in practice?" },
+  { id: "c7",  title: "Entity management: updating registers after a director change" },
+  { id: "c8",  title: "Board portal: when to publish materials vs circulate by email" },
+  { id: "c9",  title: "Conflict of interest declaration for a new NED — template checklist" },
+  { id: "c10", title: "Diligent vs manual process — what should stay human-in-the-loop?" },
+];
 
 function IncidentTile({
   icon,
@@ -139,7 +192,7 @@ function IncidentTile({
   );
 }
 
-function HeroBanner() {
+function HeroBanner({ appointmentHref }: { appointmentHref: string }) {
   const { hasAlerts } = useDemo();
   const { color, radius, weight } = useTokens();
 
@@ -160,7 +213,7 @@ function HeroBanner() {
           subtitle="Workday alert — David Chen has resigned from Pacific Polymer Logistics Pte. Ltd. (Singapore). Last day in 14 days."
           stats="ACRA filing required · Replacement needed · Board approval required"
           actionLabel="Investigate"
-          actionHref="/corpsec/appointment"
+          actionHref={appointmentHref}
         />
         <IncidentTile
           icon={<BoltOutlinedIcon sx={{ color: color.status.warning.text, fontSize: 22 }} />}
@@ -977,6 +1030,51 @@ function SystemLog() {
 
 export default function CorpSecCommandCenter() {
   const { color } = useTokens();
+  const [searchParams] = useSearchParams();
+  // ?nav=side enables the persistent left rail (Workflows + Chats);
+  // any other value (or absence) falls back to the existing centered layout.
+  const showSideNav = searchParams.get("nav") === "side";
+
+  // Conditional linking — when the user is in the side-nav variant of the
+  // command center we send them to the Conversational appointment workflow;
+  // otherwise to the original (Non-Conversational) workspace. This mirrors the
+  // way each variant is exposed on the home hub.
+  const appointmentHref = showSideNav
+    ? "/corpsec/appointment/conversation"
+    : "/corpsec/appointment";
+
+  const content = (
+    <Box
+      sx={{
+        maxWidth: 960,
+        width: "100%",
+        mx: "auto",
+        display: "flex",
+        flexDirection: "column",
+        gap: "24px",
+      }}
+    >
+      <HeroBanner appointmentHref={appointmentHref} />
+      <ChatSection />
+      <EntityPortfolio />
+      <EntityStatusSummary />
+      <AgentActivity />
+      <ProactiveTasks />
+      <OperationalTrends />
+
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+          gap: "24px",
+          alignItems: "stretch",
+        }}
+      >
+        <RecentActivity />
+        <SystemLog />
+      </Box>
+    </Box>
+  );
 
   return (
     <Box
@@ -989,46 +1087,49 @@ export default function CorpSecCommandCenter() {
     >
       <GlobalHeader currentApp="corpsec" />
 
-      <Box
-        sx={{
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          px: "24px",
-          py: "32px",
-        }}
-      >
+      {showSideNav ? (
         <Box
           sx={{
-            maxWidth: 960,
-            width: "100%",
+            flex: 1,
             display: "flex",
-            flexDirection: "column",
-            gap: "24px",
+            alignItems: "flex-start",
+            gap: "16px",
+            px: "16px",
+            py: "16px",
           }}
         >
-          <HeroBanner />
-          <ChatSection />
-          <EntityPortfolio />
-          <EntityStatusSummary />
-          <AgentActivity />
-          <ProactiveTasks />
-          <OperationalTrends />
+          <CommandCenterSideNav
+            workflows={SIDE_NAV_WORKFLOWS}
+            chats={SIDE_NAV_CHATS}
+            pastWorkflowsHref="/corpsec?view=past-workflows&nav=side"
+            allChatsHref="/corpsec?view=all-chats&nav=side"
+          />
 
           <Box
             sx={{
-              display: "grid",
-              gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
-              gap: "24px",
-              alignItems: "stretch",
+              flex: 1,
+              minWidth: 0,
+              px: "16px",
+              py: "16px",
             }}
           >
-            <RecentActivity />
-            <SystemLog />
+            {content}
           </Box>
         </Box>
-      </Box>
+      ) : (
+        <Box
+          sx={{
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            px: "24px",
+            py: "32px",
+          }}
+        >
+          {content}
+        </Box>
+      )}
 
       <DemoControlsFab />
     </Box>

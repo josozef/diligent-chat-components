@@ -27,6 +27,12 @@ interface ThinkingPanelProps {
   onToggle: () => void;
   /** Tighter layout in narrow workspace rails; general chat uses `relaxed`. */
   density?: ChatPresentationDensity;
+  /**
+   * Inverse-contrast variant for use on `surface.subtle` / `surface.variant` canvases.
+   * Lifts the expanded panel from `surface.subtle` (which would merge into the canvas)
+   * to `surface.default` with a fixed-outline border.
+   */
+  raised?: boolean;
 }
 
 function TaskStatusIcon({ status }: { status: "done" | "active" | "pending" }) {
@@ -61,6 +67,7 @@ export default function ThinkingPanel({
   open,
   onToggle,
   density = "relaxed",
+  raised = false,
 }: ThinkingPanelProps) {
   const isCompact = density === "compact";
   const stepsToShow = isThinking ? Math.min(activeStep + 1, steps.length) : steps.length;
@@ -136,7 +143,8 @@ export default function ThinkingPanel({
       <Collapse in={open} timeout={280}>
         <Box
           sx={{
-            background: color.surface.subtle,
+            background: raised ? color.surface.default : color.surface.subtle,
+            border: raised ? `1px solid ${color.outline.fixed}` : "none",
             borderRadius: radius.lg,
             p: isCompact ? "12px" : "14px",
             display: "flex",

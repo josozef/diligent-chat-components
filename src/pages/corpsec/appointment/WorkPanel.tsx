@@ -941,7 +941,7 @@ function RegulatoryFilingStep({
           ))}
           {!allDone && (
             <TradAtlasText
-              semanticFont={SF.labelSm}
+              semanticFont={SF.labelMd}
               sx={{ color: color.type.muted, mt: "8px", fontStyle: "italic" }}
             >
               Downloads will be available once filing is complete.
@@ -1034,7 +1034,7 @@ function FiledDocumentRow({ doc, ready }: { doc: FiledDocument; ready: boolean }
             {doc.label}
           </TradAtlasText>
           <TradAtlasText
-            semanticFont={SF.labelSm}
+            semanticFont={SF.labelMd}
             sx={{ color: color.type.muted, fontFamily: "monospace" }}
           >
             {fileName}
@@ -1078,7 +1078,7 @@ function FiledDocumentRow({ doc, ready }: { doc: FiledDocument; ready: boolean }
 
       {err && (
         <TradAtlasText
-          semanticFont={SF.labelSm}
+          semanticFont={SF.labelMd}
           sx={{ color: color.status.error.default, mt: "4px", ml: "10px" }}
         >
           {err}
