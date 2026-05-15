@@ -13,6 +13,14 @@ export { default as TertiaryIconButton } from "./TertiaryIconButton";
 export { default as SuggestionChip } from "./SuggestionChip";
 export { default as SectionAnnotation } from "./SectionAnnotation";
 export type { SectionAnnotationProps } from "./SectionAnnotation";
+export { default as GlobalHeader } from "./GlobalHeader";
+export type { GlobalHeaderApp, GlobalHeaderProps } from "./GlobalHeader";
+export { default as CommandCenterSideNav } from "./CommandCenterSideNav";
+export type {
+  CommandCenterSideNavProps,
+  SideNavWorkflowItem,
+  SideNavChatItem,
+} from "./CommandCenterSideNav";
 export { default as PulsingStatusDot } from "./PulsingStatusDot";
 export type {
   PulsingStatusDotProps,

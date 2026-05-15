@@ -11,6 +11,8 @@ export { default as VisibilityOutlinedIcon } from "@diligentcorp/atlas-react-bun
 export { default as AutoAwesomeOutlinedIcon } from "@diligentcorp/atlas-react-bundle/icons/AutoAwesomeOutlined";
 export { default as SendOutlinedIcon } from "@diligentcorp/atlas-react-bundle/icons/SendOutlined";
 export { default as CheckCircleIcon } from "@diligentcorp/atlas-react-bundle/icons/CheckCircle";
+/** Plain checkmark (no circle) — Material `Check`; falls back via `muiProxy/Check` when bundle absent. */
+export { default as CheckIcon } from "@diligentcorp/atlas-react-bundle/icons/Check";
 export { default as RadioButtonUncheckedIcon } from "@diligentcorp/atlas-react-bundle/icons/RadioButtonUnchecked";
 export { default as WarningAmberIcon } from "@diligentcorp/atlas-react-bundle/icons/WarningAmber";
 export { default as BoltOutlinedIcon } from "@diligentcorp/atlas-react-bundle/icons/BoltOutlined";
@@ -83,3 +85,6 @@ export { default as SummarizeOutlinedIcon } from "@diligentcorp/atlas-react-bund
 export { default as PolicyOutlinedIcon } from "@diligentcorp/atlas-react-bundle/icons/PolicyOutlined";
 export { default as SpeedOutlinedIcon } from "@diligentcorp/atlas-react-bundle/icons/SpeedOutlined";
 export { default as EditOutlinedIcon } from "@diligentcorp/atlas-react-bundle/icons/EditOutlined";
+export { default as AddIcon } from "@diligentcorp/atlas-react-bundle/icons/Add";
+export { default as OpenInFullIcon } from "@diligentcorp/atlas-react-bundle/icons/OpenInFull";
+export { default as CloseFullscreenIcon } from "@diligentcorp/atlas-react-bundle/icons/CloseFullscreen";

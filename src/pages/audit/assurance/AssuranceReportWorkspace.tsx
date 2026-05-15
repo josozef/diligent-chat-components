@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Box } from "@mui/material";
 import { useTokens } from "../../../hooks/useTokens";
+import GlobalHeader from "@/components/common/GlobalHeader";
 import WorkspaceHeader from "./WorkspaceHeader";
 import StatusPanel from "./StatusPanel";
 import WorkPanel from "./WorkPanel";
@@ -161,6 +162,7 @@ export default function AssuranceReportWorkspace() {
         overflow: "hidden",
       }}
     >
+      <GlobalHeader currentApp="audit" />
       <WorkspaceHeader onReset={handleReset} />
 
       <Box sx={{ flex: 1, display: "flex", overflow: "hidden", minHeight: 0 }}>

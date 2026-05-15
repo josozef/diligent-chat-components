@@ -1,221 +1,465 @@
-# 04 — Workflow Engine & State Machine
+# 04 — Workflow Engine, State Model & Integrations
 
-This document describes the runtime workflow structure, state transitions, and simulation logic. It is independent of any particular UI framework.
-
----
-
-## Workflow Data Model
-
-### Selected Appointment (Intake Output)
-
-Created at the end of data collection (after consent is answered):
-
-```
-selectedAppointment = {
-  company:          { id, name, location, country, flag }
-  director:         null | { id, name, title }       // non-null only for replacements
-  appointee:        { id, name, title }
-  isReplacement:    boolean                          // false for "add new director"
-  hasConsentToAct:  boolean
-  effectiveDate:    string (ISO date, e.g. "2026-03-06") | null
-}
-```
-
-### Current Appointment (Runtime Snapshot)
-
-Created when the workflow starts. Flat strings for display:
-
-```
-currentAppointment = {
-  company:              string     // e.g. "Pacific Polymer Logistics Pte. Ltd."
-  companyMeta:          string     // e.g. "Domiciled in Singapore, Singapore"
-  resigningDirector:    string | null
-  resigningDirectorTitle: string | null
-  appointee:            string     // e.g. "Priya Nair"
-  appointeeTitle:       string     // e.g. "Regional Finance Director, APAC"
-  isReplacement:        boolean
-  hasConsentToAct:      boolean
-  effectiveDate:        string | null
-}
-```
-
-### Workflow State
-
-```
-appointmentWorkflowState = {
-  approversSelected:    boolean
-  documentsReviewed:    boolean
-  selectedApprovers:    [{ name, initials, role }]
-  selectedCommittee:    string | null        // e.g. "Nomination Committee"
-}
-```
-
-### Process Control
-
-```
-processRunning:   boolean    // true from start until completion or cancellation
-processPaused:    boolean    // true when user pauses; simulation stops advancing
-```
+This document defines the **runtime model** of the director appointment
+workflow: data shapes, state machine, autonomous-segment orchestration,
+integrations with external systems, and timing. It is independent of any
+particular UI framework or chat platform — UI, chat, and deterministic
+backend implementations all read and write the same state.
 
 ---
 
-## Process Steps Structure
+## State Shape — Top Level
 
-The workflow is modeled as three sequential steps, each with substeps:
-
-### Step 1: Approval
+A workflow run is a single object that carries all state. Implementations
+MAY persist this in a database, an event log, or in-memory; the shape is
+canonical.
 
 ```
-{
-  id: 'approval',
-  name: 'Approval',
-  status: 'pending' | 'in_progress' | 'completed',
-  voteCount: null | string,     // e.g. "4/4 Approved"
+AppointmentWorkflow = {
+  id:                  string                 // workflow run id
+  status:              'active' | 'paused' | 'cancelled' | 'complete'
+  createdAt:           ISO timestamp
+  updatedAt:           ISO timestamp
+
+  trigger:             Trigger                // see below
+  entity:              EntityRef
+  isReplacement:       boolean
+  departingDirector:   PersonRef | null
+
+  selectedCandidate:   PersonRef | null       // Step 1 output
+  appointmentNric:     string | null          // Step 2a — required by regulator
+  appointmentEffectiveDate: string | null     // Step 2a — ISO date or "TBC"
+
+  consentDocument: {
+    content:           string                 // editable HTML (canonical draft)
+    sent:              boolean                // Step 2b checkpoint
+    sentAt:            ISO timestamp | null
+    replacedByUpload:  string | null          // filename, if user uploaded
+    signedAt:          ISO timestamp | null   // populated when appointee returns signature
+  }
+
+  approvers: {
+    confirmed:         boolean                // Step 3a checkpoint
+    selected:          Approver[]             // confirmed approver list
+  }
+
   boardResolution: {
-    id: 'board-resolution',
-    name: 'Board Resolution',
-    status: 'pending' | 'completed',
-    docLink: null | 'board-resolution-signed'
-  },
-  substeps: [
-    { id: 'approval-create',    name: 'Create Board Resolution',  status, time },
-    { id: 'approval-send',      name: 'Send to board members',    status, time },
-    { id: 'approval-responses', name: 'Approval Responses',       status, time,
-      approvers: [
-        { id, name, title, status: 'pending'|'completed', time: null|string, vote: null|'Approved' }
-      ]
-    }
-  ]
+    content:           string                 // editable HTML
+    sent:              boolean                // Step 3b checkpoint
+    sentAt:            ISO timestamp | null
+    signedAt:          ISO timestamp | null   // populated when last vote arrives
+  }
+
+  steps:               WorkflowStep[]         // see below — fixed shape, length 6
+
+  agentic: {
+    active:            boolean
+    paused:            boolean
+    votes:             ApproverVote[]         // per-approver vote tracking (Step 4)
+    filingSubsteps:    AgenticSubstep[]       // Step 5 substeps
+    entitySubsteps:    AgenticSubstep[]       // Step 6 substeps
+    processComplete:   boolean
+  }
 }
 ```
 
-### Step 2: Filing
+### `Trigger`
 
 ```
-{
-  id: 'filing',
-  name: 'Filing',
-  status: 'pending' | 'in_progress' | 'completed',
-  substeps: []    // no substeps; status is toggled directly
+Trigger = {
+  source:      'workday.resignation' | 'workday.new-seat' | 'human-request' | 'scheduled-review'
+  detectedAt:  ISO timestamp
+  payload:     object       // raw event from the source system, retained for audit
+  framing:     string       // human-readable opening message ("Workday has reported…")
+  filingDeadline: ISO date  // computed from jurisdictional rules
 }
 ```
 
-### Step 3: Update Entities
+### `EntityRef`
 
 ```
-{
-  id: 'entities',
-  name: 'Update Entities',
-  status: 'pending' | 'in_progress' | 'completed',
-  substeps: [
-    // Only if replacement:
-    { id: 'entity-resign',  name: 'Record {director} resignation',  status, time },
-    // Always:
-    { id: 'entity-appoint', name: 'Record {appointee} appointment', status, time }
-  ]
+EntityRef = {
+  id:          string       // e.g. "c5"
+  name:        string       // e.g. "Pacific Polymer Logistics Pte. Ltd."
+  uen:         string       // local registration number
+  location:    string       // city
+  country:     string       // country
+  jurisdiction: string      // for rule routing — e.g. "SG", "US-DE", "IE"
+}
+```
+
+### `PersonRef`
+
+```
+PersonRef = {
+  id:          string
+  name:        string
+  title:       string
+  employer?:   EntityRef
+}
+```
+
+### `Approver`
+
+```
+Approver = {
+  id:          string       // value-key, e.g. "robert-johnson"
+  name:        string
+  initials:    string
+  title:       string
+  email:       string
+  fromCommittee: string     // committee from which the agent first picked them
+}
+```
+
+### `WorkflowStep`
+
+```
+WorkflowStep = {
+  id:          'identify-candidate'
+             | 'collect-data'
+             | 'select-approvers'
+             | 'board-approval'
+             | 'filing'
+             | 'update-entities'
+  name:        string
+  status:      'not_started' | 'in_progress' | 'completed'
+  substeps?:   string[]     // human-readable substep labels (display)
+}
+```
+
+The 6 steps are fixed in order. The status enum on a step transitions
+strictly forward: `not_started → in_progress → completed`. There is no
+"failed" status on a step in the current model — failures are surfaced via
+agent messages, and recovery either retries within the same step or
+cancels the workflow.
+
+### `ApproverVote`
+
+```
+ApproverVote = {
+  id:          string       // matches Approver.id
+  name:        string
+  title:       string
+  status:      'pending' | 'approved' | 'declined'   // 'declined' reserved for production
+  time:        string | null    // human-readable timestamp at vote time
+  vote?:       'Approved' | 'Rejected' | 'Abstained' // production only
+}
+```
+
+### `AgenticSubstep`
+
+```
+AgenticSubstep = {
+  name:        string
+  status:      'pending' | 'in_progress' | 'completed' | 'failed'
+  time:        string | null    // populated on completion or failure
+  error?:      string           // populated on failure
 }
 ```
 
 ---
 
-## State Transitions
+## Step → State Mapping
 
-### Overall Flow
+The 6-step workflow maps to a deterministic state machine. Each step has a
+canonical state name plus optional sub-states for the autonomous segments.
 
-```
-[Intake Complete]
-    → approval.status = 'in_progress'
-    → approval-create = 'completed' (immediate)
-    → approval-send = 'in_progress' → 'completed'
-    → approval-responses = 'in_progress'
-        → each approver: vote = 'Approved', time set
-    → approval-responses = 'completed'
-    → approval.status = 'completed', voteCount set
-    → boardResolution.status = 'completed', docLink = 'board-resolution-signed'
+| Step | Canonical state                  | Wait-for-event (if any)         | Resume event             |
+|------|----------------------------------|---------------------------------|--------------------------|
+| 0    | `triggered`                       | (auto-advances on creation)     | —                        |
+| 1    | `identifying-candidate`           | `awaiting-candidate-selection`  | `selectCandidate`        |
+| 2a   | `collecting-appointee-data`       | `awaiting-appointee-data`       | `submitAppointeeData`    |
+| 2b   | `drafting-consent`                | `awaiting-consent-send`         | `sendConsentForSignature`|
+| 3a   | `selecting-approvers`             | `awaiting-approver-confirmation`| `confirmApprovers`       |
+| 3b   | `drafting-resolution`             | `awaiting-resolution-send`      | `sendResolution`         |
+| 4    | `awaiting-board-approval`         | (incremental: `voteCast` events)| `voteCast` × N           |
+| 5    | `filing`                          | (jobs run in sequence)          | n/a (autonomous)         |
+| 6    | `updating-entities`               | (jobs run in sequence)          | n/a (autonomous)         |
+| End  | `complete`                        | —                               | —                        |
 
-[User Notified: "Resolution Approved"]
-    → filing.status = 'in_progress'
-
-[User Confirms Filing Complete]
-    → filing.status = 'completed'
-    → entities.status = 'in_progress'
-        → each substep: 'pending' → 'in_progress' → 'completed' (with timestamp)
-    → entities.status = 'completed'
-
-[All Steps Complete]
-    → processRunning = false
-    → workflow archived
-```
-
-### Status Values
-
-Each step and substep uses the same status enum: `'pending'` → `'in_progress'` → `'completed'`.
-
-Approver-level statuses: `'pending'` → `'completed'` (with `vote` and `time` set simultaneously).
+Cancellation is allowed in any state up to and including `filing` (subject to
+the rule that the regulator may already have the filing). It transitions to
+`cancelled` and stops further work.
 
 ---
 
-## Simulation Timing
+## State Transition Rules
 
-The approval simulation runs automatically after the user starts the workflow. It uses sequential delays to create realistic-looking progress.
+### Step 1 — Identify Candidate
 
-### Approval Phase Timing
+```
+[triggered]
+   → identifying-candidate          (auto on workflow creation)
+   → awaiting-candidate-selection   (shortlist computed and presented)
 
-| Event | Delay from Start |
-|-------|-----------------|
-| approval-send → completed | ~500ms |
-| approval-responses → in_progress | ~500ms after send completes |
-| First approver vote | ~1500ms after responses start |
-| Each subsequent approver | ~1500ms apart |
-| Approval step complete | ~300ms after last vote |
-| Board Resolution signed | ~300ms after step complete |
-| "Ready to file" notification | ~same time as signing |
-| Filing step → in_progress | ~500ms after notification |
+(selectCandidate event)
+   → step.identify-candidate.status = completed
+   → step.collect-data.status      = in_progress
+   → state: collecting-appointee-data
+```
 
-### Entity Update Timing (After User Confirms Filing)
+### Step 2 — Collect Data
 
-| Event | Delay |
-|-------|-------|
-| entities → in_progress | ~500ms |
-| First substep → in_progress | immediate |
-| First substep → completed | ~800ms |
-| Second substep → in_progress | ~300ms gap |
-| Second substep → completed | ~800ms |
-| entities → completed | ~500ms after last substep |
-| Workflow complete | ~500ms after entities done |
+Step 2 has two parallel checkpoints. Both must be satisfied to advance.
 
-### Approval Timestamps (Display Labels)
+```
+state: collecting-appointee-data    ↔  state: drafting-consent
+       ↓                                    ↓
+       awaiting-appointee-data              awaiting-consent-send
+       (submitAppointeeData event)          (sendConsentForSignature event)
+       ↓                                    ↓
+       collectDataTabStatus.entities=true   collectDataTabStatus.consent=true
 
-These are cosmetic labels shown in the UI — they don't correspond to real clock time:
+(when both true)
+   → step.collect-data.status      = completed
+   → step.select-approvers.status  = in_progress
+   → state: selecting-approvers
+```
 
-- Create Board Resolution: `Jan 7, 9:00 AM`
-- Send to board members: `Jan 7, 9:15 AM`
-- Approver responses: shuffled from pool `[Jan 7 2:30 PM, Jan 8 10:15 AM, Jan 8 3:45 PM, Jan 8 4:30 PM, Jan 9 9:00 AM]`
-- Entity update timestamps: real-time `toLocaleString()` at the moment of completion
+### Step 3 — Configure Approvers
+
+Step 3 has the same parallel-checkpoint pattern.
+
+```
+state: selecting-approvers          ↔  state: drafting-resolution
+       ↓                                    ↓
+       awaiting-approver-confirmation       awaiting-resolution-send
+       (confirmApprovers event)             (sendResolution event)
+       ↓                                    ↓
+       approverTabStatus.approversConfirmed approverTabStatus.resolutionSent
+
+(when both true)
+   → step.select-approvers.status  = completed
+   → step.board-approval.status    = in_progress
+   → state: awaiting-board-approval
+   → agentic.active = true
+   → enqueue Step 4 simulation/jobs
+```
+
+### Step 4 — Board Approval (autonomous)
+
+```
+(per voteCast event from board portal / signature service / simulator)
+   → votes[i].status = 'approved'
+   → votes[i].time   = now()
+
+(when all votes.status = 'approved')
+   → boardResolution.signedAt = now()
+   → step.board-approval.status = completed
+   → step.filing.status         = in_progress
+   → state: filing
+```
+
+### Step 5 — Regulatory Filing (autonomous)
+
+```
+state: filing
+   substep[0] (Download signed documents)   pending → in_progress → completed
+   substep[1] (e-File with ACRA)            pending → in_progress → completed
+   substep[2] (Confirm filing)              pending → in_progress → completed
+
+(any substep failure → state: filing-failed; notify human; halt)
+
+(all substeps completed)
+   → step.filing.status         = completed
+   → step.update-entities.status= in_progress
+   → state: updating-entities
+```
+
+### Step 6 — Update Entity Records (autonomous)
+
+```
+state: updating-entities
+   if isReplacement:
+     substep "Record resignation — {departing director}"  pending → in_progress → completed
+   substep "Record appointment — {appointee}"             pending → in_progress → completed
+
+(all substeps completed)
+   → step.update-entities.status = completed
+   → agentic.processComplete     = true
+   → state: complete
+```
+
+### Cancellation
+
+```
+(cancelWorkflow event, allowed in states up to and including 'filing')
+   → status = 'cancelled'
+   → halt any active simulation/jobs
+   → notify human with current step + reason
+```
+
+### Pause / Resume
+
+```
+(pauseWorkflow event in autonomous segment)
+   → agentic.paused = true
+   → halt simulation/jobs (preserve substep statuses as-is)
+
+(resumeWorkflow event)
+   → agentic.paused = false
+   → continue from the next not-yet-completed substep
+```
 
 ---
 
-## Pause / Resume / Cancel
+## Integration Contracts
 
-- **Pause**: Stops the simulation timer. No further state transitions occur until resumed.
-- **Resume**: Restarts the simulation from where it left off. Already-completed substeps are skipped.
-- **Cancel**: Sets `processRunning = false`, clears workflow flag, notifies user.
+The workflow interacts with four external systems. Each is described as an
+**operation** (verb + payload) so it can be implemented synchronously,
+asynchronously, or as a stub depending on the channel.
+
+### Workday (HR System of Record)
+
+| Operation                          | Direction | Used in step | Payload (in)                          | Payload (out) / event                                                  |
+|------------------------------------|-----------|--------------|---------------------------------------|------------------------------------------------------------------------|
+| `subscribeResignationEvents`       | inbound   | 0            | filter: { entityIds }                 | event: `{ employeeId, entityId, lastWorkingDay, ...}`                  |
+| `getEmployee(employeeId)`          | outbound  | 1            | employeeId                            | full employee record (name, title, address, DOB, nationality, residency)|
+| `searchEmployees(filter)`          | outbound  | 1            | { entityId, eligibleTitles, minTenure } | list of candidate employees                                          |
+
+### Entity Register / Entity Management
+
+| Operation                          | Direction | Used in step | Payload (in)                          | Payload (out)                                                          |
+|------------------------------------|-----------|--------------|---------------------------------------|------------------------------------------------------------------------|
+| `getEntity(entityId)`              | outbound  | 0–1          | entityId                              | full entity record (name, UEN, jurisdiction, registered office)        |
+| `getDirectors(entityId)`           | outbound  | 0            | entityId                              | list of current directors (used to confirm departing director)         |
+| `recordResignation(entityId, p)`   | outbound  | 6            | { entityId, personId, effectiveDate } | confirmation + new register version                                    |
+| `recordAppointment(entityId, p)`   | outbound  | 6            | { entityId, personRef, effectiveDate } | confirmation + new register version                                   |
+
+### Regulator (e.g. ACRA / BizFile+)
+
+| Operation                          | Direction | Used in step | Payload (in)                          | Payload (out)                                                          |
+|------------------------------------|-----------|--------------|---------------------------------------|------------------------------------------------------------------------|
+| `submitForm45ChangeOfDirector`     | outbound  | 5            | signed resolution + Form 45 + PDFs    | filing receipt: `{ ackNumber, filedAt }`                               |
+| `getFilingStatus(ackNumber)`       | outbound  | 5            | ackNumber                             | { state: pending|accepted|rejected, messages[] }                       |
+
+### Board Portal / Signature Service
+
+| Operation                          | Direction | Used in step | Payload (in)                          | Payload (out) / event                                                  |
+|------------------------------------|-----------|--------------|---------------------------------------|------------------------------------------------------------------------|
+| `sendForSignature(doc, recipients)`| outbound  | 2b, 3b       | document + per-approver email/role    | per-recipient send receipts                                            |
+| `subscribeSignatureEvents`         | inbound   | 4            | documentId                            | event: `voteCast` `{ approverId, vote, timestamp }`                    |
+
+Implementations MAY collapse multiple integrations into a single integration
+hub, but the operation contracts above are canonical for the workflow.
 
 ---
 
-## Approver ID Mapping
+## Simulation Timing (Prototype)
 
-Board member names are mapped to stable IDs for use in the process steps:
+The prototype runs the autonomous segment as a single ~8-second sequence to
+exercise the UI without waiting for real signatures or filings.
+
+| Tick (ms) | Event                                                                      |
+|-----------|----------------------------------------------------------------------------|
+|       800 | Approver 1 votes (`Robert Johnson`)                                         |
+|     1,800 | Approver 2 votes (`Margaret Sullivan`)                                      |
+|     3,000 | Approver 3 votes (`Linda Williams`)                                         |
+|     4,000 | Approver 4 votes (`David Martinez`)                                         |
+|     4,500 | Step 4 → completed; Step 5 → in_progress; filing substep 0 → in_progress    |
+|     5,200 | filing substep 0 → completed; substep 1 → in_progress                       |
+|     5,900 | filing substep 1 → completed; substep 2 → in_progress                       |
+|     6,500 | filing substep 2 → completed; Step 5 → completed; Step 6 → in_progress; entity substep 0 → in_progress |
+|     7,200 | entity substep 0 → completed; substep 1 → in_progress                       |
+|     7,800 | entity substep 1 → completed; Step 6 → completed; workflow → complete       |
+
+Each completion writes a real-time `toLocaleTimeString` timestamp at the
+moment of completion (i.e. the displayed time is the wall-clock at that tick).
+
+### Approval Timestamp Pool (Display Labels)
+
+For implementations that want richer-looking timestamps than wall-clock at
+demo time, the prototype shuffles labels from this pool and assigns them to
+approvers in vote order:
 
 ```
-Robert Johnson    → approval-johnson
-Margaret Sullivan → approval-sullivan
-James Davidson    → approval-davidson
-Linda Williams    → approval-williams
-David Martinez    → approval-martinez
-Thomas Chen       → approval-chen
-Sarah Patel       → approval-patel
-Patricia Walsh    → approval-walsh
+Jan 7, 2:30 PM
+Jan 8, 10:15 AM
+Jan 8, 3:45 PM
+Jan 8, 4:30 PM
+Jan 9, 9:00 AM
 ```
 
-If a name is not in this map, the ID is generated by slugifying the name.
+Other fixed display labels:
+- `Create Board Resolution` — `Jan 7, 9:00 AM`
+- `Send to board members`   — `Jan 7, 9:15 AM`
+- Entity update timestamps — real-time `toLocaleString()` at completion.
+
+These labels are cosmetic — they don't correspond to real clock time.
+
+---
+
+## Production Behavior Notes
+
+The prototype simulation is replaced by real integrations. The state model
+is identical; the timing and event sources differ.
+
+### Step 4 — Real Voting
+
+- `voteCast` events arrive over hours or days, not milliseconds.
+- The workflow MUST be durable across process restarts. State persisted to
+  a database, not memory.
+- A vote of `Rejected` MUST be propagated to the human and trigger a
+  decision: re-route to a different approver, withdraw the resolution, or
+  cancel the workflow. The current model does not auto-handle rejection —
+  it requires an explicit human resolution.
+- Reminders MAY be issued by the agent if a vote has been pending past a
+  configured SLA (e.g. > 48 h).
+
+### Step 5 — Real Filing
+
+- `submitForm45ChangeOfDirector` is a regulator API call. In Singapore this
+  is BizFile+; in other jurisdictions it varies.
+- `getFilingStatus` MAY be polled until the regulator returns
+  `accepted` or `rejected`. On `rejected`, the workflow transitions to
+  `filing-failed` with the regulator's messages attached.
+- The 14-day filing deadline (Singapore) MUST be tracked: if filing has not
+  been initiated by `filingDeadline - 3 days`, the agent SHOULD escalate
+  to the human.
+
+### Step 6 — Real Entity Updates
+
+- `recordResignation` and `recordAppointment` MUST be transactional with
+  respect to the entity's effective dates. If the entity register is
+  multi-version, both records SHOULD share a single change-set.
+- On any failure, the workflow MUST NOT be marked complete. The human is
+  notified and the substeps can be retried.
+
+---
+
+## Audit Trail Requirements
+
+Every state transition and human checkpoint MUST be persisted with:
+
+- `timestamp` (server-side, monotonic).
+- `actor` (`agent`, `user:{userId}`, or `integration:{name}`).
+- `event` (`selectCandidate`, `submitAppointeeData`, `voteCast`, etc.).
+- `payload` (the data that drove the transition).
+- `before` / `after` state snapshots for human-driven transitions.
+
+Documents (consent, resolution) MUST be versioned. Drafts and final signed
+copies MUST both be retained. Replacement uploads MUST be retained alongside
+the original draft, not in place of it.
+
+The full transition log + document versions constitute the **audit trail**
+that the CoSec relies on. Implementations MUST be able to render this trail
+on demand from a single workflow run id.
+
+---
+
+## Backwards Compatibility
+
+Earlier prototype models (see legacy `processSteps` shape) used a 3-phase
+model (Approval → Filing → Entity Updates) with the user driving data
+collection. Implementations migrating from that model:
+
+- Collapse the prior "data collection" UX into Step 1 + Step 2 of the new
+  model.
+- Replace the prior "manual filing" checkpoint with the autonomous Step 5
+  unless local policy still requires manual filing — in which case keep an
+  explicit `awaiting-filing-confirmation` state.
+- Map prior `boardResolution.docLink = 'board-resolution-signed'` to the new
+  `boardResolution.signedAt` timestamp.
+
+The new model is a strict superset of the old one's required functionality.
