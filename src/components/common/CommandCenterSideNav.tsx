@@ -60,8 +60,12 @@ export interface CommandCenterSideNavProps {
   chats: SideNavChatItem[];
   /** Optional click target for the workflows "+" affordance. */
   onAddWorkflow?: () => void;
+  /** When set, the workflows "+" affordance navigates to this href instead. */
+  addWorkflowHref?: string;
   /** Optional click target for the chats "+" affordance. */
   onAddChat?: () => void;
+  /** When set, the chats "+" affordance navigates to this href instead. */
+  addChatHref?: string;
   /** Optional href for the "View past workflows" footer link. */
   pastWorkflowsHref?: string;
   /** Optional href for the "View all chats" footer link. */
@@ -78,7 +82,9 @@ export default function CommandCenterSideNav({
   workflows,
   chats,
   onAddWorkflow,
+  addWorkflowHref,
   onAddChat,
+  addChatHref,
   pastWorkflowsHref,
   allChatsHref,
   width = DEFAULT_WIDTH,
@@ -133,6 +139,7 @@ export default function CommandCenterSideNav({
       <SectionHeader
         label="Workflows"
         onAdd={onAddWorkflow}
+        addHref={addWorkflowHref}
         addLabel="Start a new workflow"
       />
       <Box sx={{ display: "flex", flexDirection: "column", gap: "2px", px: "8px" }}>
@@ -145,7 +152,12 @@ export default function CommandCenterSideNav({
       <Box sx={{ height: "16px" }} />
 
       {/* CHATS */}
-      <SectionHeader label="Chats" onAdd={onAddChat} addLabel="Start a new chat" />
+      <SectionHeader
+        label="Chats"
+        onAdd={onAddChat}
+        addHref={addChatHref}
+        addLabel="Start a new chat"
+      />
       <Box sx={{ display: "flex", flexDirection: "column", gap: "2px", px: "8px" }}>
         {chats.map((c) => (
           <ChatRow key={c.id} chat={c} />
@@ -209,13 +221,27 @@ function NavRowCommandCenter({ active }: { active: boolean }) {
 function SectionHeader({
   label,
   onAdd,
+  addHref,
   addLabel,
 }: {
   label: string;
   onAdd?: () => void;
+  addHref?: string;
   addLabel: string;
 }) {
   const { color, weight } = useTokens();
+
+  const buttonSx = {
+    width: 26,
+    height: 26,
+    color: color.type.muted,
+    borderRadius: "8px",
+    transition: "background-color 120ms ease, color 120ms ease",
+    "&:hover": {
+      color: color.type.default,
+      background: color.surface.subtle,
+    },
+  } as const;
 
   return (
     <Box
@@ -240,24 +266,21 @@ function SectionHeader({
       >
         {label}
       </TradAtlasText>
-      <IconButton
-        size="small"
-        onClick={onAdd}
-        aria-label={addLabel}
-        sx={{
-          width: 26,
-          height: 26,
-          color: color.type.muted,
-          borderRadius: "8px",
-          transition: "background-color 120ms ease, color 120ms ease",
-          "&:hover": {
-            color: color.type.default,
-            background: color.surface.subtle,
-          },
-        }}
-      >
-        <AddIcon sx={{ fontSize: 16 }} />
-      </IconButton>
+      {addHref ? (
+        <IconButton
+          size="small"
+          component={RouterLink}
+          to={addHref}
+          aria-label={addLabel}
+          sx={buttonSx}
+        >
+          <AddIcon sx={{ fontSize: 16 }} />
+        </IconButton>
+      ) : (
+        <IconButton size="small" onClick={onAdd} aria-label={addLabel} sx={buttonSx}>
+          <AddIcon sx={{ fontSize: 16 }} />
+        </IconButton>
+      )}
     </Box>
   );
 }

@@ -10,7 +10,6 @@ import { Link as RouterLink, useSearchParams } from "react-router";
 import {
   WarningAmberIcon,
   BoltOutlinedIcon,
-  CheckCircleOutlineIcon,
   GroupsOutlinedIcon,
   BusinessOutlinedIcon,
   GavelOutlinedIcon,
@@ -33,60 +32,8 @@ import ContentCard from "@/components/common/ContentCard";
 import PulsingStatusDot from "@/components/common/PulsingStatusDot";
 import type { PulsingStatusTone } from "@/components/common/PulsingStatusDot";
 import GlobalHeader from "@/components/common/GlobalHeader";
-import CommandCenterSideNav, {
-  type SideNavChatItem,
-  type SideNavWorkflowItem,
-} from "@/components/common/CommandCenterSideNav";
+import CorpSecSideNavLayout from "./CorpSecSideNavLayout";
 import DemoControlsFab from "./DemoControlsFab";
-
-/* ── Sample data shown by the side rail when nav=side ──────────────
- *
- * These mirror the running agentic tasks + governance Q&A chats the user
- * approved as mock data for the new chat/agent navigation. They live next to
- * the page (rather than inside the side-nav component itself) so each command
- * center can supply its own canonical list.
- *
- * The side-nav variant of the command center is the entry point to the
- * Conversational version of each workflow — clicking the running "Appoint
- * Priya Nair…" item drops the user into the conversational appointment
- * workspace (chat-driven), preserving `?nav=side` semantics throughout.
- */
-
-const SIDE_NAV_WORKFLOWS: SideNavWorkflowItem[] = [
-  {
-    id: "wf-priya-nair",
-    title: "Replace director David Chen at Pacific Polymer Logistics",
-    status: "Filing Form 45 with ACRA",
-    tone: "info",
-    href: "/corpsec/appointment/conversation",
-  },
-  {
-    id: "wf-pacific-disclosures",
-    title: "Pacific Polymer Logistics — refresh director disclosures",
-    status: "Awaiting permission to update Entities DB",
-    tone: "warning",
-    emphasizeStatus: true,
-  },
-  {
-    id: "wf-entity-sync",
-    title: "Entity records sync — Pacific Polymer Logistics UEN 201812345K",
-    status: "Reconciling Workday → Entities",
-    tone: "info",
-  },
-];
-
-const SIDE_NAV_CHATS: SideNavChatItem[] = [
-  { id: "c1",  title: "Replace a director in Singapore — what do I need before ACRA?" },
-  { id: "c2",  title: "Board resolution vs written resolution — when can we use each?" },
-  { id: "c3",  title: "How do I evidence consent to act and keep an audit trail?" },
-  { id: "c4",  title: "NRIC / ID collection for directors — what's acceptable under our policy?" },
-  { id: "c5",  title: "Who must approve this appointment on our side vs the board?" },
-  { id: "c6",  title: "ACRA Form 45 timing — what's the 14-day rule in practice?" },
-  { id: "c7",  title: "Entity management: updating registers after a director change" },
-  { id: "c8",  title: "Board portal: when to publish materials vs circulate by email" },
-  { id: "c9",  title: "Conflict of interest declaration for a new NED — template checklist" },
-  { id: "c10", title: "Diligent vs manual process — what should stay human-in-the-loop?" },
-];
 
 function IncidentTile({
   icon,
@@ -192,64 +139,197 @@ function IncidentTile({
   );
 }
 
-function HeroBanner({ appointmentHref }: { appointmentHref: string }) {
+/**
+ * Top-of-page greeting + primary chat input. Replaces the legacy `HeroBanner`
+ * "All clear" tile with a centered, conversation-led entry point — a
+ * personal greeting that adapts to the alerts state plus the design-system
+ * `ChatPrompt` so the user can immediately tell the agent what they want to
+ * do. Alert tiles, when present, render in a separate row underneath.
+ */
+function CommandCenterHero() {
   const { hasAlerts } = useDemo();
-  const { color, radius, weight } = useTokens();
+  const { color, weight } = useTokens();
+  const [input, setInput] = useState("");
 
-  if (hasAlerts) {
-    return (
-      <Box
-        sx={{
-          display: "flex",
-          gap: "16px",
-          flexDirection: { xs: "column", md: "row" },
-        }}
-      >
-        <IncidentTile
-          icon={<WarningAmberIcon sx={{ color: color.status.error.default, fontSize: 22 }} />}
-          title="Subsidiary director resignation"
-          severity="CRITICAL"
-          severityVariant="critical"
-          subtitle="Workday alert — David Chen has resigned from Pacific Polymer Logistics Pte. Ltd. (Singapore). Last day in 14 days."
-          stats="ACRA filing required · Replacement needed · Board approval required"
-          actionLabel="Investigate"
-          actionHref={appointmentHref}
-        />
-        <IncidentTile
-          icon={<BoltOutlinedIcon sx={{ color: color.status.warning.text, fontSize: 22 }} />}
-          title="Filing compliance gap"
-          severity="HIGH"
-          severityVariant="high"
-          subtitle="Zenith Compliance Services (Ireland) annual return past due"
-          stats="2 days overdue    Penalty risk    CRO filing"
-        />
-      </Box>
-    );
-  }
+  // The greeting opens with the same upbeat tone in both states — the user
+  // is in control either way. The subtitle does the differentiation: in the
+  // alerts state we acknowledge the flagged items; in the all-clear state
+  // we keep the framing light and invite the user to direct the day.
+  const subtitle = hasAlerts
+    ? "I've flagged a couple of items that need a look — but everything else is healthy. What would you like to do today?"
+    : "A few non-urgent things you might want to look at — but what would you like to do today?";
 
   return (
     <Box
       sx={{
-        border: `1px solid ${color.outline.fixed}`,
-        borderRadius: radius.lg,
-        background: color.surface.default,
-        py: "48px",
-        px: "24px",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         textAlign: "center",
-        gap: "12px",
+        gap: "20px",
+        py: { xs: "24px", md: "40px" },
       }}
     >
-      <CheckCircleOutlineIcon sx={{ color: color.type.disabled, fontSize: 48 }} />
-      <TradAtlasText semanticFont={SF.titleH4Emphasis} sx={{ fontWeight: weight.bold, color: color.type.default }}>
-        All clear
-      </TradAtlasText>
-      <TradAtlasText semanticFont={SF.textMd} sx={{ color: color.type.muted, maxWidth: 560 }}>
-        All 47 entities in good standing, 3 filings due this month (all prepared), and 2 KYC requests in progress.
-      </TradAtlasText>
+      <Box sx={{ maxWidth: 720 }}>
+        <TradAtlasText
+          semanticFont={SF.titleH2Emphasis}
+          sx={{
+            fontWeight: weight.semiBold,
+            color: color.type.default,
+            letterSpacing: "-0.015em",
+            lineHeight: 1.15,
+          }}
+        >
+          Hey Sarah, everything's under control
+        </TradAtlasText>
+        <TradAtlasText
+          semanticFont={SF.textMd}
+          sx={{ color: color.type.muted, mt: "12px", maxWidth: 600, mx: "auto" }}
+        >
+          {subtitle}
+        </TradAtlasText>
+      </Box>
+
+      <Box sx={{ width: "100%", maxWidth: 720 }}>
+        <ChatPrompt
+          value={input}
+          onChange={setInput}
+          onSend={() => setInput("")}
+          canSend={input.trim().length > 0}
+          placeholder="Ask a question or describe what you need..."
+          fullWidth
+          density="relaxed"
+        />
+      </Box>
     </Box>
+  );
+}
+
+/**
+ * Pair of incident tiles surfaced when the demo is in its "alerts" state.
+ * Extracted from the old `HeroBanner` so the greeting hero stays consistent
+ * while alert content renders as a distinct row underneath. Self-gates on
+ * `hasAlerts` so the parent doesn't have to branch.
+ */
+function AlertTiles({ appointmentHref }: { appointmentHref: string }) {
+  const { hasAlerts } = useDemo();
+  const { color } = useTokens();
+  if (!hasAlerts) return null;
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        gap: "16px",
+        flexDirection: { xs: "column", md: "row" },
+      }}
+    >
+      <IncidentTile
+        icon={<WarningAmberIcon sx={{ color: color.status.error.default, fontSize: 22 }} />}
+        title="Subsidiary director resignation"
+        severity="CRITICAL"
+        severityVariant="critical"
+        subtitle="Workday alert — David Chen has resigned from Pacific Polymer Logistics Pte. Ltd. (Singapore). Last day in 14 days."
+        stats="ACRA filing required · Replacement needed · Board approval required"
+        actionLabel="Investigate"
+        actionHref={appointmentHref}
+      />
+      <IncidentTile
+        icon={<BoltOutlinedIcon sx={{ color: color.status.warning.text, fontSize: 22 }} />}
+        title="Filing compliance gap"
+        severity="HIGH"
+        severityVariant="high"
+        subtitle="Zenith Compliance Services (Ireland) annual return past due"
+        stats="2 days overdue    Penalty risk    CRO filing"
+      />
+    </Box>
+  );
+}
+
+/**
+ * Prose overview of the command center — sits directly below the hero so the
+ * user can read an at-a-glance synthesis before scanning the structured
+ * cards underneath. Tone is "AI-authored briefing": natural sentences, no
+ * bullet lists, contextualized to the alerts state.
+ */
+function AiSummary() {
+  const { hasAlerts } = useDemo();
+  const { color, weight, radius } = useTokens();
+
+  const body = hasAlerts ? (
+    <>
+      Two entities need your attention. <strong>Aether Holdings Ltd</strong> has
+      a director vacancy past its appointment deadline — the board appointment
+      agent has the candidate shortlist mid-flight at 35%. <strong>Zenith
+      Compliance Services'</strong> Ireland annual return is two days overdue,
+      and the filing-deadline agent has the draft staged for your review. Your
+      other 45 entities are in good standing, the Q2 Meridian Corp board pack
+      is on track at 72%, and 12 open action items are tracking against the
+      next board cycle. Filings on time are up 4% to 96%; board pack
+      completion has slipped 3% to 87% — worth monitoring.
+    </>
+  ) : (
+    <>
+      Across your <strong>47 entities</strong> in 12 jurisdictions, all are in
+      good standing. Three statutory filings are due this month — all prepared
+      and ready to submit — and two KYC requests are progressing. Three
+      agentic workflows are mid-flight: the Q2 Meridian Corp board pack is at{" "}
+      <strong>72%</strong>, the Aether Holdings director appointment is at 35%,
+      and the Zenith Compliance Services annual return is staged for your
+      review. Filings on time are up 4% to <strong>96%</strong>; board pack
+      completion has slipped 3% but still sits at 87%. Twelve open action
+      items are tracking against the next board cycle.
+    </>
+  );
+
+  return (
+    <ContentCard>
+      <Box sx={{ display: "flex", alignItems: "center", gap: "10px", mb: "12px" }}>
+        <Box
+          aria-hidden
+          sx={{
+            width: 32,
+            height: 32,
+            borderRadius: radius.sm,
+            background: color.surface.variant,
+            color: color.action.primary.default,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexShrink: 0,
+          }}
+        >
+          <AutoAwesomeOutlinedIcon sx={{ fontSize: 18 }} />
+        </Box>
+        <Box>
+          <TradAtlasText
+            semanticFont={SF.textMdEmphasis}
+            sx={{ fontWeight: weight.semiBold, color: color.type.default }}
+          >
+            Today's overview
+          </TradAtlasText>
+          <TradAtlasText
+            semanticFont={SF.labelMdCompact}
+            sx={{ color: color.type.muted }}
+          >
+            AI-authored briefing across your entity portfolio and active workflows
+          </TradAtlasText>
+        </Box>
+      </Box>
+
+      <TradAtlasText
+        semanticFont={SF.textMd}
+        sx={{
+          color: color.type.default,
+          lineHeight: 1.6,
+          "& strong": {
+            fontWeight: weight.semiBold,
+            color: color.type.default,
+          },
+        }}
+      >
+        {body}
+      </TradAtlasText>
+    </ContentCard>
   );
 }
 
@@ -317,8 +397,13 @@ function EntityPortfolio() {
   );
 }
 
-function ChatSection() {
-  const [input, setInput] = useState("");
+/**
+ * Six "quick start" tiles offered under the hero's chat input. The prompt
+ * itself now lives in {@link CommandCenterHero}; this section is just the
+ * grid of conversation-starters. Inert by design — clicking a tile is a
+ * decorative placeholder for the demo.
+ */
+function QuickStarts() {
   const { color, weight } = useTokens();
 
   const suggestions = [
@@ -356,9 +441,12 @@ function ChatSection() {
 
   return (
     <ContentCard>
-      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: "4px" }}>
-        <TradAtlasText semanticFont={SF.titleH4Emphasis} sx={{ fontWeight: weight.semiBold, color: color.type.default }}>
-          What do you need to do?
+      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: "16px" }}>
+        <TradAtlasText
+          semanticFont={SF.textMdUppercase}
+          sx={{ color: color.type.muted }}
+        >
+          Or start with
         </TradAtlasText>
         <Chip
           icon={<Box sx={{ width: 8, height: 8, borderRadius: "50%", background: "#16a34a", ml: "8px !important" }} />}
@@ -374,26 +462,6 @@ function ChatSection() {
           }}
         />
       </Box>
-      <TradAtlasText semanticFont={SF.textMd} sx={{ color: color.type.muted, mb: "16px" }}>
-        Ask questions or choose an action below. Work entirely within Diligent.
-      </TradAtlasText>
-
-      <ChatPrompt
-        value={input}
-        onChange={setInput}
-        onSend={() => setInput("")}
-        canSend={input.trim().length > 0}
-        placeholder="Ask a question or describe what you need..."
-        maxWidth={9999}
-        density="relaxed"
-      />
-
-      <TradAtlasText
-        semanticFont={SF.textMdUppercase}
-        sx={{ color: color.type.muted, mt: "16px", mb: "12px" }}
-      >
-        Or start with
-      </TradAtlasText>
 
       <Box
         sx={{
@@ -1054,8 +1122,10 @@ export default function CorpSecCommandCenter() {
         gap: "24px",
       }}
     >
-      <HeroBanner appointmentHref={appointmentHref} />
-      <ChatSection />
+      <CommandCenterHero />
+      <AlertTiles appointmentHref={appointmentHref} />
+      <AiSummary />
+      <QuickStarts />
       <EntityPortfolio />
       <EntityStatusSummary />
       <AgentActivity />
@@ -1076,6 +1146,15 @@ export default function CorpSecCommandCenter() {
     </Box>
   );
 
+  if (showSideNav) {
+    return (
+      <>
+        <CorpSecSideNavLayout>{content}</CorpSecSideNavLayout>
+        <DemoControlsFab />
+      </>
+    );
+  }
+
   return (
     <Box
       sx={{
@@ -1087,49 +1166,18 @@ export default function CorpSecCommandCenter() {
     >
       <GlobalHeader currentApp="corpsec" />
 
-      {showSideNav ? (
-        <Box
-          sx={{
-            flex: 1,
-            display: "flex",
-            alignItems: "flex-start",
-            gap: "16px",
-            px: "16px",
-            py: "16px",
-          }}
-        >
-          <CommandCenterSideNav
-            workflows={SIDE_NAV_WORKFLOWS}
-            chats={SIDE_NAV_CHATS}
-            pastWorkflowsHref="/corpsec?view=past-workflows&nav=side"
-            allChatsHref="/corpsec?view=all-chats&nav=side"
-          />
-
-          <Box
-            sx={{
-              flex: 1,
-              minWidth: 0,
-              px: "16px",
-              py: "16px",
-            }}
-          >
-            {content}
-          </Box>
-        </Box>
-      ) : (
-        <Box
-          sx={{
-            flex: 1,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            px: "24px",
-            py: "32px",
-          }}
-        >
-          {content}
-        </Box>
-      )}
+      <Box
+        sx={{
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          px: "24px",
+          py: "32px",
+        }}
+      >
+        {content}
+      </Box>
 
       <DemoControlsFab />
     </Box>
